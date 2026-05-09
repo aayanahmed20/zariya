@@ -2,7 +2,7 @@
 
 # Zariya
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=500&size=22&duration=3000&pause=1000&color=58A6FF&center=true&vCenter=true&width=700&lines=Offline-First+AI+Platform;Urdu+%26+Low-Resource+Language+AI;Privacy+Focused+Intelligent+Systems;Building+Culturally+Aware+AI+Tools" />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=500&size=22&duration=3000&pause=1000&color=58A6FF&center=true&vCenter=true&width=700&lines=Offline-First+AI+Platform;Urdu+%26+Low-Resource+Language+AI;Privacy-Preserving+AI+Systems;Building+Culturally+Aware+Intelligent+Tools" />
 
 <br>
 
@@ -11,124 +11,58 @@
 </a>
 
 <a href="https://github.com/aayanahmed20">
-  <img src="https://img.shields.io/badge/Founder-Aayan%20Ahmed-0d1117?style=for-the-badge&logo=github&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Developer-Aayan%20Ahmed-0d1117?style=for-the-badge&logo=github&logoColor=white"/>
 </a>
 
 </div>
 
 ---
 
-## About Zariya
+## Overview
 
-- Offline-first AI assistant designed for low-resource languages  
-- Focused on Urdu language accessibility and inclusivity  
-- Runs fully on local devices without internet dependency  
-- Privacy-first architecture (no cloud processing)  
-- Built to explore culturally aware AI systems for education and communication  
+Zariya is an **offline-first AI assistant platform** designed to make intelligent language models accessible in **low-resource languages such as Urdu**.
 
----
+It runs fully on local devices without requiring internet connectivity, focusing on **privacy, accessibility, and inclusivity**.
 
-## Core Focus Areas
-
-- Artificial Intelligence (Local LLMs)  
-- Offline AI Systems  
-- Urdu & Low-Resource Language Technology  
-- Privacy-Preserving Computing  
-- Educational AI Tools  
+The project explores how AI systems can function independently of cloud infrastructure while supporting underserved linguistic communities.
 
 ---
 
-## System Design
+## Purpose
 
-- Local inference using lightweight LLMs  
-- Offline execution via optimized runtime engines  
-- Local memory storage (no external servers)  
-- Simple UI layer for accessibility  
-- Designed for low-resource environments  
+Zariya is built to explore:
 
----
-
-## Tech Stack
-
-<p align="center">
-
-<img src="https://img.shields.io/badge/Python-0d1117?style=for-the-badge&logo=python&logoColor=58A6FF" />
-<img src="https://img.shields.io/badge/llama.cpp-0d1117?style=for-the-badge&logo=meta&logoColor=58A6FF" />
-<img src="https://img.shields.io/badge/Streamlit-0d1117?style=for-the-badge&logo=streamlit&logoColor=58A6FF" />
-<img src="https://img.shields.io/badge/LLMs-0d1117?style=for-the-badge&logo=openai&logoColor=58A6FF" />
-
-</p>
+- Offline AI system design  
+- Urdu and low-resource language support  
+- Privacy-preserving AI architectures  
+- Edge-based (local) LLM inference  
+- Educational AI applications  
 
 ---
 
-## Features
+## Key Features
 
-### Offline AI Chat
-Runs completely offline after initial setup.
-
-### Urdu + English Support
-Handles bilingual interaction smoothly.
-
-### Privacy First
-All data stays on the local device.
-
-### Lightweight Design
-Optimized for low-resource machines.
+- Fully offline AI chat system  
+- Urdu + English bilingual support  
+- Local inference using quantized LLMs (GGUF)  
+- No cloud or API dependency  
+- Privacy-first architecture  
+- Lightweight system for low-resource devices  
+- Local memory storage for conversations  
 
 ---
 
-## Architecture
+## System Architecture
 
-<div align="center">
-
-User → UI Layer → Local Inference Engine → Quantized LLM → Response
-
-</div>
-
-- Fully offline execution pipeline  
-- No external API calls  
-- Self-contained AI system  
+User → Streamlit UI → Inference Engine (llama.cpp) → Local LLM → Response
 
 ---
 
-## Project Goals
+## Model Setup
 
-- Improve AI accessibility for Urdu-speaking users  
-- Explore offline-first AI systems  
-- Build culturally aware language tools  
-- Demonstrate local LLM deployment without cloud dependency  
+Zariya requires a local language model to run.
 
----
+### Option A (Recommended)
 
-## Future Improvements
-
-- Voice-based interaction (offline speech models)  
-- Fine-tuned Urdu LLM  
-- Educational tutor mode  
-- Mobile offline AI app  
-- Expanded regional language support  
-
----
-
-## Impact
-
-Zariya focuses on making AI:
-
-- More accessible  
-- More private  
-- More inclusive  
-- More locally relevant  
-
----
-
-## Repository
-
-- https://github.com/aayanahmed20/zariya  
-
----
-
-<div align="center">
-
-### building offline intelligence for everyone
-
-</div>
+1. Download a GGUF model (e.g., Mistral or LLaMA 3)
+2. Create a folder named:
