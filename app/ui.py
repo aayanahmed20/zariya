@@ -8,6 +8,7 @@ user_input = st.text_input("Ask something:")
 
 if user_input:
     response = chat(user_input)
-    st.write(response)
-
+    
+    st.write("🤖", response)
+    
     save_chat(user_input, response)
