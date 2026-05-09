@@ -1,1 +1,2 @@
-
+streamlit
+llama-cpp-python
