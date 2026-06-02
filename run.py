@@ -1,8 +1,3 @@
-"""
-Zariya – Launcher
-Run this file to start the app: python run.py
-"""
-
 import os
 import sys
 import subprocess
@@ -17,12 +12,12 @@ UI = ROOT / "app" / "ui.py"
 def check_model():
     model = MODELS_DIR / "model.gguf"
     if not model.exists() or model.stat().st_size < 1000:
-        print("\n⚠️  WARNING: No model found at models/model.gguf")
-        print("   The app will start but won't generate responses until a model is added.")
-        print("   See Settings → Model Status inside the app for setup instructions.\n")
+        print("\nWARNING: No model found at models/model.gguf")
+        print("The app will start but won't generate responses until a model is placed there.")
+        print("See Settings > Model inside the app for instructions.\n")
         return False
     size_gb = model.stat().st_size / (1024**3)
-    print(f"✅ Model found: model.gguf ({size_gb:.2f} GB)")
+    print(f"Model found: model.gguf ({size_gb:.2f} GB)")
     return True
 
 
@@ -35,8 +30,8 @@ def check_dependencies():
             missing.append(pkg)
 
     if missing:
-        print(f"\n⚠️  Missing packages: {', '.join(missing)}")
-        print("   Run: pip install streamlit llama-cpp-python\n")
+        print(f"\nMissing packages: {', '.join(missing)}")
+        print("Run: pip install streamlit llama-cpp-python\n")
 
     return len(missing) == 0
 
@@ -50,14 +45,14 @@ def ensure_dirs():
 
 
 def main():
-    print("\n🌙 Zariya — Offline AI Assistant")
-    print("=" * 42)
+    print("\nZariya — Offline AI Assistant")
+    print("=" * 40)
 
     ensure_dirs()
     check_dependencies()
     check_model()
 
-    print("🚀 Launching Zariya...\n")
+    print("Starting...\n")
 
     cmd = [
         sys.executable, "-m", "streamlit", "run",
@@ -75,7 +70,7 @@ def main():
     try:
         subprocess.run(cmd, cwd=str(ROOT))
     except KeyboardInterrupt:
-        print("\n\n👋 Zariya stopped. Khuda Hafiz!")
+        print("\nStopped.")
 
 
 if __name__ == "__main__":
