@@ -1,2 +1,14 @@
-streamlit
-llama-cpp-python
+# Zariya dependencies
+# Install: pip install -r requirements.txt
+
+# Core
+streamlit>=1.35.0
+
+# Local LLM inference
+# For CPU-only (works everywhere):
+llama-cpp-python>=0.2.80
+
+# For GPU acceleration (NVIDIA), comment the above and use:
+# CMAKE_ARGS="-DLLAMA_CUDA=on" pip install llama-cpp-python --force-reinstall
+# For Apple Silicon:
+# CMAKE_ARGS="-DLLAMA_METAL=on" pip install llama-cpp-python --force-reinstall
