@@ -1,8 +1,3 @@
-"""
-Zariya – Memory Manager
-Handles persistent chat history, session management, and search.
-"""
-
 from __future__ import annotations
 import json
 import uuid
@@ -16,16 +11,13 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def _load_all() -> list[dict]:
-    """Load all chat sessions from disk."""
     if not HISTORY_FILE.exists():
         return []
     try:
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-            # Support both old flat format and new sessions format
             if isinstance(data, list):
                 if data and "session_id" not in data[0]:
-                    # Old format — migrate to sessions
                     return [_migrate_old_format(data)]
                 return data
             return []
@@ -34,13 +26,11 @@ def _load_all() -> list[dict]:
 
 
 def _save_all(sessions: list[dict]) -> None:
-    """Persist all sessions to disk."""
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(sessions, f, ensure_ascii=False, indent=2)
 
 
 def _migrate_old_format(old_data: list[dict]) -> dict:
-    """Convert legacy flat chat list into a session object."""
     messages = []
     for entry in old_data:
         messages.append({"role": "user", "content": entry.get("user", "")})
@@ -55,7 +45,6 @@ def _migrate_old_format(old_data: list[dict]) -> dict:
 
 
 class MemoryManager:
-    """Manages chat sessions and message history."""
 
     def __init__(self):
         self._sessions: list[dict] = _load_all()
@@ -67,7 +56,6 @@ class MemoryManager:
         return None
 
     def new_session(self, title: Optional[str] = None) -> str:
-        """Create a new chat session and return its ID."""
         session_id = str(uuid.uuid4())
         session = {
             "session_id": session_id,
@@ -81,7 +69,6 @@ class MemoryManager:
         return session_id
 
     def add_message(self, session_id: str, role: str, content: str) -> None:
-        """Append a message to a session."""
         session = self._find_session(session_id)
         if session is None:
             raise ValueError(f"Session {session_id} not found")
@@ -93,7 +80,6 @@ class MemoryManager:
         })
         session["updated_at"] = datetime.now().isoformat()
 
-        # Auto-title from first user message
         if (
             role == "user"
             and session["title"] in ("New conversation",)
@@ -104,14 +90,12 @@ class MemoryManager:
         _save_all(self._sessions)
 
     def get_messages(self, session_id: str) -> list[dict]:
-        """Return all messages for a session (role + content only)."""
         session = self._find_session(session_id)
         if session is None:
             return []
         return [{"role": m["role"], "content": m["content"]} for m in session["messages"]]
 
     def get_sessions(self) -> list[dict]:
-        """Return sessions sorted newest first."""
         return sorted(
             self._sessions,
             key=lambda s: s.get("updated_at", ""),
@@ -119,7 +103,6 @@ class MemoryManager:
         )
 
     def delete_session(self, session_id: str) -> bool:
-        """Delete a session by ID."""
         before = len(self._sessions)
         self._sessions = [s for s in self._sessions if s["session_id"] != session_id]
         if len(self._sessions) < before:
@@ -128,7 +111,6 @@ class MemoryManager:
         return False
 
     def clear_all(self) -> None:
-        """Delete all sessions."""
         self._sessions = []
         _save_all(self._sessions)
 
@@ -141,7 +123,6 @@ class MemoryManager:
         return False
 
     def search(self, query: str) -> list[dict]:
-        """Full-text search across all sessions."""
         q = query.lower()
         results = []
         for session in self._sessions:
@@ -157,7 +138,6 @@ class MemoryManager:
         return results
 
     def export_session(self, session_id: str) -> Optional[str]:
-        """Export a session as formatted text."""
         session = self._find_session(session_id)
         if not session:
             return None
@@ -177,7 +157,6 @@ class MemoryManager:
         }
 
 
-# Module-level singleton
 _manager: Optional[MemoryManager] = None
 
 
