@@ -1,8 +1,3 @@
-"""
-Zariya – Inference Engine
-Handles local LLM loading, prompt formatting, and streaming generation.
-"""
-
 from __future__ import annotations
 import os
 from pathlib import Path
@@ -11,33 +6,26 @@ from typing import Generator, Optional
 MODEL_DIR = Path(__file__).parent.parent / "models"
 DEFAULT_MODEL = MODEL_DIR / "model.gguf"
 
-SYSTEM_PROMPT = """You are Zariya (ذریعہ), an intelligent offline AI assistant designed for Urdu-speaking and South Asian communities.
+SYSTEM_PROMPT = """You are Zariya, an offline AI assistant built for Urdu-speaking and South Asian users.
 
-You are:
-- Helpful, warm, and culturally aware
-- Fluent in both Urdu (Roman and Nastaliq) and English
-- Educational, clear, and concise
-- Capable of switching languages based on the user's preference
-
-When the user writes in Urdu (Roman script or Nastaliq), respond in Urdu.
-When the user writes in English, respond in English.
-When mixing languages (Hinglish/Urdu-English), match their style.
-
-You run fully offline — never mention internet, APIs, or cloud services.
-Keep responses helpful, accurate, and appropriately brief."""
+You are helpful, culturally aware, and fluent in both Urdu (Roman and Nastaliq) and English.
+When the user writes in Urdu, respond in Urdu. When they write in English, respond in English.
+Match their language style — including mixed Urdu-English if that's what they use.
+Keep responses clear, accurate, and reasonably brief.
+You run fully offline."""
 
 
 class InferenceEngine:
-    """Manages the local LLM and handles inference."""
 
     def __init__(self, model_path: Optional[Path] = None):
         self._llm = None
         self._model_path = model_path or DEFAULT_MODEL
         self._loaded = False
         self._error: Optional[str] = None
+        self._max_tokens = 512
+        self._temperature = 0.7
 
     def _try_load(self) -> bool:
-        """Lazy-load the model on first use."""
         if self._loaded:
             return True
         if self._error:
@@ -45,12 +33,12 @@ class InferenceEngine:
 
         if not self._model_path.exists():
             self._error = (
-                f"Model file not found at `{self._model_path}`.\n\n"
-                "**To set up Zariya:**\n"
-                "1. Download a GGUF model (e.g. Mistral 7B, LLaMA 3 8B)\n"
-                "2. Place it in the `models/` folder\n"
+                f"Model not found at `{self._model_path}`.\n\n"
+                "**Setup:**\n"
+                "1. Download a GGUF model (Mistral 7B, LLaMA 3 8B, etc.)\n"
+                "2. Put it in the `models/` folder\n"
                 "3. Rename it to `model.gguf`\n\n"
-                "Recommended: [TheBloke on HuggingFace](https://huggingface.co/TheBloke)"
+                "Download from: [TheBloke on HuggingFace](https://huggingface.co/TheBloke)"
             )
             return False
 
@@ -60,14 +48,14 @@ class InferenceEngine:
                 model_path=str(self._model_path),
                 n_ctx=4096,
                 n_threads=os.cpu_count() or 4,
-                n_gpu_layers=-1,  # auto GPU offload if available
+                n_gpu_layers=-1,
                 verbose=False,
             )
             self._loaded = True
             return True
         except ImportError:
             self._error = (
-                "`llama-cpp-python` is not installed.\n\n"
+                "`llama-cpp-python` not installed.\n\n"
                 "Run: `pip install llama-cpp-python`"
             )
             return False
@@ -85,9 +73,8 @@ class InferenceEngine:
         return self._error
 
     def build_prompt(self, messages: list[dict]) -> str:
-        """Build a chat prompt from message history."""
         prompt = SYSTEM_PROMPT.strip() + "\n\n"
-        for msg in messages[-20:]:  # keep last 20 turns for context
+        for msg in messages[-20:]:
             role = msg["role"]
             content = msg["content"].strip()
             if role == "user":
@@ -98,9 +85,8 @@ class InferenceEngine:
         return prompt
 
     def chat(self, messages: list[dict]) -> str:
-        """Synchronous chat — returns complete response."""
         if not self._try_load():
-            return f"⚠️ {self._error}"
+            return f"Error: {self._error}"
 
         prompt = self.build_prompt(messages)
         try:
@@ -115,12 +101,11 @@ class InferenceEngine:
             )
             return output["choices"][0]["text"].strip()
         except Exception as e:
-            return f"⚠️ Generation error: {e}"
+            return f"Generation error: {e}"
 
     def stream(self, messages: list[dict]) -> Generator[str, None, None]:
-        """Streaming chat — yields tokens as they generate."""
         if not self._try_load():
-            yield f"⚠️ {self._error}"
+            yield f"Error: {self._error}"
             return
 
         prompt = self.build_prompt(messages)
@@ -139,7 +124,7 @@ class InferenceEngine:
                 if token:
                     yield token
         except Exception as e:
-            yield f"\n⚠️ Streaming error: {e}"
+            yield f"\nStreaming error: {e}"
 
     def stream_with_settings(
         self,
@@ -147,9 +132,8 @@ class InferenceEngine:
         max_tokens: int = 512,
         temperature: float = 0.7,
     ) -> Generator[str, None, None]:
-        """Streaming with per-call settings override."""
         if not self._try_load():
-            yield f"⚠️ {self._error}"
+            yield f"Error: {self._error}"
             return
         prompt = self.build_prompt(messages)
         try:
@@ -167,10 +151,9 @@ class InferenceEngine:
                 if token:
                     yield token
         except Exception as e:
-            yield f"\n⚠️ Streaming error: {e}"
+            yield f"\nStreaming error: {e}"
 
     def get_model_info(self) -> dict:
-        """Return metadata about the loaded model."""
         if not self._try_load():
             return {"status": "error", "error": self._error}
         path = self._model_path
@@ -183,7 +166,6 @@ class InferenceEngine:
         }
 
 
-# Module-level singleton
 _engine: Optional[InferenceEngine] = None
 
 
