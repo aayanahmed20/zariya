@@ -1,0 +1,8 @@
+Place your GGUF model file here and rename it to model.gguf
+
+Recommended models:
+- Mistral-7B-Instruct-v0.2.Q4_K_M.gguf  (~4.4 GB)
+- Meta-Llama-3-8B-Instruct.Q4_K_M.gguf  (~4.9 GB)
+- phi-3-mini-4k-instruct.Q4_K_M.gguf    (~2.2 GB, faster)
+
+Download from: https://huggingface.co/TheBloke
