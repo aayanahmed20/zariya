@@ -141,6 +141,34 @@ class InferenceEngine:
         except Exception as e:
             yield f"\n⚠️ Streaming error: {e}"
 
+    def stream_with_settings(
+        self,
+        messages: list[dict],
+        max_tokens: int = 512,
+        temperature: float = 0.7,
+    ) -> Generator[str, None, None]:
+        """Streaming with per-call settings override."""
+        if not self._try_load():
+            yield f"⚠️ {self._error}"
+            return
+        prompt = self.build_prompt(messages)
+        try:
+            for chunk in self._llm(
+                prompt,
+                max_tokens=max_tokens,
+                stop=["User:", "\nUser", "Human:"],
+                temperature=temperature,
+                top_p=0.9,
+                repeat_penalty=1.1,
+                stream=True,
+                echo=False,
+            ):
+                token = chunk["choices"][0]["text"]
+                if token:
+                    yield token
+        except Exception as e:
+            yield f"\n⚠️ Streaming error: {e}"
+
     def get_model_info(self) -> dict:
         """Return metadata about the loaded model."""
         if not self._try_load():
