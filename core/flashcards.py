@@ -1,40 +1,27 @@
-"""
-Zariya – Flashcard Generator
-Uses the local LLM to create study flashcards from conversation content or topics.
-"""
 from __future__ import annotations
 import json
 import re
 
 
 def generate_flashcards(topic: str, engine, count: int = 8) -> list[dict]:
-    """
-    Generate flashcards for a topic.
-    Returns list of {"front": ..., "back": ...} dicts.
-    """
     messages = [{
         "role": "user",
         "content": (
             f"Create exactly {count} study flashcards about: {topic}\n\n"
             "Return ONLY a JSON array, no explanation. Format:\n"
             '[{"front": "Question?", "back": "Answer."}, ...]\n\n'
-            "Make questions clear and answers concise (1-3 sentences)."
+            "Questions should be clear, answers 1-3 sentences."
         )
     }]
 
     raw = engine.chat(messages)
-
-    # Try to extract JSON from the response
     cards = _parse_json_cards(raw)
     if cards:
         return cards[:count]
-
-    # Fallback: parse line-based format
     return _parse_fallback(raw, count)
 
 
 def generate_flashcards_from_chat(messages: list[dict], engine) -> list[dict]:
-    """Generate flashcards from a conversation's content."""
     transcript = "\n".join(
         f"{'Q' if m['role'] == 'user' else 'A'}: {m['content'][:200]}"
         for m in messages[-20:]
@@ -54,8 +41,6 @@ def generate_flashcards_from_chat(messages: list[dict], engine) -> list[dict]:
 
 
 def _parse_json_cards(text: str) -> list[dict]:
-    """Extract and parse JSON array from LLM output."""
-    # Find JSON array in the response
     match = re.search(r'\[[\s\S]*\]', text)
     if not match:
         return []
@@ -76,7 +61,6 @@ def _parse_json_cards(text: str) -> list[dict]:
 
 
 def _parse_fallback(text: str, count: int) -> list[dict]:
-    """Parse Q/A style text as fallback."""
     cards = []
     lines = [l.strip() for l in text.split("\n") if l.strip()]
     i = 0
