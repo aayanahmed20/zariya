@@ -1,14 +1,9 @@
-"""
-Zariya – Text-to-Speech Engine
-Offline TTS using pyttsx3 (no internet required).
-"""
 from __future__ import annotations
 from typing import Optional
 import threading
 
 
 class TTSEngine:
-    """Offline text-to-speech using pyttsx3."""
 
     def __init__(self):
         self._engine = None
@@ -23,10 +18,8 @@ class TTSEngine:
             self._engine = pyttsx3.init()
             self._engine.setProperty("rate", 160)
             self._engine.setProperty("volume", 1.0)
-            # Try to find a good voice
             voices = self._engine.getProperty("voices")
             if voices:
-                # Prefer a female voice if available
                 for v in voices:
                     if "female" in v.name.lower() or "zira" in v.name.lower():
                         self._engine.setProperty("voice", v.id)
@@ -40,11 +33,10 @@ class TTSEngine:
         return self._available
 
     def speak(self, text: str) -> bool:
-        """Speak text in a background thread. Returns True if started."""
         if not self._available or not text.strip():
             return False
-        # Strip markdown for speech
         clean = self._strip_markdown(text)
+
         def _run():
             with self._lock:
                 self._speaking = True
@@ -55,6 +47,7 @@ class TTSEngine:
                     pass
                 finally:
                     self._speaking = False
+
         t = threading.Thread(target=_run, daemon=True)
         t.start()
         return True
