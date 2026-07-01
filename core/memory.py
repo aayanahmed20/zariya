@@ -21,7 +21,7 @@ def _load_all() -> list[dict]:
                     return [_migrate_old_format(data)]
                 return data
             return []
-    except (json.JSONDecodeError, Exception):
+    except Exception:
         return []
 
 
@@ -94,6 +94,20 @@ class MemoryManager:
         if session is None:
             return []
         return [{"role": m["role"], "content": m["content"]} for m in session["messages"]]
+
+    def remove_last_message(self, session_id: str, role: Optional[str] = None) -> bool:
+        """Removes the most recent message in a session. If `role` is given,
+        only removes it when the last message matches that role - used by
+        Regenerate so it never accidentally drops a user message."""
+        session = self._find_session(session_id)
+        if not session or not session["messages"]:
+            return False
+        if role is not None and session["messages"][-1]["role"] != role:
+            return False
+        session["messages"].pop()
+        session["updated_at"] = datetime.now().isoformat()
+        _save_all(self._sessions)
+        return True
 
     def get_sessions(self) -> list[dict]:
         return sorted(

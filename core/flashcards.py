@@ -55,7 +55,7 @@ def _parse_json_cards(text: str) -> list[dict]:
                     if front and back:
                         result.append({"front": str(front), "back": str(back)})
             return result
-    except (json.JSONDecodeError, Exception):
+    except Exception:
         pass
     return []
 

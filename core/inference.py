@@ -82,7 +82,18 @@ class InferenceEngine:
         self._try_load()
         return self._error
 
+    def _build_chat_messages(self, messages: list[dict]) -> list[dict]:
+        chat = [{"role": "system", "content": SYSTEM_PROMPT.strip()}]
+        for msg in messages[-20:]:
+            role = msg["role"]
+            if role not in ("user", "assistant"):
+                continue
+            chat.append({"role": role, "content": msg["content"].strip()})
+        return chat
+
     def build_prompt(self, messages: list[dict]) -> str:
+        """Legacy raw-text prompt format, used only as a fallback for GGUF
+        files that don't carry an embedded chat template."""
         prompt = SYSTEM_PROMPT.strip() + "\n\n"
         for msg in messages[-20:]:
             role = msg["role"]
@@ -97,6 +108,18 @@ class InferenceEngine:
     def chat(self, messages: list[dict]) -> str:
         if not self._try_load():
             return f"Error: {self._error}"
+
+        try:
+            output = self._llm.create_chat_completion(
+                messages=self._build_chat_messages(messages),
+                max_tokens=512,
+                temperature=0.7,
+                top_p=0.9,
+                repeat_penalty=1.1,
+            )
+            return output["choices"][0]["message"]["content"].strip()
+        except Exception:
+            pass  # model has no usable chat template - fall back below
 
         prompt = self.build_prompt(messages)
         try:
@@ -114,27 +137,7 @@ class InferenceEngine:
             return f"Generation error: {e}"
 
     def stream(self, messages: list[dict]) -> Generator[str, None, None]:
-        if not self._try_load():
-            yield f"Error: {self._error}"
-            return
-
-        prompt = self.build_prompt(messages)
-        try:
-            for chunk in self._llm(
-                prompt,
-                max_tokens=512,
-                stop=["User:", "\nUser", "Human:"],
-                temperature=0.7,
-                top_p=0.9,
-                repeat_penalty=1.1,
-                stream=True,
-                echo=False,
-            ):
-                token = chunk["choices"][0]["text"]
-                if token:
-                    yield token
-        except Exception as e:
-            yield f"\nStreaming error: {e}"
+        yield from self.stream_with_settings(messages)
 
     def stream_with_settings(
         self,
@@ -145,6 +148,24 @@ class InferenceEngine:
         if not self._try_load():
             yield f"Error: {self._error}"
             return
+
+        try:
+            for chunk in self._llm.create_chat_completion(
+                messages=self._build_chat_messages(messages),
+                max_tokens=max_tokens,
+                temperature=temperature,
+                top_p=0.9,
+                repeat_penalty=1.1,
+                stream=True,
+            ):
+                delta = chunk["choices"][0].get("delta", {})
+                token = delta.get("content")
+                if token:
+                    yield token
+            return
+        except Exception:
+            pass  # model has no usable chat template - fall back below
+
         prompt = self.build_prompt(messages)
         try:
             for chunk in self._llm(

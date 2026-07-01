@@ -87,11 +87,7 @@ def render_chat(engine, memory, tts):
                 show_copy = st.button("Copy", key="copy_last")
             with b2:
                 if st.button("Regenerate", key="regen_last"):
-                    sess = memory._find_session(st.session_state.session_id)
-                    if sess and sess["messages"] and sess["messages"][-1]["role"] == "assistant":
-                        sess["messages"].pop()
-                        from core.memory import _save_all
-                        _save_all(memory._sessions)
+                    memory.remove_last_message(st.session_state.session_id, role="assistant")
                     st.session_state.regen_trigger = True
                     st.rerun()
             with b3:
