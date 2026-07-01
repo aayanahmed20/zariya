@@ -63,6 +63,16 @@ class InferenceEngine:
             self._error = f"Failed to load model: {e}"
             return False
 
+    def reload(self, model_path: Optional[Path] = None) -> bool:
+        """Clears cached load state so a newly placed/downloaded model file
+        gets picked up without restarting the app."""
+        if model_path is not None:
+            self._model_path = model_path
+        self._llm = None
+        self._loaded = False
+        self._error = None
+        return self._try_load()
+
     @property
     def is_ready(self) -> bool:
         return self._try_load()
