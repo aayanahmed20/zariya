@@ -423,7 +423,7 @@ if page == "chat":
         st.session_state.regen_trigger = False
         messages = memory.get_messages(st.session_state.session_id)
         if ready and messages:
-            with st.chat_message("assistant", avatar="Z"):
+            with st.chat_message("assistant", avatar="assistant"):
                 placeholder = st.empty()
                 full = ""
                 for tok in engine.stream_with_settings(messages,
@@ -498,7 +498,7 @@ if page == "chat":
             msgs = memory.get_messages(st.session_state.session_id)
 
             if ready:
-                with st.chat_message("assistant", avatar="Z"):
+                with st.chat_message("assistant", avatar="assistant"):
                     placeholder = st.empty()
                     placeholder.markdown(
                         '<div class="bubble bot thinking"><span></span><span></span><span></span></div>',
