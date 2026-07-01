@@ -8,6 +8,7 @@ sys.path.insert(0, str(ROOT))
 import streamlit as st
 from core.inference import get_engine, stream
 from core.memory import get_memory
+from core.notes import get_notes
 from core.tts import get_tts
 from core.summarizer import summarize_conversation, extract_key_points, generate_title
 from core.flashcards import generate_flashcards, generate_flashcards_from_chat
@@ -215,6 +216,7 @@ def render_bubble(content: str, role: str, timestamp: str = ""):
 
 memory  = get_memory()
 engine  = get_engine()
+notes   = get_notes()
 tts     = get_tts()
 
 def _init_state():
@@ -229,7 +231,6 @@ def _init_state():
         "fc_cards": [],
         "fc_flipped": set(),
         "fc_known": set(),
-        "notes": [],
         "editing_note": None,
         "regen_trigger": None,
     }
@@ -266,8 +267,13 @@ with st.sidebar:
         ("settings",   "Settings"),
     ]
     for pid, label in pages:
-        active = "active" if st.session_state.page == pid else ""
-        if st.button(label, key=f"nav_{pid}", use_container_width=True):
+        is_active = st.session_state.page == pid
+        if st.button(
+            label,
+            key=f"nav_{pid}",
+            use_container_width=True,
+            type="primary" if is_active else "secondary",
+        ):
             st.session_state.page = pid
             st.rerun()
 
@@ -392,14 +398,12 @@ if page == "chat":
         if last_bot:
             b1, b2, b3, b4, _ = st.columns([1.5, 1.5, 1.5, 1.5, 5])
             with b1:
-                st.button("Copy", key="copy_last", on_click=lambda: None)
+                show_copy = st.button("Copy", key="copy_last")
             with b2:
                 if st.button("Regenerate", key="regen_last"):
                     sess = memory._find_session(st.session_state.session_id)
-                    if sess:
-                        sess["messages"] = [m for m in sess["messages"] if not (
-                            m == sess["messages"][-1] and m["role"] == "assistant"
-                        )]
+                    if sess and sess["messages"] and sess["messages"][-1]["role"] == "assistant":
+                        sess["messages"].pop()
                         from core.memory import _save_all
                         _save_all(memory._sessions)
                     st.session_state.regen_trigger = True
@@ -412,6 +416,8 @@ if page == "chat":
                 if st.button("Auto-title", key="pin_sess"):
                     st.session_state.pending_input = "__AUTOTITLE__"
                     st.rerun()
+            if show_copy:
+                st.code(last_bot["content"], language=None, wrap_lines=True)
 
     if st.session_state.get("regen_trigger"):
         st.session_state.regen_trigger = False
@@ -628,46 +634,37 @@ elif page == "flashcards":
 
 
 elif page == "notepad":
-    import uuid as _uuid
-    from datetime import datetime as _dt
-
     st.markdown("""
     <div class="page-header">
       <div class="page-logo">NP</div>
       <div>
         <div class="page-title">Notepad</div>
-        <div class="page-sub">Quick offline notes</div>
+        <div class="page-sub">Quick offline notes, saved to disk</div>
       </div>
     </div>
     """, unsafe_allow_html=True)
 
-    notes = st.session_state.notes
-    editing = st.session_state.editing_note
+    all_notes = notes.get_all()
+    editing   = st.session_state.editing_note
 
     col_list, col_edit = st.columns([2, 3])
 
     with col_list:
         if st.button("New Note", use_container_width=True, type="primary"):
-            new_note = {
-                "id": str(_uuid.uuid4()),
-                "title": "Untitled",
-                "body": "",
-                "created_at": _dt.now().isoformat(),
-            }
-            st.session_state.notes.append(new_note)
+            new_note = notes.create()
             st.session_state.editing_note = new_note["id"]
             st.rerun()
 
         st.markdown("<div style='height:.5rem'></div>", unsafe_allow_html=True)
 
-        if not notes:
+        if not all_notes:
             st.markdown("<div style='color:var(--muted); font-size:13px; padding:1rem 0;'>No notes yet.</div>", unsafe_allow_html=True)
 
-        for note in reversed(notes):
-            nid    = note["id"]
-            active = "border-color:var(--accent);" if nid == editing else ""
+        for note in all_notes:
+            nid     = note["id"]
+            active  = "border-color:var(--accent);" if nid == editing else ""
             preview = note["body"][:60].replace("\n", " ") or "Empty note"
-            date    = note["created_at"][:10]
+            date    = note.get("updated_at", note.get("created_at", ""))[:10]
 
             st.markdown(f"""
             <div class="note-card" style="{active}">
@@ -684,14 +681,14 @@ elif page == "notepad":
                     st.rerun()
             with nb2:
                 if st.button("Del", key=f"del_note_{nid}", use_container_width=True):
-                    st.session_state.notes = [n for n in notes if n["id"] != nid]
+                    notes.delete(nid)
                     if editing == nid:
                         st.session_state.editing_note = None
                     st.rerun()
 
     with col_edit:
         if editing:
-            note = next((n for n in notes if n["id"] == editing), None)
+            note = notes.get(editing)
             if note:
                 new_title = st.text_input("Title", value=note["title"], key=f"nt_{editing}")
                 new_body  = st.text_area("Content", value=note["body"], height=380, key=f"nb_{editing}")
@@ -699,12 +696,10 @@ elif page == "notepad":
                 ec1, ec2, ec3 = st.columns(3)
                 with ec1:
                     if st.button("Save", use_container_width=True, type="primary"):
-                        note["title"] = new_title
-                        note["body"]  = new_body
+                        notes.update(editing, new_title, new_body)
                         st.success("Saved.")
                 with ec2:
-                    if st.button("Copy", use_container_width=True):
-                        st.code(new_body)
+                    show_copy = st.button("Copy", use_container_width=True)
                 with ec3:
                     if st.button("Improve with AI", use_container_width=True):
                         if engine.get_model_info()["status"] == "loaded" and new_body.strip():
@@ -713,10 +708,15 @@ elif page == "notepad":
                                     "role": "user",
                                     "content": f"Improve and expand this note, keeping the original meaning:\n\n{new_body}"
                                 }])
-                            note["body"] = ai_resp
+                            notes.update(editing, new_title, ai_resp)
                             st.rerun()
                         else:
                             st.warning("Model not loaded or note is empty.")
+                if show_copy:
+                    st.code(new_body, language=None, wrap_lines=True)
+            else:
+                st.session_state.editing_note = None
+                st.rerun()
         else:
             st.markdown("""
             <div style="display:flex; align-items:center; justify-content:center; height:300px; color:var(--muted); font-size:14px;">

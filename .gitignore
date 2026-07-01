@@ -221,3 +221,4 @@ __pycache__/
 *.pyc
 models/*.gguf
 data/chat_history.json
+data/notes.json
