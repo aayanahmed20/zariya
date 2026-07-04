@@ -878,63 +878,1056 @@ async function callClaude(messages, signal){
 
 /* ============ OFFLINE FALLBACK ASSISTANT ============ */
 const dict = {
-  "hello":"سلام", "hi":"سلام", "hey":"ارے", "thank you":"شکریہ", "thanks":"شکریہ", "good morning":"صبح بخیر",
-  "good night":"شب بخیر", "good evening":"شام بخیر", "how are you":"آپ کیسے ہیں", "i am fine":"میں ٹھیک ہوں",
-  "yes":"جی ہاں", "no":"نہیں", "maybe":"شاید", "please":"براہ مہربانی", "sorry":"معذرت", "welcome":"خوش آمدید",
-  "friend":"دوست", "family":"خاندان", "mother":"ماں", "father":"باپ", "brother":"بھائی", "sister":"بہن",
-  "book":"کتاب", "pen":"قلم", "school":"سکول", "teacher":"استاد", "student":"طالب علم", "work":"کام",
-  "water":"پانی", "food":"کھانا", "bread":"روٹی", "milk":"دودھ", "tea":"چائے", "fruit":"پھل",
-  "love":"محبت", "happiness":"خوشی", "sadness":"غم", "peace":"امن", "hope":"امید", "dream":"خواب",
-  "house":"گھر", "city":"شہر", "country":"ملک", "world":"دنیا", "road":"سڑک", "market":"بازار",
-  "today":"آج", "tomorrow":"کل", "yesterday":"گزشتہ کل", "now":"ابھی", "morning":"صبح", "night":"رات",
-  "money":"پیسے", "time":"وقت", "life":"زندگی", "health":"صحت", "beautiful":"خوبصورت", "good":"اچھا", "bad":"برا",
-  "سلام":"hello", "شکریہ":"thank you", "دوست":"friend", "کتاب":"book", "پانی":"water", "کھانا":"food",
-  "محبت":"love", "گھر":"house", "خوشی":"happiness", "زندگی":"life", "استاد":"teacher", "طالب علم":"student",
-  "الحمدللہ":"praise be to God (Alhamdulillah)", "ان شاء اللہ":"God willing (Insha'Allah)", "ماشاءاللہ":"as God has willed (Masha'Allah)",
-  "جزاک اللہ":"may God reward you (JazakAllah)"
+  "hello": "سلام",
+  "hi": "سلام",
+  "hey": "ارے",
+  "thank you": "شکریہ",
+  "thanks": "شکریہ",
+  "good morning": "صبح بخیر",
+  "good night": "شب بخیر",
+  "good evening": "شام بخیر",
+  "how are you": "آپ کیسے ہیں",
+  "i am fine": "میں ٹھیک ہوں",
+  "yes": "جی ہاں",
+  "no": "نہیں",
+  "maybe": "شاید",
+  "please": "براہ مہربانی",
+  "sorry": "معذرت",
+  "welcome": "خوش آمدید",
+  "goodbye": "خدا حافظ",
+  "see you": "پھر ملیں گے",
+  "congratulations": "مبارک ہو",
+  "excuse me": "معاف کیجیے گا",
+  "friend": "دوست",
+  "family": "خاندان",
+  "mother": "ماں",
+  "father": "باپ",
+  "brother": "بھائی",
+  "sister": "بہن",
+  "son": "بیٹا",
+  "daughter": "بیٹی",
+  "husband": "شوہر",
+  "wife": "بیوی",
+  "grandfather": "دادا",
+  "grandmother": "دادی",
+  "uncle": "چچا",
+  "aunt": "خالہ",
+  "child": "بچہ",
+  "baby": "بچہ",
+  "book": "کتاب",
+  "pen": "قلم",
+  "school": "سکول",
+  "teacher": "استاد",
+  "student": "طالب علم",
+  "work": "کام",
+  "house": "گھر",
+  "city": "شہر",
+  "country": "ملک",
+  "world": "دنیا",
+  "road": "سڑک",
+  "market": "بازار",
+  "car": "گاڑی",
+  "door": "دروازہ",
+  "window": "کھڑکی",
+  "chair": "کرسی",
+  "table": "میز",
+  "key": "چابی",
+  "phone": "فون",
+  "computer": "کمپیوٹر",
+  "money": "پیسے",
+  "clothes": "کپڑے",
+  "shoes": "جوتے",
+  "water": "پانی",
+  "food": "کھانا",
+  "bread": "روٹی",
+  "milk": "دودھ",
+  "tea": "چائے",
+  "fruit": "پھل",
+  "rice": "چاول",
+  "sugar": "چینی",
+  "salt": "نمک",
+  "meat": "گوشت",
+  "vegetable": "سبزی",
+  "egg": "انڈا",
+  "love": "محبت",
+  "happiness": "خوشی",
+  "sadness": "غم",
+  "peace": "امن",
+  "hope": "امید",
+  "dream": "خواب",
+  "fear": "خوف",
+  "anger": "غصہ",
+  "patience": "صبر",
+  "truth": "سچ",
+  "lie": "جھوٹ",
+  "respect": "عزت",
+  "trust": "بھروسہ",
+  "courage": "ہمت",
+  "wisdom": "عقل",
+  "today": "آج",
+  "tomorrow": "کل",
+  "yesterday": "گزشتہ کل",
+  "now": "ابھی",
+  "morning": "صبح",
+  "night": "رات",
+  "week": "ہفتہ",
+  "month": "مہینہ",
+  "year": "سال",
+  "hour": "گھنٹہ",
+  "minute": "منٹ",
+  "sun": "سورج",
+  "moon": "چاند",
+  "star": "ستارہ",
+  "sky": "آسمان",
+  "earth": "زمین",
+  "fire": "آگ",
+  "wind": "ہوا",
+  "rain": "بارش",
+  "tree": "درخت",
+  "flower": "پھول",
+  "mountain": "پہاڑ",
+  "river": "دریا",
+  "sea": "سمندر",
+  "animal": "جانور",
+  "bird": "پرندہ",
+  "dog": "کتا",
+  "cat": "بلی",
+  "life": "زندگی",
+  "health": "صحت",
+  "beautiful": "خوبصورت",
+  "good": "اچھا",
+  "bad": "برا",
+  "big": "بڑا",
+  "small": "چھوٹا",
+  "fast": "تیز",
+  "slow": "آہستہ",
+  "hot": "گرم",
+  "cold": "ٹھنڈا",
+  "new": "نیا",
+  "old": "پرانا",
+  "easy": "آسان",
+  "difficult": "مشکل",
+  "strong": "مضبوط",
+  "weak": "کمزور",
+  "rich": "امیر",
+  "poor": "غریب",
+  "red": "سرخ",
+  "blue": "نیلا",
+  "green": "سبز",
+  "yellow": "پیلا",
+  "black": "کالا",
+  "white": "سفید",
+  "one": "ایک",
+  "two": "دو",
+  "three": "تین",
+  "four": "چار",
+  "five": "پانچ",
+  "six": "چھ",
+  "seven": "سات",
+  "eight": "آٹھ",
+  "nine": "نو",
+  "ten": "دس",
+  "hundred": "سو",
+  "thousand": "ہزار",
+  "monday": "پیر",
+  "tuesday": "منگل",
+  "wednesday": "بدھ",
+  "thursday": "جمعرات",
+  "friday": "جمعہ",
+  "saturday": "ہفتہ",
+  "sunday": "اتوار",
+  "eat": "کھانا",
+  "drink": "پینا",
+  "sleep": "سونا",
+  "walk": "چلنا",
+  "run": "دوڑنا",
+  "speak": "بولنا",
+  "listen": "سننا",
+  "read": "پڑھنا",
+  "write": "لکھنا",
+  "see": "دیکھنا",
+  "go": "جانا",
+  "come": "آنا",
+  "give": "دینا",
+  "take": "لینا",
+  "understand": "سمجھنا",
+  "help": "مدد",
+  "سلام": "hi",
+  "شکریہ": "thanks",
+  "دوست": "friend",
+  "کتاب": "book",
+  "پانی": "water",
+  "کھانا": "eat",
+  "محبت": "love",
+  "گھر": "house",
+  "خوشی": "happiness",
+  "زندگی": "life",
+  "استاد": "teacher",
+  "طالب علم": "student",
+  "ماں": "mother",
+  "باپ": "father",
+  "بھائی": "brother",
+  "بہن": "sister",
+  "صبح بخیر": "good morning",
+  "شب بخیر": "good night",
+  "خدا حافظ": "goodbye",
+  "الحمدللہ": "praise be to God (Alhamdulillah)",
+  "ان شاء اللہ": "God willing (Insha'Allah)",
+  "ماشاءاللہ": "as God has willed (Masha'Allah)",
+  "جزاک اللہ": "may God reward you (JazakAllah)"
 };
 
 const kb = [
-  { k:["who are you","what are you","your name"], a:"I'm **Zariya** (ذریعہ — \"channel\" or \"medium\"), a bilingual Urdu/English assistant. Right now I'm running fully offline in your browser, using a small built-in knowledge base rather than a full language model. Connect a Claude API key in Settings for open-ended answers." },
-  { k:["what can you do","help me","features"], a:"Offline, I can: do arithmetic and unit conversions, translate common English/Urdu words, answer a set of general-knowledge questions, share small code snippets, and give quick study tips. I can also summarize this chat, pull out key points, and turn any conversation or note into flashcards using the tools bar above the message box." },
-  { k:["capital of pakistan"], a:"Islamabad is the capital of Pakistan." },
-  { k:["capital of france"], a:"Paris is the capital of France." },
-  { k:["capital of japan"], a:"Tokyo is the capital of Japan." },
-  { k:["capital of uk","capital of united kingdom","capital of england"], a:"London is the capital of the United Kingdom." },
-  { k:["capital of usa","capital of united states","capital of america"], a:"Washington, D.C. is the capital of the United States." },
-  { k:["capital of india"], a:"New Delhi is the capital of India." },
-  { k:["capital of china"], a:"Beijing is the capital of China." },
-  { k:["largest ocean"], a:"The Pacific Ocean is the largest and deepest ocean on Earth." },
-  { k:["largest planet"], a:"Jupiter is the largest planet in our solar system." },
-  { k:["smallest planet"], a:"Mercury is the smallest planet in our solar system." },
-  { k:["how many planets"], a:"There are eight planets in our solar system: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune." },
-  { k:["speed of light"], a:"Light travels at about **299,792 kilometres per second** (roughly 186,282 miles per second) in a vacuum." },
-  { k:["boiling point of water"], a:"Water boils at 100°C (212°F) at standard atmospheric pressure." },
-  { k:["freezing point of water"], a:"Water freezes at 0°C (32°F) at standard atmospheric pressure." },
-  { k:["tallest mountain","highest mountain"], a:"Mount Everest, on the border of Nepal and Tibet, is the tallest mountain above sea level at about 8,849 metres." },
-  { k:["longest river"], a:"The Nile is generally considered the longest river in the world, at roughly 6,650 km, though some measurements favour the Amazon." },
-  { k:["national language of pakistan"], a:"Urdu is the national language of Pakistan, though many regional languages such as Punjabi, Sindhi, Pashto, and Balochi are also widely spoken." },
-  { k:["who wrote romeo and juliet"], a:"William Shakespeare wrote *Romeo and Juliet*." },
-  { k:["who discovered gravity"], a:"Sir Isaac Newton formulated the laws of gravity after observing that objects fall toward the Earth, formalising it in his 1687 work *Principia*." },
-  { k:["who invented the telephone"], a:"Alexander Graham Bell is credited with inventing the first practical telephone in 1876." },
-  { k:["what is photosynthesis"], a:"Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to produce glucose and oxygen, mainly in their chloroplasts." },
-  { k:["what is gravity"], a:"Gravity is the force of attraction between masses — it's what pulls objects toward each other, like keeping planets in orbit and keeping you on the ground." },
-  { k:["what is an algorithm"], a:"An algorithm is a step-by-step set of instructions for solving a problem or completing a task, the way a recipe is a set of instructions for cooking a dish." },
-  { k:["what is artificial intelligence","what is ai"], a:"Artificial intelligence refers to computer systems built to perform tasks that normally need human intelligence — recognising speech, understanding language, or making decisions." },
-  { k:["what is machine learning"], a:"Machine learning is a branch of AI where systems learn patterns from data rather than being explicitly programmed with rules, improving at a task as they see more examples." },
-  { k:["define love"], a:"**Love** — a deep feeling of affection, care, or attachment toward someone or something." },
-  { k:["define hope"], a:"**Hope** — a feeling of expectation and desire for a particular thing to happen." },
-  { k:["define patience","define sabr"], a:"**Patience (صبر / sabr)** — the capacity to accept delay, difficulty, or suffering calmly, without becoming upset." },
-  { k:["define wisdom"], a:"**Wisdom** — the quality of having good judgement, built from experience and knowledge." },
-  { k:["pomodoro","study tip","how to focus","time management"], a:"A simple, well-tested study method is the **Pomodoro Technique**: work with full focus for 25 minutes, then take a 5-minute break; after four rounds, take a longer 15–30 minute break. Keeping a written to-do list and studying your hardest subject when your energy is highest also helps a lot." },
-  { k:["how to learn a language"], a:"Consistency beats intensity: a little practice every day (vocabulary, listening, and speaking) works better than long, occasional sessions. Try labelling objects around your home in the language you're learning, and consume media — songs, shows — in it." },
-  { k:["reverse a string python"], a:"Here's how to reverse a string in Python:\n\n```python\ntext = \"zariya\"\nreversed_text = text[::-1]\nprint(reversed_text)  # ayiraz\n```" },
-  { k:["fibonacci python"], a:"A simple Fibonacci sequence generator in Python:\n\n```python\ndef fibonacci(n):\n    a, b = 0, 1\n    result = []\n    for _ in range(n):\n        result.append(a)\n        a, b = b, a + b\n    return result\n\nprint(fibonacci(10))\n```" },
-  { k:["hello world python"], a:"```python\nprint(\"Hello, world!\")\n```" },
-  { k:["hello world javascript"], a:"```javascript\nconsole.log(\"Hello, world!\");\n```" },
-  { k:["sort a list python","sort array python"], a:"```python\nnumbers = [5, 2, 9, 1]\nnumbers.sort()\nprint(numbers)  # [1, 2, 5, 9]\n```" },
-  { k:["what is eid"], a:"Eid refers to two major Islamic festivals: **Eid-ul-Fitr**, marking the end of Ramadan's fasting month, and **Eid-ul-Adha**, commemorating the Prophet Ibrahim's willingness to sacrifice, marked by the sacrifice of an animal and sharing the meat." },
-  { k:["what is ramadan"], a:"Ramadan is the ninth month of the Islamic lunar calendar, observed by Muslims worldwide with fasting from dawn to sunset, increased prayer, reflection, and charity." }
+  {
+    "k": [
+      "who are you",
+      "what are you",
+      "your name"
+    ],
+    "a": "I'm **Zariya** (ذریعہ — \"channel\" or \"medium\"), a bilingual Urdu/English assistant. Offline, I run on a fairly large built-in knowledge base rather than a full language model, so I can cover a lot of common questions but I'm not truly open-ended. Connect a Claude API key in Settings and I switch to real Claude responses for anything you ask."
+  },
+  {
+    "k": [
+      "what can you do",
+      "help me",
+      "features"
+    ],
+    "a": "Offline I can: do arithmetic, unit conversions, translate common English/Urdu words and phrases, answer a wide set of general-knowledge questions (geography, science, history, Islam, Pakistan), share small code snippets, explain common concepts, and give study/productivity tips. I can also summarize this chat, pull out key points, and turn a conversation or note into flashcards using the tools bar above the message box."
+  },
+  {
+    "k": [
+      "why is your database small",
+      "why can't you answer everything",
+      "you don't know much",
+      "limited knowledge",
+      "how much do you know"
+    ],
+    "a": "Fair question — offline I'm a curated set of a few hundred hand-written answers and rules, not a trained model, so I'll always have gaps. For genuinely open-ended answers on anything, add a Claude API key in Settings — that routes your questions to the real Claude model instead of me guessing from a fixed list."
+  },
+  {
+    "k": [
+      "capital of pakistan"
+    ],
+    "a": "**Islamabad** is the capital of Pakistan."
+  },
+  {
+    "k": [
+      "capital of france"
+    ],
+    "a": "**Paris** is the capital of France."
+  },
+  {
+    "k": [
+      "capital of japan"
+    ],
+    "a": "**Tokyo** is the capital of Japan."
+  },
+  {
+    "k": [
+      "capital of uk"
+    ],
+    "a": "**London** is the capital of Uk."
+  },
+  {
+    "k": [
+      "capital of united kingdom"
+    ],
+    "a": "**London** is the capital of United Kingdom."
+  },
+  {
+    "k": [
+      "capital of england"
+    ],
+    "a": "**London** is the capital of England."
+  },
+  {
+    "k": [
+      "capital of usa"
+    ],
+    "a": "**Washington, D.C.** is the capital of Usa."
+  },
+  {
+    "k": [
+      "capital of united states"
+    ],
+    "a": "**Washington, D.C.** is the capital of United States."
+  },
+  {
+    "k": [
+      "capital of america"
+    ],
+    "a": "**Washington, D.C.** is the capital of America."
+  },
+  {
+    "k": [
+      "capital of india"
+    ],
+    "a": "**New Delhi** is the capital of India."
+  },
+  {
+    "k": [
+      "capital of china"
+    ],
+    "a": "**Beijing** is the capital of China."
+  },
+  {
+    "k": [
+      "capital of germany"
+    ],
+    "a": "**Berlin** is the capital of Germany."
+  },
+  {
+    "k": [
+      "capital of italy"
+    ],
+    "a": "**Rome** is the capital of Italy."
+  },
+  {
+    "k": [
+      "capital of spain"
+    ],
+    "a": "**Madrid** is the capital of Spain."
+  },
+  {
+    "k": [
+      "capital of russia"
+    ],
+    "a": "**Moscow** is the capital of Russia."
+  },
+  {
+    "k": [
+      "capital of canada"
+    ],
+    "a": "**Ottawa** is the capital of Canada."
+  },
+  {
+    "k": [
+      "capital of australia"
+    ],
+    "a": "**Canberra** is the capital of Australia."
+  },
+  {
+    "k": [
+      "capital of egypt"
+    ],
+    "a": "**Cairo** is the capital of Egypt."
+  },
+  {
+    "k": [
+      "capital of turkey"
+    ],
+    "a": "**Ankara** is the capital of Turkey."
+  },
+  {
+    "k": [
+      "capital of iran"
+    ],
+    "a": "**Tehran** is the capital of Iran."
+  },
+  {
+    "k": [
+      "capital of saudi arabia"
+    ],
+    "a": "**Riyadh** is the capital of Saudi Arabia."
+  },
+  {
+    "k": [
+      "capital of bangladesh"
+    ],
+    "a": "**Dhaka** is the capital of Bangladesh."
+  },
+  {
+    "k": [
+      "capital of afghanistan"
+    ],
+    "a": "**Kabul** is the capital of Afghanistan."
+  },
+  {
+    "k": [
+      "capital of brazil"
+    ],
+    "a": "**Brasília** is the capital of Brazil."
+  },
+  {
+    "k": [
+      "capital of mexico"
+    ],
+    "a": "**Mexico City** is the capital of Mexico."
+  },
+  {
+    "k": [
+      "capital of south korea"
+    ],
+    "a": "**Seoul** is the capital of South Korea."
+  },
+  {
+    "k": [
+      "capital of indonesia"
+    ],
+    "a": "**Jakarta** is the capital of Indonesia."
+  },
+  {
+    "k": [
+      "capital of nigeria"
+    ],
+    "a": "**Abuja** is the capital of Nigeria."
+  },
+  {
+    "k": [
+      "capital of south africa"
+    ],
+    "a": "**Pretoria** is the capital of South Africa."
+  },
+  {
+    "k": [
+      "capital of kenya"
+    ],
+    "a": "**Nairobi** is the capital of Kenya."
+  },
+  {
+    "k": [
+      "capital of uae"
+    ],
+    "a": "**Abu Dhabi** is the capital of Uae."
+  },
+  {
+    "k": [
+      "capital of sri lanka"
+    ],
+    "a": "**Sri Jayawardenepura Kotte** is the capital of Sri Lanka."
+  },
+  {
+    "k": [
+      "capital of nepal"
+    ],
+    "a": "**Kathmandu** is the capital of Nepal."
+  },
+  {
+    "k": [
+      "largest ocean"
+    ],
+    "a": "The Pacific Ocean is the largest and deepest ocean on Earth."
+  },
+  {
+    "k": [
+      "smallest ocean"
+    ],
+    "a": "The Arctic Ocean is the smallest and shallowest of the world's oceans."
+  },
+  {
+    "k": [
+      "largest country"
+    ],
+    "a": "Russia is the largest country in the world by land area."
+  },
+  {
+    "k": [
+      "smallest country"
+    ],
+    "a": "Vatican City is the smallest country in the world by both area and population."
+  },
+  {
+    "k": [
+      "largest continent"
+    ],
+    "a": "Asia is the largest continent, both by area and population."
+  },
+  {
+    "k": [
+      "smallest continent"
+    ],
+    "a": "Australia is the smallest continent."
+  },
+  {
+    "k": [
+      "largest desert"
+    ],
+    "a": "Antarctica is technically the largest desert in the world; the Sahara is the largest hot desert."
+  },
+  {
+    "k": [
+      "tallest mountain",
+      "highest mountain"
+    ],
+    "a": "Mount Everest, on the border of Nepal and Tibet, is the tallest mountain above sea level at about 8,849 metres."
+  },
+  {
+    "k": [
+      "longest river"
+    ],
+    "a": "The Nile is generally considered the longest river in the world, at roughly 6,650 km, though some measurements favour the Amazon."
+  },
+  {
+    "k": [
+      "largest river by volume"
+    ],
+    "a": "The Amazon River carries by far the largest volume of water of any river in the world."
+  },
+  {
+    "k": [
+      "provinces of pakistan"
+    ],
+    "a": "Pakistan has four provinces: **Punjab, Sindh, Khyber Pakhtunkhwa, and Balochistan**, plus the federal territory of Islamabad and the regions of Azad Kashmir and Gilgit-Baltistan."
+  },
+  {
+    "k": [
+      "national language of pakistan"
+    ],
+    "a": "Urdu is the national language of Pakistan, though many regional languages such as Punjabi, Sindhi, Pashto, and Balochi are also widely spoken."
+  },
+  {
+    "k": [
+      "currency of pakistan"
+    ],
+    "a": "The currency of Pakistan is the **Pakistani Rupee (PKR)**."
+  },
+  {
+    "k": [
+      "national flower of pakistan"
+    ],
+    "a": "The jasmine (چنبیلی) is the national flower of Pakistan."
+  },
+  {
+    "k": [
+      "national bird of pakistan"
+    ],
+    "a": "The chukar partridge is the national bird of Pakistan."
+  },
+  {
+    "k": [
+      "national animal of pakistan"
+    ],
+    "a": "The markhor, a wild goat species, is the national animal of Pakistan."
+  },
+  {
+    "k": [
+      "when did pakistan gain independence",
+      "pakistan independence"
+    ],
+    "a": "Pakistan gained independence from British rule on **14 August 1947**."
+  },
+  {
+    "k": [
+      "founder of pakistan"
+    ],
+    "a": "Muhammad Ali Jinnah, known as Quaid-e-Azam, is regarded as the founder of Pakistan."
+  },
+  {
+    "k": [
+      "national poet of pakistan"
+    ],
+    "a": "Allama Muhammad Iqbal is regarded as the national poet (Shair-e-Mashriq) of Pakistan."
+  },
+  {
+    "k": [
+      "largest planet"
+    ],
+    "a": "Jupiter is the largest planet in our solar system."
+  },
+  {
+    "k": [
+      "smallest planet"
+    ],
+    "a": "Mercury is the smallest planet in our solar system."
+  },
+  {
+    "k": [
+      "how many planets"
+    ],
+    "a": "There are eight planets in our solar system: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune."
+  },
+  {
+    "k": [
+      "closest planet to the sun"
+    ],
+    "a": "Mercury is the closest planet to the Sun."
+  },
+  {
+    "k": [
+      "farthest planet from the sun"
+    ],
+    "a": "Neptune is the farthest planet from the Sun."
+  },
+  {
+    "k": [
+      "speed of light"
+    ],
+    "a": "Light travels at about **299,792 kilometres per second** (roughly 186,282 miles per second) in a vacuum."
+  },
+  {
+    "k": [
+      "speed of sound"
+    ],
+    "a": "Sound travels at about **343 metres per second** (1,235 km/h) through air at room temperature."
+  },
+  {
+    "k": [
+      "boiling point of water"
+    ],
+    "a": "Water boils at 100°C (212°F) at standard atmospheric pressure."
+  },
+  {
+    "k": [
+      "freezing point of water"
+    ],
+    "a": "Water freezes at 0°C (32°F) at standard atmospheric pressure."
+  },
+  {
+    "k": [
+      "what is photosynthesis"
+    ],
+    "a": "Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to produce glucose and oxygen, mainly in their chloroplasts."
+  },
+  {
+    "k": [
+      "what is gravity"
+    ],
+    "a": "Gravity is the force of attraction between masses — it's what pulls objects toward each other, like keeping planets in orbit and keeping you on the ground."
+  },
+  {
+    "k": [
+      "what is dna"
+    ],
+    "a": "DNA (deoxyribonucleic acid) is the molecule that carries the genetic instructions used in the growth, development, and functioning of all known living organisms."
+  },
+  {
+    "k": [
+      "how many bones in the human body"
+    ],
+    "a": "An adult human body has **206 bones**."
+  },
+  {
+    "k": [
+      "how many chromosomes do humans have"
+    ],
+    "a": "Humans typically have **46 chromosomes**, arranged in 23 pairs."
+  },
+  {
+    "k": [
+      "what is the largest organ"
+    ],
+    "a": "The skin is the largest organ of the human body."
+  },
+  {
+    "k": [
+      "periodic table",
+      "how many elements"
+    ],
+    "a": "The periodic table currently has **118 confirmed chemical elements**, organised by atomic number."
+  },
+  {
+    "k": [
+      "chemical formula of water"
+    ],
+    "a": "The chemical formula of water is **H₂O** — two hydrogen atoms bonded to one oxygen atom."
+  },
+  {
+    "k": [
+      "what is an atom"
+    ],
+    "a": "An atom is the basic building block of matter, made of a nucleus (protons and neutrons) surrounded by electrons."
+  },
+  {
+    "k": [
+      "what is a black hole"
+    ],
+    "a": "A black hole is a region of space where gravity is so strong that nothing, not even light, can escape from it, formed when massive stars collapse."
+  },
+  {
+    "k": [
+      "area of a circle",
+      "circle area formula"
+    ],
+    "a": "The area of a circle is **π × r²**, where r is the radius."
+  },
+  {
+    "k": [
+      "circumference of a circle"
+    ],
+    "a": "The circumference of a circle is **2 × π × r**, where r is the radius."
+  },
+  {
+    "k": [
+      "area of a triangle"
+    ],
+    "a": "The area of a triangle is **½ × base × height**."
+  },
+  {
+    "k": [
+      "area of a rectangle"
+    ],
+    "a": "The area of a rectangle is **length × width**."
+  },
+  {
+    "k": [
+      "pythagorean theorem"
+    ],
+    "a": "The Pythagorean theorem states that in a right triangle, **a² + b² = c²**, where c is the hypotenuse and a, b are the other two sides."
+  },
+  {
+    "k": [
+      "value of pi"
+    ],
+    "a": "π (pi) is approximately **3.14159**, the ratio of a circle's circumference to its diameter."
+  },
+  {
+    "k": [
+      "what is an api"
+    ],
+    "a": "An API (Application Programming Interface) is a set of rules that lets one piece of software talk to another — for example, letting an app fetch weather data from a weather service."
+  },
+  {
+    "k": [
+      "what is the internet"
+    ],
+    "a": "The internet is a global network of interconnected computers that communicate using standard protocols, allowing information to be shared worldwide."
+  },
+  {
+    "k": [
+      "what is the cloud",
+      "cloud computing"
+    ],
+    "a": "\"The cloud\" refers to storing and processing data on remote servers accessed over the internet, rather than on your own local device."
+  },
+  {
+    "k": [
+      "what is a database"
+    ],
+    "a": "A database is an organised collection of data, typically stored and accessed electronically, structured so it can be efficiently queried and updated."
+  },
+  {
+    "k": [
+      "what is open source"
+    ],
+    "a": "Open-source software has its source code made publicly available, so anyone can view, modify, and distribute it, usually under a specific license."
+  },
+  {
+    "k": [
+      "what is machine learning"
+    ],
+    "a": "Machine learning is a branch of AI where systems learn patterns from data rather than being explicitly programmed with rules, improving at a task as they see more examples."
+  },
+  {
+    "k": [
+      "what is artificial intelligence",
+      "what is ai"
+    ],
+    "a": "Artificial intelligence refers to computer systems built to perform tasks that normally need human intelligence — recognising speech, understanding language, or making decisions."
+  },
+  {
+    "k": [
+      "what is an algorithm"
+    ],
+    "a": "An algorithm is a step-by-step set of instructions for solving a problem or completing a task, the way a recipe is a set of instructions for cooking a dish."
+  },
+  {
+    "k": [
+      "difference between http and https"
+    ],
+    "a": "HTTPS is HTTP with an added layer of encryption (TLS/SSL), so data exchanged between your browser and a website is protected from eavesdropping — HTTP alone sends data in plain text."
+  },
+  {
+    "k": [
+      "define love",
+      "what does love mean",
+      "meaning of love"
+    ],
+    "a": "**Love** — a deep feeling of affection, care, or attachment toward someone or something."
+  },
+  {
+    "k": [
+      "define hope",
+      "what does hope mean",
+      "meaning of hope"
+    ],
+    "a": "**Hope** — a feeling of expectation and desire for a particular thing to happen."
+  },
+  {
+    "k": [
+      "define patience",
+      "what does patience mean",
+      "meaning of patience"
+    ],
+    "a": "**Patience** — the capacity to accept delay, difficulty, or suffering calmly, without becoming upset."
+  },
+  {
+    "k": [
+      "define wisdom",
+      "what does wisdom mean",
+      "meaning of wisdom"
+    ],
+    "a": "**Wisdom** — the quality of having good judgement, built from experience and knowledge."
+  },
+  {
+    "k": [
+      "define courage",
+      "what does courage mean",
+      "meaning of courage"
+    ],
+    "a": "**Courage** — the ability to do something that frightens you; strength in the face of fear."
+  },
+  {
+    "k": [
+      "define integrity",
+      "what does integrity mean",
+      "meaning of integrity"
+    ],
+    "a": "**Integrity** — the quality of being honest and having strong moral principles that you refuse to compromise."
+  },
+  {
+    "k": [
+      "define empathy",
+      "what does empathy mean",
+      "meaning of empathy"
+    ],
+    "a": "**Empathy** — the ability to understand and share the feelings of another person."
+  },
+  {
+    "k": [
+      "define resilience",
+      "what does resilience mean",
+      "meaning of resilience"
+    ],
+    "a": "**Resilience** — the capacity to recover quickly from difficulties; toughness."
+  },
+  {
+    "k": [
+      "define gratitude",
+      "what does gratitude mean",
+      "meaning of gratitude"
+    ],
+    "a": "**Gratitude** — the quality of being thankful and appreciative."
+  },
+  {
+    "k": [
+      "define humility",
+      "what does humility mean",
+      "meaning of humility"
+    ],
+    "a": "**Humility** — a modest view of one's own importance; freedom from pride or arrogance."
+  },
+  {
+    "k": [
+      "reverse a string python"
+    ],
+    "a": "Here's how to reverse a string in Python:\n\n```python\ntext = \"zariya\"\nreversed_text = text[::-1]\nprint(reversed_text)  # ayiraz\n```"
+  },
+  {
+    "k": [
+      "fibonacci python"
+    ],
+    "a": "A simple Fibonacci sequence generator in Python:\n\n```python\ndef fibonacci(n):\n    a, b = 0, 1\n    result = []\n    for _ in range(n):\n        result.append(a)\n        a, b = b, a + b\n    return result\n\nprint(fibonacci(10))\n```"
+  },
+  {
+    "k": [
+      "hello world python"
+    ],
+    "a": "```python\nprint(\"Hello, world!\")\n```"
+  },
+  {
+    "k": [
+      "hello world javascript"
+    ],
+    "a": "```javascript\nconsole.log(\"Hello, world!\");\n```"
+  },
+  {
+    "k": [
+      "sort a list python",
+      "sort array python"
+    ],
+    "a": "```python\nnumbers = [5, 2, 9, 1]\nnumbers.sort()\nprint(numbers)  # [1, 2, 5, 9]\n```"
+  },
+  {
+    "k": [
+      "for loop python"
+    ],
+    "a": "```python\nfor i in range(5):\n    print(i)\n```"
+  },
+  {
+    "k": [
+      "for loop javascript"
+    ],
+    "a": "```javascript\nfor (let i = 0; i < 5; i++) {\n  console.log(i);\n}\n```"
+  },
+  {
+    "k": [
+      "function python"
+    ],
+    "a": "```python\ndef greet(name):\n    return f\"Hello, {name}!\"\n\nprint(greet(\"Zariya\"))\n```"
+  },
+  {
+    "k": [
+      "function javascript"
+    ],
+    "a": "```javascript\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\nconsole.log(greet(\"Zariya\"));\n```"
+  },
+  {
+    "k": [
+      "class python"
+    ],
+    "a": "```python\nclass Person:\n    def __init__(self, name):\n        self.name = name\n\n    def greet(self):\n        return f\"Hi, I'm {self.name}\"\n\np = Person(\"Ali\")\nprint(p.greet())\n```"
+  },
+  {
+    "k": [
+      "read a file python"
+    ],
+    "a": "```python\nwith open(\"file.txt\", \"r\") as f:\n    content = f.read()\nprint(content)\n```"
+  },
+  {
+    "k": [
+      "html boilerplate",
+      "basic html template"
+    ],
+    "a": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Page title</title>\n</head>\n<body>\n  <h1>Hello, world!</h1>\n</body>\n</html>\n```"
+  },
+  {
+    "k": [
+      "pomodoro",
+      "study tip",
+      "how to focus",
+      "time management"
+    ],
+    "a": "A simple, well-tested study method is the **Pomodoro Technique**: work with full focus for 25 minutes, then take a 5-minute break; after four rounds, take a longer 15–30 minute break. Keeping a written to-do list and studying your hardest subject when your energy is highest also helps a lot."
+  },
+  {
+    "k": [
+      "how to learn a language"
+    ],
+    "a": "Consistency beats intensity: a little practice every day (vocabulary, listening, and speaking) works better than long, occasional sessions. Try labelling objects around your home in the language you're learning, and consume media — songs, shows — in it."
+  },
+  {
+    "k": [
+      "how to memorize"
+    ],
+    "a": "Spaced repetition (reviewing material at increasing intervals) and active recall (testing yourself instead of just re-reading) are the two most evidence-backed memorisation techniques. That's exactly what the Flashcards tab in this app is built for."
+  },
+  {
+    "k": [
+      "how to write a resume",
+      "how to write a cv"
+    ],
+    "a": "Keep a resume to one page where possible: lead with a short summary, list experience in reverse-chronological order with measurable achievements (not just duties), and tailor keywords to each job description."
+  },
+  {
+    "k": [
+      "what is eid"
+    ],
+    "a": "Eid refers to two major Islamic festivals: **Eid-ul-Fitr**, marking the end of Ramadan's fasting month, and **Eid-ul-Adha**, commemorating the Prophet Ibrahim's willingness to sacrifice, marked by the sacrifice of an animal and sharing the meat."
+  },
+  {
+    "k": [
+      "what is ramadan"
+    ],
+    "a": "Ramadan is the ninth month of the Islamic lunar calendar, observed by Muslims worldwide with fasting from dawn to sunset, increased prayer, reflection, and charity."
+  },
+  {
+    "k": [
+      "five pillars of islam"
+    ],
+    "a": "The Five Pillars of Islam are: **Shahada** (declaration of faith), **Salah** (five daily prayers), **Zakat** (charity), **Sawm** (fasting in Ramadan), and **Hajj** (pilgrimage to Mecca, once in a lifetime if able)."
+  },
+  {
+    "k": [
+      "what is zakat"
+    ],
+    "a": "Zakat is obligatory almsgiving in Islam — typically 2.5% of a Muslim's savings and qualifying wealth given annually to those in need."
+  },
+  {
+    "k": [
+      "what is hajj"
+    ],
+    "a": "Hajj is the annual Islamic pilgrimage to Mecca, Saudi Arabia, which every able-bodied Muslim who can afford it is required to undertake at least once in their lifetime."
+  },
+  {
+    "k": [
+      "who wrote romeo and juliet"
+    ],
+    "a": "William Shakespeare wrote *Romeo and Juliet*."
+  },
+  {
+    "k": [
+      "who discovered gravity"
+    ],
+    "a": "Sir Isaac Newton formulated the laws of gravity after observing that objects fall toward the Earth, formalising it in his 1687 work *Principia*."
+  },
+  {
+    "k": [
+      "who invented the telephone"
+    ],
+    "a": "Alexander Graham Bell is credited with inventing the first practical telephone in 1876."
+  },
+  {
+    "k": [
+      "who invented the light bulb"
+    ],
+    "a": "Thomas Edison developed the first commercially practical incandescent light bulb in 1879, building on earlier work by other inventors."
+  },
+  {
+    "k": [
+      "when did world war 2 end"
+    ],
+    "a": "World War II ended in 1945 — in Europe on 8 May (V-E Day) and in the Pacific on 2 September after Japan's surrender."
+  },
+  {
+    "k": [
+      "when did world war 1 start"
+    ],
+    "a": "World War I began in **1914**, following the assassination of Archduke Franz Ferdinand of Austria."
+  },
+  {
+    "k": [
+      "who was the first man on the moon"
+    ],
+    "a": "Neil Armstrong was the first person to walk on the Moon, on 20 July 1969, during NASA's Apollo 11 mission."
+  },
+  {
+    "k": [
+      "break the ice"
+    ],
+    "a": "**\"Break The Ice\"** — to do or say something that relieves tension or awkwardness, especially when meeting someone new."
+  },
+  {
+    "k": [
+      "piece of cake"
+    ],
+    "a": "**\"Piece Of Cake\"** — something very easy to do."
+  },
+  {
+    "k": [
+      "hit the books"
+    ],
+    "a": "**\"Hit The Books\"** — to study hard."
+  },
+  {
+    "k": [
+      "under the weather"
+    ],
+    "a": "**\"Under The Weather\"** — feeling slightly unwell."
+  },
+  {
+    "k": [
+      "once in a blue moon"
+    ],
+    "a": "**\"Once In A Blue Moon\"** — very rarely."
+  },
+  {
+    "k": [
+      "cost an arm and a leg"
+    ],
+    "a": "**\"Cost An Arm And A Leg\"** — to be very expensive."
+  },
+  {
+    "k": [
+      "bite the bullet"
+    ],
+    "a": "**\"Bite The Bullet\"** — to face a difficult or unpleasant situation with courage."
+  },
+  {
+    "k": [
+      "the ball is in your court"
+    ],
+    "a": "**\"The Ball Is In Your Court\"** — it's your turn to take action or make a decision."
+  }
 ];
 function knowledgeBaseLookup(text){
   const lower = text.toLowerCase();
