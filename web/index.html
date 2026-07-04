@@ -522,8 +522,26 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
         </div>
 
         <div class="setting-group">
-          <h3>AI connection</h3>
-          <p class="desc">Zariya works offline with a lightweight built-in assistant. Optionally connect your own Anthropic API key for full model responses — it's stored only in this browser and sent directly to Anthropic, nowhere else.</p>
+          <h3>On-device AI <span style="font-weight:400;color:var(--text-muted);">— no API key needed</span></h3>
+          <p class="desc">Downloads a small language model straight into this browser tab and runs it locally on your device (via WebGPU). No account, no key, no server — once it's downloaded once, it keeps working without internet. Needs a recent Chrome or Edge; needs internet only for the first download.</p>
+          <div class="setting-row" style="display:block;">
+            <div class="key-row" style="margin-bottom:10px;">
+              <select class="text-input" id="localModelSelect" style="flex:1;">
+                <option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen2.5 0.5B — smallest, fastest, weaker</option>
+                <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama 3.2 1B — better answers, bigger download</option>
+              </select>
+              <button class="btn primary" id="loadLocalModelBtn">Load model</button>
+            </div>
+            <div id="localModelProgressWrap" style="display:none;">
+              <div class="deck-progress" style="margin:6px 0;"><div class="deck-progress-fill" id="localModelProgressFill" style="width:0%;"></div></div>
+            </div>
+            <div class="small-note" id="localModelStatus">Not loaded yet.</div>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <h3>Claude API <span style="font-weight:400;color:var(--text-muted);">— optional, best quality</span></h3>
+          <p class="desc">Optionally connect your own Anthropic API key for full Claude responses — it's stored only in this browser and sent directly to Anthropic, nowhere else. If both this and on-device AI are set up, Claude is used first.</p>
           <div class="setting-row" style="display:block;">
             <label>Anthropic API key (optional)</label>
             <div class="key-row" style="margin-top:8px;">
@@ -588,6 +606,8 @@ let editingIndex = null;
 let isGenerating = false;
 let stopped = false;
 let currentAbort = null;
+let localModelEngine = null;
+let localModelStatus = 'idle'; // idle | loading | ready | error | unsupported
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 function nowISO(){ return new Date().toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}); }
@@ -640,7 +660,9 @@ function updateStatusPill(){
   const dot = document.getElementById('statusDot');
   const txt = document.getElementById('statusText');
   if(settings.apiKey){ dot.classList.remove('off'); txt.textContent = 'Claude connected'; }
-  else { dot.classList.add('off'); txt.textContent = 'Offline mode'; }
+  else if(localModelStatus==='ready'){ dot.classList.remove('off'); txt.textContent = 'On-device AI ready'; }
+  else if(localModelStatus==='loading'){ dot.classList.add('off'); txt.textContent = 'Loading on-device AI…'; }
+  else { dot.classList.add('off'); txt.textContent = 'Offline (basic)'; }
 }
 
 /* ============ VIEW SWITCHING ============ */
@@ -849,12 +871,14 @@ async function respondTo(session){
     if(settings.apiKey){
       currentAbort = new AbortController();
       reply = await callClaude(session.messages, currentAbort.signal);
+    } else if(localModelStatus==='ready'){
+      reply = await callLocalModel(session.messages);
     } else {
       reply = await offlineReply(session.messages);
     }
   }catch(err){
     if(err.name==='AbortError'){ removeThinking(); setGenerating(false); return; }
-    reply = "I couldn't reach the Claude API from this page (" + (err.message||'connection blocked') + "). Falling back to offline mode.\n\n" + await offlineReply(session.messages);
+    reply = "I hit a problem generating a reply (" + (err.message||'unknown error') + "). Falling back to basic offline mode.\n\n" + await offlineReply(session.messages);
   }
   removeThinking();
   setGenerating(false);
@@ -916,6 +940,68 @@ async function callClaude(messages, signal){
   const data = await res.json();
   const block = (data.content||[]).find(b=>b.type==='text');
   return block ? block.text : "(empty response)";
+}
+
+/* ============ ON-DEVICE AI (WebLLM, no API key, runs locally via WebGPU) ============ */
+const localModelStatusEl = document.getElementById('localModelStatus');
+const localModelProgressWrap = document.getElementById('localModelProgressWrap');
+const localModelProgressFill = document.getElementById('localModelProgressFill');
+const loadLocalModelBtn = document.getElementById('loadLocalModelBtn');
+
+function setLocalModelStatus(text){ if(localModelStatusEl) localModelStatusEl.textContent = text; }
+
+async function loadLocalModel(){
+  if(!('gpu' in navigator)){
+    localModelStatus = 'unsupported';
+    setLocalModelStatus('This browser doesn\'t support WebGPU, so on-device AI can\'t run here — it needs a recent desktop Chrome or Edge. The offline built-in assistant and the Claude API key option both still work fine.');
+    updateStatusPill();
+    return;
+  }
+  const modelId = document.getElementById('localModelSelect').value;
+  localModelStatus = 'loading';
+  loadLocalModelBtn.disabled = true;
+  loadLocalModelBtn.textContent = 'Loading…';
+  localModelProgressWrap.style.display = 'block';
+  setLocalModelStatus('Downloading model (first time only — this can be a few hundred MB, then it\'s cached)…');
+  updateStatusPill();
+  try{
+    const webllm = await import('https://esm.run/@mlc-ai/web-llm');
+    localModelEngine = await webllm.CreateMLCEngine(modelId, {
+      initProgressCallback: (p)=>{
+        const pct = Math.round((p.progress||0)*100);
+        localModelProgressFill.style.width = pct+'%';
+        setLocalModelStatus((p.text || 'Loading') + ' — ' + pct + '%');
+      }
+    });
+    localModelStatus = 'ready';
+    setLocalModelStatus('Ready — running locally on this device, no internet needed from here on.');
+    loadLocalModelBtn.textContent = 'Reload model';
+    loadLocalModelBtn.disabled = false;
+  }catch(err){
+    localModelStatus = 'error';
+    setLocalModelStatus('Could not load the on-device model (' + (err.message || 'unknown error') + '). This usually means no internet on first load, or your GPU/browser isn\'t supported. The offline built-in assistant still works regardless.');
+    loadLocalModelBtn.textContent = 'Try again';
+    loadLocalModelBtn.disabled = false;
+  }
+  updateStatusPill();
+}
+if(loadLocalModelBtn) loadLocalModelBtn.addEventListener('click', loadLocalModel);
+
+async function callLocalModel(messages){
+  const recent = messages.slice(-12).map(m=>({
+    role: m.role,
+    content: (m.content || '') + attachmentsTextContext(m.attachments)
+  }));
+  const chatMessages = [
+    { role:'system', content:'You are Zariya, a warm, concise bilingual Urdu/English assistant running locally on the user\'s device. Reply in whichever language the user writes in.' },
+    ...recent
+  ];
+  const result = await localModelEngine.chat.completions.create({
+    messages: chatMessages,
+    temperature: 0.7,
+    max_tokens: 500
+  });
+  return result.choices[0].message.content;
 }
 
 /* ============ OFFLINE FALLBACK ASSISTANT ============ */
