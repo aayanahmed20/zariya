@@ -62,7 +62,3 @@ User → Streamlit UI → Inference Engine (llama.cpp) → Local LLM → Respons
 
 Zariya requires a local language model to run.
 
-### Option A (Recommended)
-
-1. Download a GGUF model (e.g., Mistral or LLaMA 3)
-2. Create a folder
