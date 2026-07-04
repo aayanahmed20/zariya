@@ -167,14 +167,14 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
 .empty-hero h2{ font-family:var(--font-serif); font-size:30px; margin:0 0 4px; font-weight:700; letter-spacing:-.3px; color:var(--text); }
 .empty-hero .urdu-line{ font-family:var(--font-urdu); font-size:34px; line-height:2.2; font-weight:500; color:var(--accent-strong); margin-bottom:12px; }
 .empty-hero p{ color:var(--text-muted); font-size:13.5px; margin:0 0 26px;}
-.suggest-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; max-width:560px; margin:0 auto; }
-@media(max-width:640px){ .suggest-grid{ grid-template-columns:1fr; } }
+.home-suggestions{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:12px; }
+.home-suggestions .suggest-card{ flex:0 0 auto; }
 .suggest-card{
-  text-align:left; padding:12px 14px; border-radius:14px; background:var(--bg-surface);
+  text-align:left; padding:9px 15px; border-radius:20px; background:var(--bg-surface);
   border:1px solid var(--border); color:var(--text-dim); cursor:pointer; font-size:13px; transition:.15s;
 }
 .suggest-card:hover{ border-color:var(--accent); color:var(--text); }
-.suggest-card.urdu{ font-family:var(--font-urdu); text-align:right; font-size:22px; line-height:2.2; font-weight:500; }
+.suggest-card.urdu{ font-family:var(--font-urdu); text-align:right; font-size:16px; line-height:1.6; font-weight:500; }
 
 .msg-row{ display:flex; gap:11px; }
 .msg-row.user{ justify-content:flex-end; }
@@ -435,6 +435,7 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
       </div>
       <div id="composer">
         <div class="composer-inner">
+          <div class="home-suggestions" id="homeSuggestions" style="display:none;"></div>
           <div class="attach-preview" id="attachPreview"></div>
           <div class="composer-box" id="composerBox">
             <input type="file" id="fileInput" accept=".txt,.md,.csv,.json,image/png,image/jpeg,image/webp,application/pdf" multiple style="display:none;">
@@ -547,6 +548,19 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
         </div>
 
         <div class="setting-group">
+          <h3>Learning <span style="font-weight:400;color:var(--text-muted);">— grows from real answers, not model training</span></h3>
+          <p class="desc">To be precise about what this does: it does <strong>not</strong> retrain any model. When Claude or the on-device AI gives you a real answer, Zariya saves that question/answer pair on this device. Next time you (or offline mode) ask something similar, it reuses that saved answer instead of falling back to the generic response — so the offline experience keeps improving the more you use it with a model connected.</p>
+          <div class="setting-row">
+            <div><label>Learn from AI answers</label><div class="sub" id="learnedCount">0 answers learned so far</div></div>
+            <div class="toggle" id="toggleLearn"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="setting-row">
+            <button class="btn" id="exportLearnedBtn">Export learned answers (.json)</button>
+            <button class="btn danger" id="clearLearnedBtn">Clear learned answers</button>
+          </div>
+        </div>
+
+        <div class="setting-group">
           <h3>Claude API <span style="font-weight:400;color:var(--text-muted);">— optional, best quality</span></h3>
           <p class="desc">Optionally connect your own Anthropic API key for full Claude responses — it's stored only in this browser and sent directly to Anthropic, nowhere else. If both this and on-device AI are set up, Claude is used first.</p>
           <div class="setting-row" style="display:block;">
@@ -599,9 +613,11 @@ let sessions = LS.get('zariya_sessions', []);
 let notes    = LS.get('zariya_notes', []);
 let decks    = LS.get('zariya_decks', []);
 let pendingAttachments = [];
+let learnedQA = LS.get('zariya_learned', []);
 let settings = LS.get('zariya_settings', {
-  theme:'light', fontSize:15, showTimestamps:true, ttsEnabled:false, apiKey:''
+  theme:'light', fontSize:15, showTimestamps:true, ttsEnabled:false, apiKey:'', learnEnabled:true
 });
+if(settings.learnEnabled === undefined) settings.learnEnabled = true;
 
 let currentSessionId = sessions.length ? sessions[0].id : null;
 let currentNoteId = null;
@@ -660,6 +676,8 @@ function applySettings(){
   document.documentElement.style.setProperty('--chat-font-size', settings.fontSize+'px');
   document.getElementById('toggleTimestamps').classList.toggle('on', settings.showTimestamps);
   document.getElementById('toggleTTS').classList.toggle('on', settings.ttsEnabled);
+  document.getElementById('toggleLearn').classList.toggle('on', settings.learnEnabled);
+  updateLearnedCountUI();
   document.getElementById('apiKeyInput').value = settings.apiKey || '';
   updateStatusPill();
 }
@@ -734,6 +752,7 @@ const suggestions = [
 function renderChat(){
   const inner = document.getElementById('chat-inner');
   const scroll = document.getElementById('chat-scroll');
+  const homeSug = document.getElementById('homeSuggestions');
   const session = currentSession();
   inner.innerHTML = '';
   if(!session || !session.messages.length){
@@ -746,16 +765,20 @@ function renderChat(){
     hero.innerHTML =
       '<h2>'+greeting+'</h2>'+
       '<div class="urdu-line">کچھ بھی پوچھیں</div>'+
-      '<p>Ask anything in Urdu or English. Runs offline, right here in your browser.</p>'+
-      '<div class="suggest-grid">'+suggestions.map(function(pair){
-        return '<button class="suggest-card '+(pair[1]?'urdu':'')+'" data-sug="'+escapeHtml(pair[0])+'">'+escapeHtml(pair[0])+'</button>';
-      }).join('')+'</div>';
+      '<p>Ask anything in Urdu or English. Runs offline, right here in your browser.</p>';
     inner.appendChild(hero);
-    inner.querySelectorAll('[data-sug]').forEach(b=>{
+
+    homeSug.style.display = 'flex';
+    homeSug.innerHTML = suggestions.map(function(pair){
+      return '<button class="suggest-card '+(pair[1]?'urdu':'')+'" data-sug="'+escapeHtml(pair[0])+'">'+escapeHtml(pair[0])+'</button>';
+    }).join('');
+    homeSug.querySelectorAll('[data-sug]').forEach(b=>{
       b.addEventListener('click', ()=>{ document.getElementById('chat-input').value = b.dataset.sug; syncSendState(); sendMessage(); });
     });
     return;
   }
+  homeSug.style.display = 'none';
+  homeSug.innerHTML = '';
   scroll.classList.remove('empty-mode');
   inner.classList.remove('empty-mode');
   session.messages.forEach((m, idx)=>renderBubble(m, idx, idx===session.messages.length-1 && m.role==='assistant'));
@@ -885,12 +908,15 @@ async function respondTo(session){
   setGenerating(true);
   showThinking();
   let reply;
+  let usedRealModel = false;
   try{
     if(settings.apiKey){
       currentAbort = new AbortController();
       reply = await callClaude(session.messages, currentAbort.signal);
+      usedRealModel = true;
     } else if(localModelStatus==='ready'){
       reply = await callLocalModel(session.messages);
+      usedRealModel = true;
     } else {
       reply = await offlineReply(session.messages);
     }
@@ -902,6 +928,10 @@ async function respondTo(session){
   setGenerating(false);
   if(stopped) return;
   session.messages.push({ role:'assistant', content:reply, ts: nowISO() });
+  if(usedRealModel && settings.learnEnabled){
+    const lastUser = [...session.messages].reverse().find(m=>m.role==='user');
+    if(lastUser && lastUser.content.trim()) rememberAnswer(lastUser.content, reply);
+  }
   saveAll(); renderChat();
   if(settings.ttsEnabled) speak(reply);
 }
@@ -3250,6 +3280,218 @@ const kb = [
       "what is a supernova"
     ],
     "a": "A supernova is the powerful explosion of a star at the end of its life cycle, briefly outshining an entire galaxy and scattering heavy elements into space."
+  },
+  {
+    "k": [
+      "what is zariya learning feature",
+      "how does zariya learn"
+    ],
+    "a": "When Claude or the on-device AI is connected, Zariya saves each question/answer pair on this device after a real response. If you (or offline mode) ask something similar again, it reuses that saved answer instead of the generic offline reply. This is a local cache, not model retraining — you can review, export, or clear it anytime in Settings."
+  },
+  {
+    "k": [
+      "capital of yemen"
+    ],
+    "a": "**Sana'a** is the capital of Yemen."
+  },
+  {
+    "k": [
+      "capital of syria"
+    ],
+    "a": "**Damascus** is the capital of Syria."
+  },
+  {
+    "k": [
+      "capital of lebanon"
+    ],
+    "a": "**Beirut** is the capital of Lebanon."
+  },
+  {
+    "k": [
+      "capital of cuba"
+    ],
+    "a": "**Havana** is the capital of Cuba."
+  },
+  {
+    "k": [
+      "capital of venezuela"
+    ],
+    "a": "**Caracas** is the capital of Venezuela."
+  },
+  {
+    "k": [
+      "capital of ecuador"
+    ],
+    "a": "**Quito** is the capital of Ecuador."
+  },
+  {
+    "k": [
+      "capital of bolivia"
+    ],
+    "a": "**Sucre** is the capital of Bolivia."
+  },
+  {
+    "k": [
+      "capital of paraguay"
+    ],
+    "a": "**Asunción** is the capital of Paraguay."
+  },
+  {
+    "k": [
+      "capital of uruguay"
+    ],
+    "a": "**Montevideo** is the capital of Uruguay."
+  },
+  {
+    "k": [
+      "capital of panama"
+    ],
+    "a": "**Panama City** is the capital of Panama."
+  },
+  {
+    "k": [
+      "capital of iceland"
+    ],
+    "a": "**Reykjavik** is the capital of Iceland."
+  },
+  {
+    "k": [
+      "capital of croatia"
+    ],
+    "a": "**Zagreb** is the capital of Croatia."
+  },
+  {
+    "k": [
+      "capital of serbia"
+    ],
+    "a": "**Belgrade** is the capital of Serbia."
+  },
+  {
+    "k": [
+      "capital of bulgaria"
+    ],
+    "a": "**Sofia** is the capital of Bulgaria."
+  },
+  {
+    "k": [
+      "capital of slovakia"
+    ],
+    "a": "**Bratislava** is the capital of Slovakia."
+  },
+  {
+    "k": [
+      "capital of azerbaijan"
+    ],
+    "a": "**Baku** is the capital of Azerbaijan."
+  },
+  {
+    "k": [
+      "capital of kazakhstan"
+    ],
+    "a": "**Astana** is the capital of Kazakhstan."
+  },
+  {
+    "k": [
+      "capital of uzbekistan"
+    ],
+    "a": "**Tashkent** is the capital of Uzbekistan."
+  },
+  {
+    "k": [
+      "capital of georgia"
+    ],
+    "a": "**Tbilisi** is the capital of Georgia."
+  },
+  {
+    "k": [
+      "empathy vs sympathy"
+    ],
+    "a": "**Empathy Vs Sympathy** — Empathy is feeling *with* someone — sharing or understanding their emotional state as if it were your own. Sympathy is feeling *for* someone — recognizing their pain and caring about it, from more of a distance."
+  },
+  {
+    "k": [
+      "resilience vs perseverance"
+    ],
+    "a": "**Resilience Vs Perseverance** — Resilience is the ability to recover and adapt after a setback. Perseverance is continuing to try despite difficulty — resilience is about bouncing back, perseverance is about pushing through."
+  },
+  {
+    "k": [
+      "what is newton's first law"
+    ],
+    "a": "Newton's first law (the law of inertia) states that an object at rest stays at rest, and an object in motion stays in motion at constant velocity, unless acted on by an external force."
+  },
+  {
+    "k": [
+      "what is newton's second law"
+    ],
+    "a": "Newton's second law states that force equals mass times acceleration (**F = ma**) — the more mass an object has, the more force is needed to accelerate it."
+  },
+  {
+    "k": [
+      "what is newton's third law"
+    ],
+    "a": "Newton's third law states that for every action, there is an equal and opposite reaction — when one object exerts a force on another, the second exerts an equal force back in the opposite direction."
+  },
+  {
+    "k": [
+      "what is the theory of relativity"
+    ],
+    "a": "Einstein's theory of relativity has two parts: **special relativity** (1905), which shows time and space are relative to the observer's speed, and **general relativity** (1915), which describes gravity as the curvature of spacetime caused by mass."
+  },
+  {
+    "k": [
+      "what is evolution"
+    ],
+    "a": "Evolution is the process by which species change over generations through natural selection — traits that improve survival and reproduction become more common in a population over time."
+  },
+  {
+    "k": [
+      "what is an ecosystem"
+    ],
+    "a": "An ecosystem is a community of living organisms (plants, animals, microbes) interacting with each other and their physical environment (soil, water, climate) as a functional unit."
+  },
+  {
+    "k": [
+      "famous mountains in pakistan",
+      "k2 pakistan"
+    ],
+    "a": "K2, in the Karakoram range of Pakistan, is the world's second-highest mountain at 8,611 metres, and is considered one of the most technically difficult and dangerous peaks to climb."
+  },
+  {
+    "k": [
+      "famous rivers in pakistan"
+    ],
+    "a": "The Indus River is Pakistan's longest and most important river, along with its major tributaries: the Jhelum, Chenab, Ravi, and Sutlej — collectively giving Punjab (\"land of five rivers\") its name."
+  },
+  {
+    "k": [
+      "what is basant"
+    ],
+    "a": "Basant is a traditional spring kite-flying festival historically celebrated in Lahore and parts of Punjab, marking the arrival of spring, though it has faced restrictions in recent years due to safety concerns around kite string."
+  },
+  {
+    "k": [
+      "what is a nikah"
+    ],
+    "a": "A Nikah is the Islamic marriage contract ceremony — a formal agreement between a bride and groom, made in the presence of witnesses, that establishes them as legally and religiously married."
+  },
+  {
+    "k": [
+      "how to write a formal email"
+    ],
+    "a": "Start with a clear subject line, a proper greeting (\"Dear Mr./Ms. [Name]\"), state your purpose in the first line or two, keep paragraphs short, and close formally (\"Best regards,\" / \"Sincerely,\") followed by your name."
+  },
+  {
+    "k": [
+      "how to make a good first impression"
+    ],
+    "a": "Be on time, make eye contact, offer a firm handshake or appropriate greeting, listen more than you talk early on, and follow up on anything you promised to do."
+  },
+  {
+    "k": [
+      "how to negotiate salary"
+    ],
+    "a": "Research the market rate for the role beforehand, let the employer name a number first if possible, justify your ask with specific achievements or skills, and consider the full package (benefits, growth, flexibility) — not just the base number."
   }
 ];
 const KB_STOPWORDS = new Set(["who","what","the","is","are","was","were","a","an","of","in","on","to","do","does","did",
@@ -3284,6 +3526,48 @@ function knowledgeBaseLookup(text){
     if(score>bestScore){ bestScore=score; best=entry; }
   });
   return bestScore>0 ? best.a : null;
+}
+
+/* ============ LEARNING: remember real model answers, reuse them offline later ============
+   This is NOT model training — it's a local cache of past question/answer pairs from
+   real Claude API or on-device model responses, matched with the same fuzzy scoring as
+   the static knowledge base. It grows the more you use Zariya with a model connected,
+   and those answers stay available offline afterward. */
+const LEARNED_MAX = 500;
+function rememberAnswer(question, answer){
+  const q = question.trim();
+  if(!q || !answer) return;
+  learnedQA = learnedQA.filter(e=>e.q.toLowerCase() !== q.toLowerCase());
+  learnedQA.unshift({ q, a: answer, ts: Date.now() });
+  if(learnedQA.length > LEARNED_MAX) learnedQA.length = LEARNED_MAX;
+  LS.set('zariya_learned', learnedQA);
+  updateLearnedCountUI();
+}
+function learnedLookup(text){
+  const lower = text.toLowerCase();
+  const normalized = normalizeQuery(text);
+  const queryWords = new Set(normalized.split(/\s+/).filter(w=>w.length>2 && !KB_STOPWORDS.has(w)));
+  let best=null, bestScore=0;
+  learnedQA.forEach(entry=>{
+    const entryLower = entry.q.toLowerCase();
+    let score=0;
+    if(lower===entryLower){ score = 999; }
+    else if(lower.includes(entryLower) || entryLower.includes(lower)){ score = 20; }
+    else {
+      const entryWords = entryLower.split(/\s+/).filter(w=>w.length>2 && !KB_STOPWORDS.has(w));
+      if(entryWords.length){
+        const overlap = entryWords.filter(w=>queryWords.has(w)).length;
+        const ratio = overlap / entryWords.length;
+        if(ratio >= 0.7) score = overlap;
+      }
+    }
+    if(score>bestScore){ bestScore=score; best=entry; }
+  });
+  return bestScore>0 ? best.a : null;
+}
+function updateLearnedCountUI(){
+  const el = document.getElementById('learnedCount');
+  if(el) el.textContent = learnedQA.length + ' answer' + (learnedQA.length===1?'':'s') + ' learned so far';
 }
 function tryMath(text){
   const sqrtMatch = text.match(/sqrt\(?\s*(-?\d+(\.\d+)?)\s*\)?/i);
@@ -3368,6 +3652,7 @@ async function offlineReply(messages){
   if(lower.includes('time') && !lower.includes('management') && !lower.includes('pomodoro')) return "It's currently " + new Date().toLocaleTimeString() + " on your device.";
   if(lower.includes('date') || lower.includes('today') && lower.includes('is')) return "Today is " + new Date().toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + ".";
 
+  const learned = learnedLookup(last); if(learned) return learned;
   const kbHit = knowledgeBaseLookup(last); if(kbHit) return kbHit;
 
   if(hasText){
@@ -3699,6 +3984,12 @@ document.getElementById('themeToggleBtn').addEventListener('click', ()=>{ settin
 document.getElementById('fontSizeSlider').addEventListener('input', (e)=>{ settings.fontSize = parseInt(e.target.value,10); saveAll(); applySettings(); });
 document.getElementById('toggleTimestamps').addEventListener('click', ()=>{ settings.showTimestamps = !settings.showTimestamps; saveAll(); applySettings(); renderChat(); });
 document.getElementById('toggleTTS').addEventListener('click', ()=>{ settings.ttsEnabled = !settings.ttsEnabled; saveAll(); applySettings(); });
+document.getElementById('toggleLearn').addEventListener('click', ()=>{ settings.learnEnabled = !settings.learnEnabled; saveAll(); applySettings(); });
+document.getElementById('exportLearnedBtn').addEventListener('click', ()=>{ downloadFile('zariya-learned.json', JSON.stringify(learnedQA, null, 2)); });
+document.getElementById('clearLearnedBtn').addEventListener('click', ()=>{
+  if(!confirm('This deletes every answer Zariya has remembered from past AI responses. Continue?')) return;
+  learnedQA = []; LS.set('zariya_learned', learnedQA); updateLearnedCountUI();
+});
 document.getElementById('toggleKeyVisBtn').addEventListener('click', (e)=>{
   const inp = document.getElementById('apiKeyInput'); const showing = inp.type==='text';
   inp.type = showing ? 'password' : 'text'; e.target.textContent = showing ? 'Show' : 'Hide';
