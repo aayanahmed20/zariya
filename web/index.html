@@ -159,9 +159,11 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
 
 /* ===== CHAT ===== */
 #chat-scroll{ flex:1; overflow-y:auto; padding:24px 0 8px; }
+#chat-scroll.empty-mode{ display:flex; }
 #chat-inner{ max-width:720px; margin:0 auto; padding:0 24px; display:flex; flex-direction:column; gap:22px; }
+#chat-inner.empty-mode{ flex:1; justify-content:center; margin:auto; width:100%; }
 
-.empty-hero{ text-align:center; padding:min(14vh,120px) 20px 20px; }
+.empty-hero{ text-align:center; padding:20px; }
 .empty-hero h2{ font-family:var(--font-serif); font-size:30px; margin:0 0 4px; font-weight:700; letter-spacing:-.3px; color:var(--text); }
 .empty-hero .urdu-line{ font-family:var(--font-urdu); font-size:34px; line-height:2.2; font-weight:500; color:var(--accent-strong); margin-bottom:12px; }
 .empty-hero p{ color:var(--text-muted); font-size:13.5px; margin:0 0 26px;}
@@ -731,13 +733,18 @@ const suggestions = [
 ];
 function renderChat(){
   const inner = document.getElementById('chat-inner');
+  const scroll = document.getElementById('chat-scroll');
   const session = currentSession();
   inner.innerHTML = '';
   if(!session || !session.messages.length){
+    scroll.classList.add('empty-mode');
+    inner.classList.add('empty-mode');
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     const hero = document.createElement('div');
     hero.className = 'empty-hero';
     hero.innerHTML =
-      '<h2>Assalam-o-Alaikum</h2>'+
+      '<h2>'+greeting+'</h2>'+
       '<div class="urdu-line">کچھ بھی پوچھیں</div>'+
       '<p>Ask anything in Urdu or English. Runs offline, right here in your browser.</p>'+
       '<div class="suggest-grid">'+suggestions.map(function(pair){
@@ -749,6 +756,8 @@ function renderChat(){
     });
     return;
   }
+  scroll.classList.remove('empty-mode');
+  inner.classList.remove('empty-mode');
   session.messages.forEach((m, idx)=>renderBubble(m, idx, idx===session.messages.length-1 && m.role==='assistant'));
   document.getElementById('chat-scroll').scrollTop = 999999;
 }
@@ -2548,6 +2557,331 @@ const kb = [
       "forgot my password"
     ],
     "a": "Most services have a \"Forgot password\" link on the sign-in page that emails or texts you a reset link — if you don't have access to that email/phone anymore, look for the platform's account-recovery support page."
+  },
+  {
+    "k": [
+      "how to write a thesis statement"
+    ],
+    "a": "A strong thesis statement makes a specific, arguable claim (not just a topic) and previews your main reasons — e.g. \"Social media harms teen mental health because it increases comparison, disrupts sleep, and displaces in-person friendships\" rather than just \"Social media affects teens.\""
+  },
+  {
+    "k": [
+      "how to cite apa",
+      "apa citation format"
+    ],
+    "a": "A basic APA (7th edition) in-text citation looks like **(Author, Year)**, e.g. (Khan, 2021). A reference list entry looks like: Khan, A. (2021). *Title of the work*. Publisher."
+  },
+  {
+    "k": [
+      "how to cite mla",
+      "mla citation format"
+    ],
+    "a": "A basic MLA in-text citation looks like **(Author Page)**, e.g. (Khan 45). A Works Cited entry looks like: Khan, Ahmed. *Title of the Work*. Publisher, Year."
+  },
+  {
+    "k": [
+      "what is plagiarism"
+    ],
+    "a": "Plagiarism is presenting someone else's words, ideas, or work as your own without proper credit — this includes copying text directly, closely paraphrasing without citation, and even reusing your own previously submitted work without permission (self-plagiarism)."
+  },
+  {
+    "k": [
+      "how to write an abstract"
+    ],
+    "a": "A good academic abstract (usually 150–250 words) briefly covers: the problem/purpose, your method, key results, and the main conclusion — written so someone can understand your paper's contribution without reading the full text."
+  },
+  {
+    "k": [
+      "how to reduce exam stress",
+      "exam anxiety tips"
+    ],
+    "a": "Practical steps: start revising early rather than cramming, break topics into small daily chunks, practice with past papers under timed conditions, sleep properly the night before rather than staying up late, and do a few slow breaths before you start if you feel anxious in the exam itself."
+  },
+  {
+    "k": [
+      "how to make a study schedule",
+      "study timetable"
+    ],
+    "a": "Work backward from your exam date, list topics by priority (weakest or highest-weight first), assign specific days/times using short focused blocks (like Pomodoro sessions), and build in regular review days to revisit older material rather than only moving forward."
+  },
+  {
+    "k": [
+      "tips for group projects",
+      "group project tips"
+    ],
+    "a": "Agree on roles and deadlines in writing early on, use a shared document or task board so progress is visible to everyone, schedule short regular check-ins rather than one big meeting at the end, and address problems (like an unresponsive teammate) directly and early rather than letting them build up."
+  },
+  {
+    "k": [
+      "how to write a literature review"
+    ],
+    "a": "A literature review isn't just a list of summaries — group sources by theme or argument, show how they relate to or disagree with each other, and end by identifying the gap your own work addresses."
+  },
+  {
+    "k": [
+      "difference between qualitative and quantitative research"
+    ],
+    "a": "**Quantitative research** collects numerical data and looks for statistical patterns (surveys, experiments). **Qualitative research** collects non-numerical data like interviews or observations to understand experiences, meanings, and context in depth."
+  },
+  {
+    "k": [
+      "how to improve gpa",
+      "how to get good grades"
+    ],
+    "a": "Attend classes consistently, start assignments as soon as they're given rather than near the deadline, actively review notes within a day or two of the lecture (not just before exams), and ask for help from professors or TAs early when confused rather than after falling behind."
+  },
+  {
+    "k": [
+      "what is a hypothesis"
+    ],
+    "a": "A hypothesis is a specific, testable prediction about the relationship between variables — e.g. \"increasing study time will improve test scores\" — that an experiment or study is designed to support or refute."
+  },
+  {
+    "k": [
+      "how to write a good introduction paragraph"
+    ],
+    "a": "A strong introduction typically: opens with a hook (a question, fact, or scenario), gives brief background/context, and ends with a clear thesis statement that tells the reader exactly what the piece will argue or cover."
+  },
+  {
+    "k": [
+      "actions speak louder than words"
+    ],
+    "a": "**\"Actions Speak Louder Than Words\"** — What you do matters more than what you say."
+  },
+  {
+    "k": [
+      "better late than never"
+    ],
+    "a": "**\"Better Late Than Never\"** — It's better to do something late than not at all."
+  },
+  {
+    "k": [
+      "practice makes perfect"
+    ],
+    "a": "**\"Practice Makes Perfect\"** — Repeated practice leads to improvement and mastery."
+  },
+  {
+    "k": [
+      "don't judge a book by its cover"
+    ],
+    "a": "**\"Don'T Judge A Book By Its Cover\"** — Don't judge something's worth based only on appearance."
+  },
+  {
+    "k": [
+      "when in rome, do as the romans do"
+    ],
+    "a": "**\"When In Rome, Do As The Romans Do\"** — Adapt to the customs of the place or situation you're in."
+  },
+  {
+    "k": [
+      "the early bird catches the worm"
+    ],
+    "a": "**\"The Early Bird Catches The Worm\"** — Those who act early gain an advantage."
+  },
+  {
+    "k": [
+      "every cloud has a silver lining"
+    ],
+    "a": "**\"Every Cloud Has A Silver Lining\"** — Even difficult situations have some positive aspect."
+  },
+  {
+    "k": [
+      "a friend in need is a friend indeed"
+    ],
+    "a": "**\"A Friend In Need Is A Friend Indeed\"** — A true friend is one who helps you in difficult times."
+  },
+  {
+    "k": [
+      "boond boond se darya banta hai"
+    ],
+    "a": "**\"Boond boond se darya banta hai\"** (بوند بوند سے دریا بنتا ہے) — a river is formed drop by drop; small consistent efforts add up to something big."
+  },
+  {
+    "k": [
+      "jaisi karni waisi bharni"
+    ],
+    "a": "**\"Jaisi karni waisi bharni\"** (جیسی کرنی ویسی بھرنی) — you reap what you sow; your actions determine your outcomes."
+  },
+  {
+    "k": [
+      "sabar ka phal meetha hota hai"
+    ],
+    "a": "**\"Sabar ka phal meetha hota hai\"** (صبر کا پھل میٹھا ہوتا ہے) — the fruit of patience is sweet; good things come to those who wait patiently."
+  },
+  {
+    "k": [
+      "capital of singapore"
+    ],
+    "a": "**Singapore** is the capital of Singapore."
+  },
+  {
+    "k": [
+      "capital of finland"
+    ],
+    "a": "**Helsinki** is the capital of Finland."
+  },
+  {
+    "k": [
+      "capital of denmark"
+    ],
+    "a": "**Copenhagen** is the capital of Denmark."
+  },
+  {
+    "k": [
+      "capital of ireland"
+    ],
+    "a": "**Dublin** is the capital of Ireland."
+  },
+  {
+    "k": [
+      "capital of ukraine"
+    ],
+    "a": "**Kyiv** is the capital of Ukraine."
+  },
+  {
+    "k": [
+      "capital of czech republic"
+    ],
+    "a": "**Prague** is the capital of Czech Republic."
+  },
+  {
+    "k": [
+      "capital of hungary"
+    ],
+    "a": "**Budapest** is the capital of Hungary."
+  },
+  {
+    "k": [
+      "capital of romania"
+    ],
+    "a": "**Bucharest** is the capital of Romania."
+  },
+  {
+    "k": [
+      "capital of israel palestine"
+    ],
+    "a": "**Jerusalem** is the capital of Israel Palestine."
+  },
+  {
+    "k": [
+      "capital of libya"
+    ],
+    "a": "**Tripoli** is the capital of Libya."
+  },
+  {
+    "k": [
+      "capital of tunisia"
+    ],
+    "a": "**Tunis** is the capital of Tunisia."
+  },
+  {
+    "k": [
+      "capital of ethiopia"
+    ],
+    "a": "**Addis Ababa** is the capital of Ethiopia."
+  },
+  {
+    "k": [
+      "capital of ghana"
+    ],
+    "a": "**Accra** is the capital of Ghana."
+  },
+  {
+    "k": [
+      "capital of tanzania"
+    ],
+    "a": "**Dodoma** is the capital of Tanzania."
+  },
+  {
+    "k": [
+      "capital of myanmar"
+    ],
+    "a": "**Naypyidaw** is the capital of Myanmar."
+  },
+  {
+    "k": [
+      "capital of cambodia"
+    ],
+    "a": "**Phnom Penh** is the capital of Cambodia."
+  },
+  {
+    "k": [
+      "capital of laos"
+    ],
+    "a": "**Vientiane** is the capital of Laos."
+  },
+  {
+    "k": [
+      "capital of mongolia"
+    ],
+    "a": "**Ulaanbaatar** is the capital of Mongolia."
+  },
+  {
+    "k": [
+      "how many chambers does the heart have"
+    ],
+    "a": "The human heart has **four chambers**: two atria (upper) and two ventricles (lower)."
+  },
+  {
+    "k": [
+      "what is the function of the liver"
+    ],
+    "a": "The liver filters toxins from the blood, produces bile to help digest fats, stores energy as glycogen, and helps process nutrients and medications."
+  },
+  {
+    "k": [
+      "what is the function of the kidneys"
+    ],
+    "a": "The kidneys filter waste and excess fluid from the blood to form urine, helping regulate blood pressure, electrolyte balance, and overall fluid balance in the body."
+  },
+  {
+    "k": [
+      "how many teeth do adults have"
+    ],
+    "a": "Adults typically have **32 teeth**, including wisdom teeth (though some people never develop all four wisdom teeth)."
+  },
+  {
+    "k": [
+      "what is the largest bone in the human body"
+    ],
+    "a": "The femur (thigh bone) is the largest and strongest bone in the human body."
+  },
+  {
+    "k": [
+      "what is a stack data structure"
+    ],
+    "a": "A stack is a Last-In-First-Out (LIFO) data structure — the most recently added item is the first one removed, like a stack of plates. Common operations are push (add) and pop (remove)."
+  },
+  {
+    "k": [
+      "what is a queue data structure"
+    ],
+    "a": "A queue is a First-In-First-Out (FIFO) data structure — items are removed in the order they were added, like a line of people waiting. Common operations are enqueue (add) and dequeue (remove)."
+  },
+  {
+    "k": [
+      "difference between array and linked list"
+    ],
+    "a": "An **array** stores elements in contiguous memory with fast index-based access but costly insertion/deletion. A **linked list** stores elements as nodes with pointers to the next node — insertion/deletion is cheaper, but accessing an element requires traversing from the start."
+  },
+  {
+    "k": [
+      "what is big o notation"
+    ],
+    "a": "Big O notation describes how an algorithm's run time or memory use grows as the input size grows — e.g. O(n) means time grows linearly with input size, O(n²) means it grows quadratically (like nested loops over the same list)."
+  },
+  {
+    "k": [
+      "what is object oriented programming",
+      "what is oop"
+    ],
+    "a": "Object-oriented programming (OOP) organizes code around **objects** that bundle data (attributes) and behavior (methods) together, built around concepts like classes, inheritance, encapsulation, and polymorphism."
+  },
+  {
+    "k": [
+      "what is a compiler"
+    ],
+    "a": "A compiler translates source code written in a programming language (like C++ or Java) into machine code or an intermediate form, all at once before the program runs — as opposed to an interpreter, which executes code line by line."
   }
 ];
 function knowledgeBaseLookup(text){
