@@ -248,6 +248,21 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
 .composer-btn.mic.active{ background:var(--danger); color:#fff; animation:pulse 1.2s infinite; }
 @keyframes pulse{ 0%,100%{box-shadow:0 0 0 0 rgba(191,74,58,.5);} 50%{box-shadow:0 0 0 7px rgba(191,74,58,0);} }
 .composer-hint{ text-align:center; font-size:11px; color:var(--text-muted); margin-top:9px; }
+.composer-hint.listening{ color:var(--danger); font-weight:600; }
+
+.attach-preview{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.attach-chip{
+  display:flex; align-items:center; gap:7px; background:var(--bg-surface); border:1px solid var(--border);
+  border-radius:10px; padding:5px 8px 5px 6px; font-size:12px; color:var(--text-dim); max-width:220px;
+}
+.attach-chip img{ width:26px; height:26px; object-fit:cover; border-radius:6px; }
+.attach-chip .attach-icon{ width:26px; height:26px; border-radius:6px; background:var(--code-bg); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--accent-strong); }
+.attach-chip .attach-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px; }
+.attach-chip .attach-remove{ background:none; border:none; color:var(--text-muted); cursor:pointer; padding:2px; flex-shrink:0; }
+.attach-chip .attach-remove:hover{ color:var(--danger); }
+
+.msg-attachments{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:7px; justify-content:flex-end; }
+.msg-attachments .attach-chip{ background:var(--bg-user-bubble); }
 
 /* ===== NOTEPAD ===== */
 #notepad-body{ flex:1; display:flex; min-height:0; }
@@ -297,7 +312,8 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
 .study-progress-text{ font-size:11.5px; color:var(--text-muted); margin-bottom:14px; }
 
 /* ===== SETTINGS ===== */
-#settings-body{ flex:1; overflow-y:auto; padding:22px 30px; max-width:620px; }
+#settings-body{ flex:1; overflow-y:auto; padding:22px 30px; width:100%; max-width:none; }
+.setting-group{ max-width:900px; }
 .setting-group{ margin-bottom:24px; padding-bottom:24px; border-bottom:1px solid var(--border-soft); }
 .setting-group:last-child{ border-bottom:none; }
 .setting-group h3{ font-family:var(--font-serif); font-size:15.5px; margin:0 0 4px; font-weight:700; }
@@ -413,9 +429,10 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
       </div>
       <div id="composer">
         <div class="composer-inner">
-          <div class="composer-box">
-            <input type="file" id="fileInput" accept=".txt,.md" style="display:none;">
-            <button class="composer-btn attach" id="attachBtn" title="Attach a text file">
+          <div class="attach-preview" id="attachPreview"></div>
+          <div class="composer-box" id="composerBox">
+            <input type="file" id="fileInput" accept=".txt,.md,.csv,.json,image/png,image/jpeg,image/webp,application/pdf" multiple style="display:none;">
+            <button class="composer-btn attach" id="attachBtn" title="Attach a file (text, image, or PDF)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05 12.25 20.24a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95L9.94 17.31a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
             </button>
             <button class="composer-btn mic" id="micBtn" title="Voice input">
@@ -426,10 +443,11 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
             </button>
           </div>
-          <div class="composer-hint">Zariya can make mistakes. Everything runs in this browser.</div>
+          <div class="composer-hint" id="composerHint">Zariya can make mistakes. Everything runs in this browser.</div>
         </div>
       </div>
     </section>
+
 
     <!-- NOTEPAD VIEW -->
     <section class="view" id="view-notepad">
@@ -728,9 +746,11 @@ function renderBubble(m, idx, isLast){
 
   const urduClass = isUrdu(m.content) ? 'is-urdu' : '';
   if(m.role==='user'){
+    const attHtml = (m.attachments && m.attachments.length) ? '<div class="msg-attachments">'+m.attachments.map(a=>attachChipHtml(a,false)).join('')+'</div>' : '';
     row.innerHTML =
       '<div class="bubble-col user-col">'+
-        '<div class="bubble user '+urduClass+'">'+formatInline(m.content)+'</div>'+
+        attHtml+
+        (m.content ? '<div class="bubble user '+urduClass+'">'+formatInline(m.content)+'</div>' : '')+
         (settings.showTimestamps ? '<div class="msg-meta">'+(m.ts||'')+'</div>' : '')+
         '<div class="msg-actions"><button class="ghost-btn" data-act="edit">Edit</button></div>'+
       '</div>';
@@ -781,7 +801,7 @@ const input = document.getElementById('chat-input');
 const sendBtn = document.getElementById('sendBtn');
 function syncSendState(){
   if(isGenerating) return;
-  sendBtn.disabled = input.value.trim().length===0;
+  sendBtn.disabled = input.value.trim().length===0 && pendingAttachments.length===0;
 }
 input.addEventListener('input', ()=>{ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,160)+'px'; syncSendState(); });
 input.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); if(!sendBtn.disabled) sendMessage(); } });
@@ -790,11 +810,14 @@ syncSendState();
 
 function sendMessage(){
   const text = input.value.trim();
-  if(!text) return;
+  const attachments = pendingAttachments;
+  if(!text && !attachments.length) return;
   if(!currentSession()) newSession();
   const session = currentSession();
-  session.messages.push({ role:'user', content:text, ts: nowISO() });
-  if(session.title==='New chat') session.title = text.slice(0,40);
+  session.messages.push({ role:'user', content:text, attachments, ts: nowISO() });
+  if(session.title==='New chat') session.title = (text || (attachments[0] && attachments[0].name) || 'New chat').slice(0,40);
+  pendingAttachments = [];
+  renderAttachPreview();
   saveAll(); renderSessionList(); renderChat();
   input.value=''; input.style.height='auto'; syncSendState();
   respondTo(session);
@@ -854,6 +877,24 @@ function regenerateLast(){
 }
 
 /* ============ CLAUDE API (optional, BYO key) ============ */
+function messageToApiContent(m){
+  const atts = m.attachments || [];
+  if(!atts.length) return m.content;
+  const blocks = [];
+  if(m.content) blocks.push({ type:'text', text: m.content });
+  atts.forEach(att=>{
+    if(att.kind==='image'){
+      const base64 = att.dataUrl.split(',')[1];
+      blocks.push({ type:'image', source:{ type:'base64', media_type: att.mime, data: base64 } });
+    } else if(att.kind==='document'){
+      const base64 = att.dataUrl.split(',')[1];
+      blocks.push({ type:'document', source:{ type:'base64', media_type: 'application/pdf', data: base64 } });
+    } else if(att.kind==='text'){
+      blocks.push({ type:'text', text: '[Attached file: '+att.name+']\n'+att.text });
+    }
+  });
+  return blocks;
+}
 async function callClaude(messages, signal){
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method:'POST', signal,
@@ -866,8 +907,8 @@ async function callClaude(messages, signal){
     body: JSON.stringify({
       model:'claude-sonnet-4-6',
       max_tokens:1000,
-      system:"You are Zariya, a warm, concise bilingual Urdu/English assistant. Reply in whichever language the user writes in, mixing naturally if they mix.",
-      messages: messages.map(m=>({role:m.role, content:m.content}))
+      system:"You are Zariya, a warm, concise bilingual Urdu/English assistant. Reply in whichever language the user writes in, mixing naturally if they mix. Users may attach images, PDFs, or text files — read and use their contents directly in your answer.",
+      messages: messages.map(m=>({role:m.role, content: messageToApiContent(m)}))
     })
   });
   if(!res.ok) throw new Error('HTTP '+res.status);
@@ -1074,7 +1115,68 @@ const dict = {
   "الحمدللہ": "praise be to God (Alhamdulillah)",
   "ان شاء اللہ": "God willing (Insha'Allah)",
   "ماشاءاللہ": "as God has willed (Masha'Allah)",
-  "جزاک اللہ": "may God reward you (JazakAllah)"
+  "جزاک اللہ": "may God reward you (JazakAllah)",
+  "doctor": "ڈاکٹر",
+  "engineer": "انجینئر",
+  "lawyer": "وکیل",
+  "farmer": "کسان",
+  "businessman": "تاجر",
+  "nurse": "نرس",
+  "police": "پولیس",
+  "soldier": "فوجی",
+  "artist": "فنکار",
+  "writer": "مصنف",
+  "weather": "موسم",
+  "summer": "گرمی",
+  "winter": "سردی",
+  "spring": "بہار",
+  "autumn": "خزاں",
+  "cloud": "بادل",
+  "storm": "طوفان",
+  "snow": "برف",
+  "fog": "دھند",
+  "internet": "انٹرنیٹ",
+  "mobile": "موبائل",
+  "laptop": "لیپ ٹاپ",
+  "camera": "کیمرہ",
+  "game": "کھیل",
+  "football": "فٹبال",
+  "cricket": "کرکٹ",
+  "hockey": "ہاکی",
+  "team": "ٹیم",
+  "player": "کھلاڑی",
+  "match": "میچ",
+  "angry": "غصہ",
+  "tired": "تھکا ہوا",
+  "excited": "پرجوش",
+  "worried": "پریشان",
+  "proud": "فخر",
+  "jealous": "حسد",
+  "success": "کامیابی",
+  "failure": "ناکامی",
+  "dream job": "خوابوں کی نوکری",
+  "goal": "مقصد",
+  "effort": "کوشش",
+  "question": "سوال",
+  "answer": "جواب",
+  "problem": "مسئلہ",
+  "solution": "حل",
+  "idea": "خیال",
+  "opinion": "رائے",
+  "true": "سچ",
+  "false": "جھوٹ",
+  "important": "اہم",
+  "possible": "ممکن",
+  "impossible": "ناممکن",
+  "north": "شمال",
+  "south": "جنوب",
+  "east": "مشرق",
+  "west": "مغرب",
+  "spring water": "چشمہ",
+  "desert": "صحرا",
+  "forest": "جنگل",
+  "island": "جزیرہ",
+  "valley": "وادی"
 };
 
 const kb = [
@@ -1927,6 +2029,384 @@ const kb = [
       "the ball is in your court"
     ],
     "a": "**\"The Ball Is In Your Court\"** — it's your turn to take action or make a decision."
+  },
+  {
+    "k": [
+      "capital of netherlands"
+    ],
+    "a": "**Amsterdam** is the capital of Netherlands."
+  },
+  {
+    "k": [
+      "capital of sweden"
+    ],
+    "a": "**Stockholm** is the capital of Sweden."
+  },
+  {
+    "k": [
+      "capital of norway"
+    ],
+    "a": "**Oslo** is the capital of Norway."
+  },
+  {
+    "k": [
+      "capital of poland"
+    ],
+    "a": "**Warsaw** is the capital of Poland."
+  },
+  {
+    "k": [
+      "capital of greece"
+    ],
+    "a": "**Athens** is the capital of Greece."
+  },
+  {
+    "k": [
+      "capital of portugal"
+    ],
+    "a": "**Lisbon** is the capital of Portugal."
+  },
+  {
+    "k": [
+      "capital of switzerland"
+    ],
+    "a": "**Bern** is the capital of Switzerland."
+  },
+  {
+    "k": [
+      "capital of austria"
+    ],
+    "a": "**Vienna** is the capital of Austria."
+  },
+  {
+    "k": [
+      "capital of belgium"
+    ],
+    "a": "**Brussels** is the capital of Belgium."
+  },
+  {
+    "k": [
+      "capital of thailand"
+    ],
+    "a": "**Bangkok** is the capital of Thailand."
+  },
+  {
+    "k": [
+      "capital of vietnam"
+    ],
+    "a": "**Hanoi** is the capital of Vietnam."
+  },
+  {
+    "k": [
+      "capital of malaysia"
+    ],
+    "a": "**Kuala Lumpur** is the capital of Malaysia."
+  },
+  {
+    "k": [
+      "capital of philippines"
+    ],
+    "a": "**Manila** is the capital of Philippines."
+  },
+  {
+    "k": [
+      "capital of iraq"
+    ],
+    "a": "**Baghdad** is the capital of Iraq."
+  },
+  {
+    "k": [
+      "capital of israel"
+    ],
+    "a": "**Jerusalem** is the capital of Israel."
+  },
+  {
+    "k": [
+      "capital of jordan"
+    ],
+    "a": "**Amman** is the capital of Jordan."
+  },
+  {
+    "k": [
+      "capital of qatar"
+    ],
+    "a": "**Doha** is the capital of Qatar."
+  },
+  {
+    "k": [
+      "capital of kuwait"
+    ],
+    "a": "**Kuwait City** is the capital of Kuwait."
+  },
+  {
+    "k": [
+      "capital of oman"
+    ],
+    "a": "**Muscat** is the capital of Oman."
+  },
+  {
+    "k": [
+      "capital of morocco"
+    ],
+    "a": "**Rabat** is the capital of Morocco."
+  },
+  {
+    "k": [
+      "capital of algeria"
+    ],
+    "a": "**Algiers** is the capital of Algeria."
+  },
+  {
+    "k": [
+      "capital of argentina"
+    ],
+    "a": "**Buenos Aires** is the capital of Argentina."
+  },
+  {
+    "k": [
+      "capital of chile"
+    ],
+    "a": "**Santiago** is the capital of Chile."
+  },
+  {
+    "k": [
+      "capital of colombia"
+    ],
+    "a": "**Bogotá** is the capital of Colombia."
+  },
+  {
+    "k": [
+      "capital of peru"
+    ],
+    "a": "**Lima** is the capital of Peru."
+  },
+  {
+    "k": [
+      "capital of new zealand"
+    ],
+    "a": "**Wellington** is the capital of New Zealand."
+  },
+  {
+    "k": [
+      "how many players in a football team",
+      "football team players"
+    ],
+    "a": "A football (soccer) team has **11 players** on the field at a time, including the goalkeeper."
+  },
+  {
+    "k": [
+      "how many players in a cricket team"
+    ],
+    "a": "A cricket team has **11 players** on the field at a time."
+  },
+  {
+    "k": [
+      "how often are the olympics held",
+      "olympics every"
+    ],
+    "a": "The Summer and Winter Olympic Games are each held every **4 years**, staggered two years apart."
+  },
+  {
+    "k": [
+      "who has won the most cricket world cups"
+    ],
+    "a": "Australia has won the most Cricket World Cup titles, with six championships as of the most recent tournaments in my training data — check a live source for the very latest count."
+  },
+  {
+    "k": [
+      "what is the offside rule"
+    ],
+    "a": "In football, a player is offside if they're nearer to the opponent's goal line than both the ball and the second-last defender when the ball is played to them, unless they're in their own half."
+  },
+  {
+    "k": [
+      "who wrote hamlet"
+    ],
+    "a": "William Shakespeare wrote *Hamlet*."
+  },
+  {
+    "k": [
+      "who wrote pride and prejudice"
+    ],
+    "a": "Jane Austen wrote *Pride and Prejudice*, published in 1813."
+  },
+  {
+    "k": [
+      "who wrote 1984"
+    ],
+    "a": "George Orwell wrote *1984*, published in 1949."
+  },
+  {
+    "k": [
+      "who wrote to kill a mockingbird"
+    ],
+    "a": "Harper Lee wrote *To Kill a Mockingbird*, published in 1960."
+  },
+  {
+    "k": [
+      "who is allama iqbal"
+    ],
+    "a": "Allama Muhammad Iqbal (1877–1938) was a poet, philosopher, and politician, widely regarded as the spiritual father of Pakistan and the national poet, famous for works like *Bang-e-Dara* and *Bal-e-Jibril*."
+  },
+  {
+    "k": [
+      "who is mirza ghalib"
+    ],
+    "a": "Mirza Ghalib (1797–1869) was one of the most celebrated Urdu and Persian poets, known for his ghazals exploring love, philosophy, and the human condition."
+  },
+  {
+    "k": [
+      "difference between affect and effect"
+    ],
+    "a": "**Affect** is usually a verb meaning to influence something (\"the rain affected our plans\"). **Effect** is usually a noun meaning the result (\"the effect of the rain was a delay\")."
+  },
+  {
+    "k": [
+      "difference between their there they're"
+    ],
+    "a": "**Their** shows possession (\"their house\"), **there** refers to a place (\"put it there\"), and **they're** is a contraction of \"they are\" (\"they're coming\")."
+  },
+  {
+    "k": [
+      "difference between its and it's"
+    ],
+    "a": "**Its** shows possession (\"the dog wagged its tail\"). **It's** is a contraction of \"it is\" or \"it has\" (\"it's raining\")."
+  },
+  {
+    "k": [
+      "past tense of go"
+    ],
+    "a": "The past tense of **go** is **went** (and the past participle is **gone**)."
+  },
+  {
+    "k": [
+      "plural of child"
+    ],
+    "a": "The plural of **child** is **children** — an irregular plural."
+  },
+  {
+    "k": [
+      "hello world java"
+    ],
+    "a": "```java\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, world!\");\n    }\n}\n```"
+  },
+  {
+    "k": [
+      "hello world c++",
+      "hello world cpp"
+    ],
+    "a": "```cpp\n#include <iostream>\nint main() {\n    std::cout << \"Hello, world!\" << std::endl;\n    return 0;\n}\n```"
+  },
+  {
+    "k": [
+      "sql select query",
+      "basic sql query"
+    ],
+    "a": "```sql\nSELECT name, age FROM users WHERE age > 18 ORDER BY name;\n```"
+  },
+  {
+    "k": [
+      "center a div css",
+      "css center div"
+    ],
+    "a": "```css\n.container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n```"
+  },
+  {
+    "k": [
+      "what is a for loop"
+    ],
+    "a": "A for loop repeats a block of code a set number of times — useful when you know in advance how many iterations you need, unlike a while loop which repeats until a condition becomes false."
+  },
+  {
+    "k": [
+      "difference between let and var javascript"
+    ],
+    "a": "**var** is function-scoped and can be re-declared, which often causes bugs. **let** is block-scoped and can't be re-declared in the same scope — modern JavaScript generally prefers `let` (and `const` for values that don't change)."
+  },
+  {
+    "k": [
+      "what is recursion"
+    ],
+    "a": "Recursion is when a function calls itself to solve a smaller version of the same problem, until it reaches a base case that stops the calls — commonly used for things like factorials, tree traversal, and the Fibonacci sequence."
+  },
+  {
+    "k": [
+      "how much water should i drink"
+    ],
+    "a": "A commonly cited general guideline is about **8 glasses (roughly 2 litres) a day**, though needs vary with body size, climate, and activity level — this isn't medical advice, so check with a doctor for anything specific to you."
+  },
+  {
+    "k": [
+      "how many hours of sleep"
+    ],
+    "a": "Most adults generally need **7–9 hours** of sleep per night for good health; teenagers typically need a bit more, around 8–10 hours."
+  },
+  {
+    "k": [
+      "benefits of exercise"
+    ],
+    "a": "Regular exercise is linked to better cardiovascular health, stronger muscles and bones, improved mood, better sleep, and lower risk of chronic disease — even 30 minutes of brisk walking most days makes a real difference."
+  },
+  {
+    "k": [
+      "who founded microsoft"
+    ],
+    "a": "Bill Gates and Paul Allen founded Microsoft in 1975."
+  },
+  {
+    "k": [
+      "who founded apple"
+    ],
+    "a": "Steve Jobs, Steve Wozniak, and Ronald Wayne founded Apple in 1976."
+  },
+  {
+    "k": [
+      "who founded google"
+    ],
+    "a": "Larry Page and Sergey Brin founded Google in 1998, while they were PhD students at Stanford."
+  },
+  {
+    "k": [
+      "who founded amazon"
+    ],
+    "a": "Jeff Bezos founded Amazon in 1994, initially as an online bookstore."
+  },
+  {
+    "k": [
+      "who created python"
+    ],
+    "a": "Guido van Rossum created the Python programming language, first released in 1991."
+  },
+  {
+    "k": [
+      "who created javascript"
+    ],
+    "a": "Brendan Eich created JavaScript in 1995, in just 10 days, while working at Netscape."
+  },
+  {
+    "k": [
+      "what does cpu stand for"
+    ],
+    "a": "CPU stands for **Central Processing Unit** — the primary component of a computer that executes instructions."
+  },
+  {
+    "k": [
+      "what does ram stand for"
+    ],
+    "a": "RAM stands for **Random Access Memory** — the computer's short-term, high-speed memory used to hold data actively being worked on."
+  },
+  {
+    "k": [
+      "my phone is slow",
+      "phone running slow"
+    ],
+    "a": "A few quick fixes: restart the phone, close unused apps, clear cached data, delete unused apps/photos to free storage, and check for pending software updates — these solve most slowdown issues."
+  },
+  {
+    "k": [
+      "forgot my password"
+    ],
+    "a": "Most services have a \"Forgot password\" link on the sign-in page that emails or texts you a reset link — if you don't have access to that email/phone anymore, look for the platform's account-recovery support page."
   }
 ];
 function knowledgeBaseLookup(text){
@@ -1993,9 +2473,18 @@ function tryTranslate(text){
 async function offlineReply(messages){
   await new Promise(r=>setTimeout(r, 450+Math.random()*350));
   if(stopped) return "";
-  const last = messages[messages.length-1].content.trim();
+  const lastMsg = messages[messages.length-1];
+  const atts = lastMsg.attachments || [];
+  const last = (lastMsg.content.trim() + attachmentsTextContext(atts)).trim();
   const lower = last.toLowerCase();
-  const urdu = isUrdu(last);
+  const urdu = isUrdu(lastMsg.content);
+
+  const hasMedia = atts.some(a=>a.kind==='image' || a.kind==='document');
+  const hasText = atts.some(a=>a.kind==='text');
+
+  if(hasMedia && !lastMsg.content.trim()){
+    return "I can see you've attached " + (atts.length>1?"files":"a file") + " (" + atts.map(a=>a.name).join(', ') + "), but offline mode can't look inside images or PDFs — it can only read plain text attachments. Connect a Claude API key in Settings and I'll be able to actually see and describe them.";
+  }
 
   const conv = tryConvert(last); if(conv) return conv;
   const math = tryMath(last); if(math) return math;
@@ -2012,6 +2501,11 @@ async function offlineReply(messages){
   if(/شکریہ|thank/i.test(last)) return urdu ? "خوش آمدید! کوئی اور سوال؟" : "You're welcome! Anything else?";
 
   const kbHit = knowledgeBaseLookup(last); if(kbHit) return kbHit;
+
+  if(hasText){
+    const names = atts.filter(a=>a.kind==='text').map(a=>a.name).join(', ');
+    return "I read " + names + ", but nothing in it matched my offline knowledge base for that question. Connect a Claude API key in Settings for a real read-through and answer.";
+  }
 
   const genericEn = [
     "I don't have that in my offline knowledge base yet — I can handle arithmetic, unit conversions, common English⇄Urdu words, a range of general-knowledge questions, small code snippets, and study tips. For truly open-ended answers, add your Claude API key in Settings.",
@@ -2079,22 +2573,74 @@ function flashcardsFromMessages(messages){
   return cards;
 }
 
-/* ============ ATTACH FILE ============ */
+/* ============ ATTACHMENTS (files & images, readable by the AI) ============ */
+let pendingAttachments = [];
+const ATTACH_ICONS = {
+  image: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+  document: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+  text: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>'
+};
+function kindForFile(file){
+  if(file.type.startsWith('image/')) return 'image';
+  if(file.type==='application/pdf') return 'document';
+  return 'text';
+}
+function fileToDataUrl(file){
+  return new Promise((resolve, reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+function fileToText(file){
+  return new Promise((resolve, reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(String(r.result));
+    r.onerror = reject;
+    r.readAsText(file);
+  });
+}
 document.getElementById('attachBtn').addEventListener('click', ()=>document.getElementById('fileInput').click());
-document.getElementById('fileInput').addEventListener('change', (e)=>{
-  const file = e.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    const content = String(reader.result).slice(0,4000);
-    input.value = (input.value ? input.value+'\n\n' : '') + '```'+file.name+'\n'+content+'\n```\n';
-    input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,160)+'px';
-    syncSendState(); input.focus();
-  };
-  reader.readAsText(file);
+document.getElementById('fileInput').addEventListener('change', async (e)=>{
+  const files = Array.from(e.target.files || []);
+  for(const file of files){
+    const kind = kindForFile(file);
+    const att = { id: uid(), name: file.name, kind, mime: file.type || 'text/plain', size: file.size };
+    try{
+      if(kind==='text'){
+        att.text = (await fileToText(file)).slice(0, 6000);
+      } else {
+        att.dataUrl = await fileToDataUrl(file); // data:<mime>;base64,....
+      }
+      pendingAttachments.push(att);
+    }catch(err){ console.error('Could not read file', file.name, err); }
+  }
+  renderAttachPreview();
   e.target.value = '';
 });
+function renderAttachPreview(){
+  const wrap = document.getElementById('attachPreview');
+  wrap.innerHTML = pendingAttachments.map(att=>attachChipHtml(att, true)).join('');
+  wrap.querySelectorAll('[data-remove-att]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      pendingAttachments = pendingAttachments.filter(a=>a.id!==btn.dataset.removeAtt);
+      renderAttachPreview();
+    });
+  });
+  syncSendState();
+}
+function attachChipHtml(att, removable){
+  const preview = att.kind==='image' ? '<img src="'+att.dataUrl+'" alt="">' : '<span class="attach-icon">'+ATTACH_ICONS[att.kind]+'</span>';
+  return '<span class="attach-chip">'+preview+'<span class="attach-name">'+escapeHtml(att.name)+'</span>'+
+    (removable ? '<button class="attach-remove" data-remove-att="'+att.id+'" title="Remove">✕</button>' : '')+'</span>';
+}
+function attachmentsTextContext(attachments){
+  if(!attachments || !attachments.length) return '';
+  return attachments.filter(a=>a.kind==='text').map(a=>'\n\n[Attached file: '+a.name+']\n'+a.text).join('');
+}
 
-/* ============ SPEECH: TTS + STT ============ */
+/* ============ SPEECH: TTS + STT (voice becomes plain, editable, readable text) ============ */
 function speak(text){
   if(!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
@@ -2108,14 +2654,35 @@ function speak(text){
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognizer = null, listening = false;
 const micBtn = document.getElementById('micBtn');
+const composerHint = document.getElementById('composerHint');
+const composerBox = document.getElementById('composerBox');
+const defaultHint = composerHint.textContent;
 if(SR){
   recognizer = new SR();
-  recognizer.continuous = false; recognizer.interimResults = false;
-  recognizer.onresult = (e)=>{ const text = e.results[0][0].transcript; input.value = (input.value ? input.value+' ' : '') + text; syncSendState(); };
-  recognizer.onend = ()=>{ listening=false; micBtn.classList.remove('active'); };
+  recognizer.continuous = false; recognizer.interimResults = true;
+  recognizer.onresult = (e)=>{
+    let transcript = '';
+    for(let i=0;i<e.results.length;i++) transcript += e.results[i][0].transcript;
+    const base = recognizer._baseValue || '';
+    input.value = (base ? base+' ' : '') + transcript;
+    input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,160)+'px';
+    syncSendState();
+  };
+  recognizer.onstart = ()=>{
+    listening = true; micBtn.classList.add('active'); composerBox.classList.add('listening');
+    recognizer._baseValue = input.value.trim();
+    composerHint.textContent = 'Listening… speak now, then tap the mic again to stop';
+    composerHint.classList.add('listening');
+  };
+  recognizer.onend = ()=>{
+    listening=false; micBtn.classList.remove('active'); composerBox.classList.remove('listening');
+    composerHint.textContent = defaultHint; composerHint.classList.remove('listening');
+    input.focus();
+  };
+  recognizer.onerror = ()=>{ listening=false; micBtn.classList.remove('active'); composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); };
   micBtn.addEventListener('click', ()=>{
     if(listening){ recognizer.stop(); return; }
-    try{ recognizer.lang = 'en-US'; recognizer.start(); listening=true; micBtn.classList.add('active'); }catch(e){}
+    try{ recognizer.lang = isUrdu(input.value) ? 'ur-PK' : 'en-US'; recognizer.start(); }catch(e){}
   });
 } else { micBtn.style.display = 'none'; }
 
