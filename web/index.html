@@ -528,18 +528,25 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
 
         <div class="setting-group">
           <h3>Profile</h3>
-          <p class="desc">A local display name and, optionally, your public GitHub avatar/bio pulled in for a nicer sidebar. To be upfront: this is <strong>not</strong> "Sign in with GitHub" — a real GitHub OAuth login needs a server to safely hold a client secret, and this is intentionally a single file with no server or backend, so a true sign-in isn't something I can build here without one. This just reads your GitHub profile's already-public info (avatar, name, bio) — no password, no token, no access to your account.</p>
+          <p class="desc">A local display name and photo for the sidebar. To be upfront: this is <strong>not</strong> "Sign in with GitHub" — a real GitHub OAuth login needs a server to safely hold a client secret, and this is intentionally a single file with no server or backend, so a true sign-in isn't something I can build here without one.</p>
           <div class="setting-row" style="display:block;">
             <label>Display name</label>
             <div class="key-row" style="margin-top:8px; margin-bottom:14px;">
               <input class="text-input" id="profileNameInput" placeholder="Your name">
             </div>
-            <label>GitHub username (optional, public info only)</label>
+            <label>Your own photo (this is the option that's actually verifiably yours)</label>
+            <div class="key-row" style="margin-top:8px; margin-bottom:14px;">
+              <input type="file" id="avatarFileInput" accept="image/png,image/jpeg,image/webp" style="display:none;">
+              <button class="btn" id="uploadAvatarBtn">Upload a photo</button>
+              <button class="btn" id="removeAvatarBtn">Remove photo</button>
+            </div>
+            <label>GitHub username (optional — public info only, <strong>not verified as you</strong>)</label>
             <div class="key-row" style="margin-top:8px;">
               <input class="text-input" id="githubUsernameInput" placeholder="e.g. aayanahmed20">
               <button class="btn primary" id="fetchGithubBtn">Fetch profile</button>
             </div>
-            <div class="small-note" id="profileStatus">No profile set up yet.</div>
+            <div class="small-note">Important: this looks up whatever public GitHub profile matches the username you type — it does not check that it's actually you, since there's no real sign-in happening. Anyone could type any username. If you want your sidebar photo to genuinely be yours, use "Upload a photo" above instead.</div>
+            <div class="small-note" id="profileStatus" style="margin-top:6px;">No profile set up yet.</div>
             <div id="profilePreview" style="display:none; margin-top:12px; align-items:center; gap:12px;">
               <img id="profilePreviewAvatar" style="width:48px;height:48px;border-radius:50%;object-fit:cover;" alt="">
               <div>
@@ -694,6 +701,7 @@ if(settings.profileName === undefined) settings.profileName = '';
 if(settings.githubUsername === undefined) settings.githubUsername = '';
 if(settings.githubAvatarUrl === undefined) settings.githubAvatarUrl = '';
 if(settings.githubBio === undefined) settings.githubBio = '';
+if(settings.localAvatarDataUrl === undefined) settings.localAvatarDataUrl = '';
 
 let currentSessionId = sessions.length ? sessions[0].id : null;
 let currentNoteId = null;
@@ -785,21 +793,24 @@ function renderProfile(){
 
   const displayName = settings.profileName || (settings.githubUsername ? '@'+settings.githubUsername : '');
   sbName.textContent = displayName || 'Set up profile';
-  if(settings.githubAvatarUrl){
-    sbAvatar.innerHTML = '<img src="'+settings.githubAvatarUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">';
+  const avatarSrc = settings.localAvatarDataUrl || settings.githubAvatarUrl;
+  if(avatarSrc){
+    sbAvatar.innerHTML = '<img src="'+avatarSrc+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">';
   } else {
     sbAvatar.textContent = (displayName ? displayName.replace('@','')[0] : 'Z').toUpperCase();
   }
 
-  if(settings.githubUsername && settings.githubAvatarUrl){
+  if(avatarSrc){
     preview.style.display = 'flex';
-    document.getElementById('profilePreviewAvatar').src = settings.githubAvatarUrl;
-    document.getElementById('profilePreviewName').textContent = settings.profileName || settings.githubUsername;
-    document.getElementById('profilePreviewBio').textContent = settings.githubBio || '';
-    status.textContent = 'Showing public GitHub profile for @'+settings.githubUsername+'.';
+    document.getElementById('profilePreviewAvatar').src = avatarSrc;
+    document.getElementById('profilePreviewName').textContent = settings.profileName || settings.githubUsername || '';
+    document.getElementById('profilePreviewBio').textContent = settings.localAvatarDataUrl ? '' : (settings.githubBio || '');
+    status.textContent = settings.localAvatarDataUrl
+      ? 'Using your uploaded photo.' + (settings.githubUsername ? ' (GitHub username saved too, but your uploaded photo takes priority.)' : '')
+      : 'Showing the public GitHub profile for @'+settings.githubUsername+' — remember, this is not verified as you.';
   } else {
     preview.style.display = 'none';
-    status.textContent = settings.profileName ? 'Local display name set — no GitHub profile linked.' : 'No profile set up yet.';
+    status.textContent = settings.profileName ? 'Local display name set — no photo yet.' : 'No profile set up yet.';
   }
 }
 async function fetchGithubProfile(){
@@ -809,6 +820,10 @@ async function fetchGithubProfile(){
   const statusEl = document.getElementById('profileStatus');
   if(location.protocol === 'file:'){
     statusEl.textContent = 'This needs the page served over http(s) — see the banner at the top. Run "python3 -m http.server" and open http://localhost:8000 instead of opening the file directly.';
+    return;
+  }
+  if(navigator.onLine === false){
+    statusEl.textContent = 'Your browser reports no internet connection right now — reconnect and try again.';
     return;
   }
   btn.disabled = true; btn.textContent = 'Fetching…';
@@ -825,9 +840,9 @@ async function fetchGithubProfile(){
   }catch(err){
     console.error('GitHub profile fetch failed:', err);
     const isNetworkErr = err instanceof TypeError || /failed to fetch/i.test(err.message||'');
-    statusEl.textContent = isNetworkErr
-      ? 'Could not reach GitHub — check your internet connection, or your network may be blocking api.github.com.'
-      : 'Could not fetch that profile: ' + err.message;
+    statusEl.innerHTML = isNetworkErr
+      ? 'Could not reach api.github.com — this is a network-level block, not something in the app. Something between your browser and GitHub (a firewall, VPN, or an ad-blocker/privacy extension) is refusing the request. To check: open <a href="https://api.github.com/users/octocat" target="_blank" rel="noopener">this link</a> in a new tab — if that also fails to load, it confirms your network is blocking it and no code change here can fix that.'
+      : 'Could not fetch that profile: ' + escapeHtml(err.message);
   }
   btn.disabled = false; btn.textContent = 'Fetch profile';
 }
@@ -3880,6 +3895,114 @@ const kb = [
       "80 20 rule"
     ],
     "a": "The Pareto Principle (80/20 rule) observes that roughly 80% of outcomes often come from 20% of causes or efforts — commonly used as a prompt to identify and focus on the highest-impact tasks rather than spreading effort evenly."
+  },
+  {
+    "k": [
+      "how do i know this is really your github profile",
+      "is the github lookup verified",
+      "does the github feature prove identity"
+    ],
+    "a": "It doesn't — and it isn't meant to. Typing a GitHub username just displays that account's already-public avatar, name, and bio; it never checks that you actually own it, because there's no real sign-in happening (that would need a backend server, which this single file intentionally doesn't have). If you want your sidebar photo to genuinely be yours, use \"Upload a photo\" in Settings → Profile instead — that file only ever comes from your own device."
+  },
+  {
+    "k": [
+      "what is the largest mammal"
+    ],
+    "a": "The blue whale is the largest animal ever known to have existed, reaching lengths of up to 30 metres and weighing as much as 200 tonnes."
+  },
+  {
+    "k": [
+      "fastest land animal"
+    ],
+    "a": "The cheetah is the fastest land animal, capable of reaching speeds of about 100–120 km/h in short bursts."
+  },
+  {
+    "k": [
+      "what is the tallest animal"
+    ],
+    "a": "The giraffe is the tallest living land animal, with adult males reaching up to about 5.5 metres tall."
+  },
+  {
+    "k": [
+      "how long do elephants live"
+    ],
+    "a": "Elephants typically live 60–70 years in the wild, among the longest lifespans of any land mammal besides humans."
+  },
+  {
+    "k": [
+      "what is the smallest country in the world"
+    ],
+    "a": "Vatican City is the smallest country in the world, at just about 0.44 square kilometres."
+  },
+  {
+    "k": [
+      "define procrastination",
+      "what does procrastination mean",
+      "meaning of procrastination"
+    ],
+    "a": "**Procrastination** — the act of unnecessarily delaying or postponing tasks, often despite knowing it may cause problems."
+  },
+  {
+    "k": [
+      "define productivity",
+      "what does productivity mean",
+      "meaning of productivity"
+    ],
+    "a": "**Productivity** — the effectiveness of effort in producing a desired result, often measured as output relative to time or resources invested."
+  },
+  {
+    "k": [
+      "define mindfulness",
+      "what does mindfulness mean",
+      "meaning of mindfulness"
+    ],
+    "a": "**Mindfulness** — the practice of being fully present and aware of the current moment, without judgment."
+  },
+  {
+    "k": [
+      "define burnout",
+      "what does burnout mean",
+      "meaning of burnout"
+    ],
+    "a": "**Burnout** — a state of physical and emotional exhaustion caused by prolonged stress, often from work or overcommitment."
+  },
+  {
+    "k": [
+      "define networking (professional)",
+      "what does networking (professional) mean",
+      "meaning of networking (professional)"
+    ],
+    "a": "**Networking (Professional)** — building and maintaining relationships with people who can offer support, advice, or opportunities in your field."
+  },
+  {
+    "k": [
+      "how to open a bank account"
+    ],
+    "a": "Typically you'll need a valid ID (CNIC/passport), proof of address, and sometimes proof of income — visit a bank branch or use their app, fill out the application, and often make a small minimum deposit to activate the account."
+  },
+  {
+    "k": [
+      "how to renew a passport in pakistan"
+    ],
+    "a": "In Pakistan, passport renewal is handled through NADRA/Directorate General of Immigration & Passports — you can apply online via the Pak-ID / DGIP portal, submit required documents (CNIC, old passport, photos), pay the applicable fee, and visit a Passport Office if biometrics are needed."
+  },
+  {
+    "k": [
+      "how to apply for a visa"
+    ],
+    "a": "Requirements vary by country, but generally involve: a valid passport, a completed application form, passport-size photos, proof of funds, travel/accommodation details, and sometimes an interview — check the specific destination country's embassy or consulate website for exact requirements."
+  },
+  {
+    "k": [
+      "how to beat procrastination"
+    ],
+    "a": "Break tasks into the smallest possible first step (\"open the document\" rather than \"write the essay\"), remove distractions before starting rather than relying on willpower mid-task, and use a timer to commit to just 10–15 minutes — often the hardest part is starting, not continuing."
+  },
+  {
+    "k": [
+      "difference between summative and formative assessment"
+    ],
+    "a": "**Formative assessment** happens during learning to give feedback and guide improvement (quizzes, drafts). **Summative assessment** happens at the end to evaluate overall learning (final exams, final projects)."
   }
 ];
 const KB_STOPWORDS = new Set(["who","what","the","is","are","was","were","a","an","of","in","on","to","do","does","did",
@@ -4463,9 +4586,23 @@ document.getElementById('saveGoogleBtn').addEventListener('click', ()=>{
   saveAll(); applySettings();
 });
 document.getElementById('fetchGithubBtn').addEventListener('click', fetchGithubProfile);
+document.getElementById('uploadAvatarBtn').addEventListener('click', ()=>document.getElementById('avatarFileInput').click());
+document.getElementById('avatarFileInput').addEventListener('change', (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    settings.localAvatarDataUrl = String(reader.result);
+    saveAll(); applySettings();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+document.getElementById('removeAvatarBtn').addEventListener('click', ()=>{
+  settings.localAvatarDataUrl = ''; saveAll(); applySettings();
+});
 document.getElementById('profileNameInput').addEventListener('input', (e)=>{ settings.profileName = e.target.value; saveAll(); renderProfile(); });
 document.getElementById('clearProfileBtn').addEventListener('click', ()=>{
-  settings.profileName=''; settings.githubUsername=''; settings.githubAvatarUrl=''; settings.githubBio='';
+  settings.profileName=''; settings.githubUsername=''; settings.githubAvatarUrl=''; settings.githubBio=''; settings.localAvatarDataUrl='';
   saveAll(); applySettings();
 });
 document.getElementById('sbProfileRow').addEventListener('click', ()=>switchView('settings'));
