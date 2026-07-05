@@ -132,7 +132,19 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
 .sess-item:hover .sess-del{ opacity:1; }
 .sess-del:hover{ color:var(--danger); }
 
-.sb-footer{ padding:11px 14px; border-top:1px solid var(--border-soft); display:flex; align-items:center; justify-content:space-between; gap:8px;}
+.sb-footer{ padding:8px 10px 11px; border-top:1px solid var(--border-soft); display:flex; flex-direction:column; gap:6px;}
+.sb-footer-bottom{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 4px;}
+.sb-profile-row{
+  display:flex; align-items:center; gap:9px; padding:8px; border-radius:10px; border:none; background:none;
+  cursor:pointer; text-align:left; width:100%; transition:.15s;
+}
+.sb-profile-row:hover{ background:var(--bg-hover); }
+.sb-profile-avatar{
+  width:28px; height:28px; border-radius:50%; flex-shrink:0; object-fit:cover;
+  display:flex; align-items:center; justify-content:center; background:var(--accent); color:#fff;
+  font-size:12.5px; font-weight:700; overflow:hidden;
+}
+.sb-profile-name{ font-size:13px; font-weight:600; color:var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .status-pill{ display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-muted); }
 .status-dot{ width:6px; height:6px; border-radius:50%; background:var(--success); }
 .status-dot.off{ background:var(--text-muted); }
@@ -189,6 +201,12 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
 .bubble p{ margin:0 0 12px; }
 .bubble p:last-child{ margin-bottom:0; }
 .bubble code{ background:var(--code-bg); padding:1px 5px; border-radius:4px; font-family:var(--font-mono); font-size:.87em; }
+.bubble a{ color:var(--accent-strong); text-decoration:underline; text-underline-offset:2px; }
+.bubble a:hover{ color:var(--accent); }
+.search-result{ display:block; margin:10px 0; padding:10px 13px; border:1px solid var(--border); border-radius:12px; background:var(--bg-surface); }
+.search-result .sr-title{ font-weight:600; }
+.search-result .sr-url{ font-size:11.5px; color:var(--success); margin:2px 0 4px; word-break:break-all; }
+.search-result .sr-snippet{ font-size:13px; color:var(--text-dim); }
 .bubble.user code{ background:rgba(0,0,0,.08); }
 .code-block{ margin:10px 0; border-radius:10px; overflow:hidden; border:1px solid var(--border); }
 .code-block-head{ display:flex; align-items:center; justify-content:space-between; padding:6px 12px; background:var(--code-bg); border-bottom:1px solid var(--border); font-size:11px; color:var(--text-muted); font-family:var(--font-mono); }
@@ -406,10 +424,16 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
     </div>
 
     <div class="sb-footer">
-      <div class="status-pill"><span class="status-dot off" id="statusDot"></span><span id="statusText">Offline mode</span></div>
-      <button class="icon-btn" id="themeToggleBtn" title="Toggle theme">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <button class="sb-profile-row" id="sbProfileRow">
+        <span class="sb-profile-avatar" id="sbProfileAvatar">Z</span>
+        <span class="sb-profile-name" id="sbProfileName">Set up profile</span>
       </button>
+      <div class="sb-footer-bottom">
+        <div class="status-pill"><span class="status-dot off" id="statusDot"></span><span id="statusText">Offline mode</span></div>
+        <button class="icon-btn" id="themeToggleBtn" title="Toggle theme">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
     </div>
   </aside>
 
@@ -431,6 +455,7 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
         <button class="qt-btn" data-tool="keypoints">Key points</button>
         <button class="qt-btn" data-tool="flashcards">Make flashcards</button>
         <button class="qt-btn" data-tool="translate">Translate last</button>
+        <button class="qt-btn" data-tool="websearch">Search web</button>
         <button class="qt-btn" data-tool="title">Auto-title</button>
       </div>
       <div id="composer">
@@ -501,6 +526,31 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
       <div id="settings-body">
 
         <div class="setting-group">
+          <h3>Profile</h3>
+          <p class="desc">A local display name and, optionally, your public GitHub avatar/bio pulled in for a nicer sidebar. To be upfront: this is <strong>not</strong> "Sign in with GitHub" — a real GitHub OAuth login needs a server to safely hold a client secret, and this is intentionally a single file with no server or backend, so a true sign-in isn't something I can build here without one. This just reads your GitHub profile's already-public info (avatar, name, bio) — no password, no token, no access to your account.</p>
+          <div class="setting-row" style="display:block;">
+            <label>Display name</label>
+            <div class="key-row" style="margin-top:8px; margin-bottom:14px;">
+              <input class="text-input" id="profileNameInput" placeholder="Your name">
+            </div>
+            <label>GitHub username (optional, public info only)</label>
+            <div class="key-row" style="margin-top:8px;">
+              <input class="text-input" id="githubUsernameInput" placeholder="e.g. aayanahmed20">
+              <button class="btn primary" id="fetchGithubBtn">Fetch profile</button>
+            </div>
+            <div class="small-note" id="profileStatus">No profile set up yet.</div>
+            <div id="profilePreview" style="display:none; margin-top:12px; align-items:center; gap:12px;">
+              <img id="profilePreviewAvatar" style="width:48px;height:48px;border-radius:50%;object-fit:cover;" alt="">
+              <div>
+                <div id="profilePreviewName" style="font-weight:700;font-size:14px;"></div>
+                <div id="profilePreviewBio" style="font-size:12px;color:var(--text-muted);max-width:400px;"></div>
+              </div>
+            </div>
+            <button class="btn danger" id="clearProfileBtn" style="margin-top:12px;">Clear profile</button>
+          </div>
+        </div>
+
+        <div class="setting-group">
           <h3>Appearance</h3>
           <p class="desc">Theme and reading comfort</p>
           <div class="setting-row">
@@ -561,6 +611,24 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
         </div>
 
         <div class="setting-group">
+          <h3>Web Search <span style="font-weight:400;color:var(--text-muted);">— optional, real Google results with links</span></h3>
+          <p class="desc">Connect your own free Google Custom Search credentials to let the "Search web" tool pull real, current results with clickable source links — this is genuine internet search, not something built into the browser, so it needs your own key. Get one free at <a href="https://programmablesearchengine.google.com/" target="_blank" rel="noopener">programmablesearchengine.google.com</a> (create a search engine, set it to search the whole web) and an API key at <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">console.cloud.google.com</a> (enable the "Custom Search API"). Free tier: 100 searches/day.</p>
+          <div class="setting-row" style="display:block;">
+            <label>Google API key</label>
+            <div class="key-row" style="margin-top:8px; margin-bottom:10px;">
+              <input class="text-input" type="password" id="googleKeyInput" placeholder="AIza...">
+              <button class="btn" id="toggleGoogleKeyVisBtn">Show</button>
+            </div>
+            <label>Search engine ID (cx)</label>
+            <div class="key-row" style="margin-top:8px;">
+              <input class="text-input" id="googleCxInput" placeholder="e.g. a1b2c3d4e5f6g7h8i">
+              <button class="btn primary" id="saveGoogleBtn">Save</button>
+            </div>
+            <div class="small-note" id="googleSearchStatus">Not connected — the "Search web" tool will explain this until both fields above are filled in.</div>
+          </div>
+        </div>
+
+        <div class="setting-group">
           <h3>Claude API <span style="font-weight:400;color:var(--text-muted);">— optional, best quality</span></h3>
           <p class="desc">Optionally connect your own Anthropic API key for full Claude responses — it's stored only in this browser and sent directly to Anthropic, nowhere else. If both this and on-device AI are set up, Claude is used first.</p>
           <div class="setting-row" style="display:block;">
@@ -615,9 +683,16 @@ let decks    = LS.get('zariya_decks', []);
 let pendingAttachments = [];
 let learnedQA = LS.get('zariya_learned', []);
 let settings = LS.get('zariya_settings', {
-  theme:'light', fontSize:15, showTimestamps:true, ttsEnabled:false, apiKey:'', learnEnabled:true
+  theme:'light', fontSize:15, showTimestamps:true, ttsEnabled:false, apiKey:'', learnEnabled:true,
+  googleApiKey:'', googleCx:'', profileName:'', githubUsername:'', githubAvatarUrl:'', githubBio:''
 });
 if(settings.learnEnabled === undefined) settings.learnEnabled = true;
+if(settings.googleApiKey === undefined) settings.googleApiKey = '';
+if(settings.googleCx === undefined) settings.googleCx = '';
+if(settings.profileName === undefined) settings.profileName = '';
+if(settings.githubUsername === undefined) settings.githubUsername = '';
+if(settings.githubAvatarUrl === undefined) settings.githubAvatarUrl = '';
+if(settings.githubBio === undefined) settings.githubBio = '';
 
 let currentSessionId = sessions.length ? sessions[0].id : null;
 let currentNoteId = null;
@@ -638,10 +713,19 @@ function isUrdu(text){ return /[\u0600-\u06FF]/.test(text); }
 function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 function formatInline(s){
+  const links = [];
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (m, text, url)=>{
+    links.push({text, url});
+    return '\u0000LINK'+(links.length-1)+'\u0000';
+  });
   s = escapeHtml(s);
   s = s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
   s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
   s = s.replace(/\n/g,'<br>');
+  s = s.replace(/\u0000LINK(\d+)\u0000/g, (m, idx)=>{
+    const l = links[parseInt(idx,10)];
+    return '<a href="'+escapeHtml(l.url)+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(l.text)+'</a>';
+  });
   return s;
 }
 function renderMarkdown(raw){
@@ -679,7 +763,62 @@ function applySettings(){
   document.getElementById('toggleLearn').classList.toggle('on', settings.learnEnabled);
   updateLearnedCountUI();
   document.getElementById('apiKeyInput').value = settings.apiKey || '';
+  document.getElementById('googleKeyInput').value = settings.googleApiKey || '';
+  document.getElementById('googleCxInput').value = settings.googleCx || '';
+  const gStatus = document.getElementById('googleSearchStatus');
+  if(gStatus){
+    gStatus.textContent = (settings.googleApiKey && settings.googleCx)
+      ? 'Connected — the "Search web" tool above the message box will pull real results.'
+      : 'Not connected — the "Search web" tool will explain this until both fields above are filled in.';
+  }
   updateStatusPill();
+  renderProfile();
+}
+function renderProfile(){
+  document.getElementById('profileNameInput').value = settings.profileName || '';
+  document.getElementById('githubUsernameInput').value = settings.githubUsername || '';
+  const status = document.getElementById('profileStatus');
+  const preview = document.getElementById('profilePreview');
+  const sbAvatar = document.getElementById('sbProfileAvatar');
+  const sbName = document.getElementById('sbProfileName');
+
+  const displayName = settings.profileName || (settings.githubUsername ? '@'+settings.githubUsername : '');
+  sbName.textContent = displayName || 'Set up profile';
+  if(settings.githubAvatarUrl){
+    sbAvatar.innerHTML = '<img src="'+settings.githubAvatarUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">';
+  } else {
+    sbAvatar.textContent = (displayName ? displayName.replace('@','')[0] : 'Z').toUpperCase();
+  }
+
+  if(settings.githubUsername && settings.githubAvatarUrl){
+    preview.style.display = 'flex';
+    document.getElementById('profilePreviewAvatar').src = settings.githubAvatarUrl;
+    document.getElementById('profilePreviewName').textContent = settings.profileName || settings.githubUsername;
+    document.getElementById('profilePreviewBio').textContent = settings.githubBio || '';
+    status.textContent = 'Showing public GitHub profile for @'+settings.githubUsername+'.';
+  } else {
+    preview.style.display = 'none';
+    status.textContent = settings.profileName ? 'Local display name set — no GitHub profile linked.' : 'No profile set up yet.';
+  }
+}
+async function fetchGithubProfile(){
+  const username = document.getElementById('githubUsernameInput').value.trim().replace(/^@/,'');
+  if(!username) return;
+  const btn = document.getElementById('fetchGithubBtn');
+  btn.disabled = true; btn.textContent = 'Fetching…';
+  try{
+    const res = await fetch('https://api.github.com/users/'+encodeURIComponent(username));
+    if(!res.ok) throw new Error(res.status===404 ? 'No GitHub user found with that username' : 'HTTP '+res.status);
+    const data = await res.json();
+    settings.githubUsername = username;
+    settings.githubAvatarUrl = data.avatar_url || '';
+    settings.githubBio = data.bio || '';
+    if(!settings.profileName && data.name) settings.profileName = data.name;
+    saveAll(); applySettings();
+  }catch(err){
+    document.getElementById('profileStatus').textContent = 'Could not fetch that profile: ' + err.message;
+  }
+  btn.disabled = false; btn.textContent = 'Fetch profile';
 }
 function updateStatusPill(){
   const dot = document.getElementById('statusDot');
@@ -746,8 +885,6 @@ document.getElementById('newChatBtn').addEventListener('click', newSession);
 const suggestions = [
   ["اردو میں ایک مختصر کہانی لکھیں", true],
   ["Explain machine learning simply", false],
-  ["مجھے وقت کا انتظام سکھائیں", true],
-  ["Write a professional email", false],
 ];
 function renderChat(){
   const inner = document.getElementById('chat-inner');
@@ -968,6 +1105,21 @@ function messageToApiContent(m){
   });
   return blocks;
 }
+/* ============ GOOGLE WEB SEARCH (optional, BYO key + search engine ID) ============ */
+async function callGoogleSearch(query){
+  const url = 'https://www.googleapis.com/customsearch/v1?key='+encodeURIComponent(settings.googleApiKey)+
+    '&cx='+encodeURIComponent(settings.googleCx)+'&q='+encodeURIComponent(query);
+  const res = await fetch(url);
+  if(!res.ok){
+    const body = await res.json().catch(()=>({}));
+    throw new Error('HTTP '+res.status+(body && body.error && body.error.message ? ': '+body.error.message : ''));
+  }
+  const data = await res.json();
+  return (data.items || []).slice(0,5).map(item=>({
+    title: item.title, link: item.link, snippet: item.snippet || ''
+  }));
+}
+
 async function callClaude(messages, signal){
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method:'POST', signal,
@@ -3492,6 +3644,142 @@ const kb = [
       "how to negotiate salary"
     ],
     "a": "Research the market rate for the role beforehand, let the employer name a number first if possible, justify your ask with specific achievements or skills, and consider the full package (benefits, growth, flexibility) — not just the base number."
+  },
+  {
+    "k": [
+      "how do i search the web",
+      "can zariya search the internet",
+      "does zariya have internet access"
+    ],
+    "a": "Yes — use the \"Search web\" button above the message box. It needs your own free Google Custom Search API key and Search Engine ID, set up once under Settings → Web Search, since real internet search needs a real search provider behind it."
+  },
+  {
+    "k": [
+      "what is the equator"
+    ],
+    "a": "The equator is an imaginary line around the Earth's middle, equidistant from the North and South Poles, dividing the planet into the Northern and Southern Hemispheres."
+  },
+  {
+    "k": [
+      "what are tectonic plates"
+    ],
+    "a": "Tectonic plates are large slabs of the Earth's lithosphere that float on the semi-fluid mantle beneath them, slowly moving and interacting at their boundaries — causing earthquakes, volcanoes, and mountain formation over millions of years."
+  },
+  {
+    "k": [
+      "how many continents are there"
+    ],
+    "a": "There are generally considered to be **7 continents**: Asia, Africa, North America, South America, Antarctica, Europe, and Australia (Oceania)."
+  },
+  {
+    "k": [
+      "how many oceans are there"
+    ],
+    "a": "There are **5 oceans**: the Pacific, Atlantic, Indian, Southern (Antarctic), and Arctic Ocean."
+  },
+  {
+    "k": [
+      "biggest city in the world by population"
+    ],
+    "a": "Tokyo's greater metropolitan area is typically cited as the largest urban area in the world by population, though rankings vary depending on how city boundaries are measured."
+  },
+  {
+    "k": [
+      "define bias",
+      "what does bias mean",
+      "meaning of bias"
+    ],
+    "a": "**Bias** — a tendency to favour or disfavour something unfairly, often without full awareness of it."
+  },
+  {
+    "k": [
+      "define ethics",
+      "what does ethics mean",
+      "meaning of ethics"
+    ],
+    "a": "**Ethics** — the branch of philosophy concerned with what is morally right and wrong, and how people ought to act."
+  },
+  {
+    "k": [
+      "define philosophy",
+      "what does philosophy mean",
+      "meaning of philosophy"
+    ],
+    "a": "**Philosophy** — the study of fundamental questions about existence, knowledge, values, reason, and reality."
+  },
+  {
+    "k": [
+      "define irony",
+      "what does irony mean",
+      "meaning of irony"
+    ],
+    "a": "**Irony** — a situation or expression where the intended meaning is opposite to, or strikingly different from, the literal meaning."
+  },
+  {
+    "k": [
+      "define metaphor",
+      "what does metaphor mean",
+      "meaning of metaphor"
+    ],
+    "a": "**Metaphor** — a figure of speech that describes something by referring to it as if it were something else, to suggest a resemblance."
+  },
+  {
+    "k": [
+      "define context",
+      "what does context mean",
+      "meaning of context"
+    ],
+    "a": "**Context** — the circumstances or background surrounding an event, statement, or idea that help explain its meaning."
+  },
+  {
+    "k": [
+      "what is json"
+    ],
+    "a": "JSON (JavaScript Object Notation) is a lightweight, text-based data format used to store and exchange structured data — built from key-value pairs and arrays, and readable by both humans and machines. Example: `{\"name\": \"Ali\", \"age\": 21}`"
+  },
+  {
+    "k": [
+      "what is an array"
+    ],
+    "a": "An array is an ordered collection of values stored under a single variable name, accessed by index — e.g. in Python, `fruits = [\"apple\", \"banana\", \"mango\"]` and `fruits[0]` gives `\"apple\"`."
+  },
+  {
+    "k": [
+      "what is a variable"
+    ],
+    "a": "A variable is a named container that stores a value in a program, which can usually be read or changed later — e.g. `age = 21` stores the number 21 under the name `age`."
+  },
+  {
+    "k": [
+      "what is a loop"
+    ],
+    "a": "A loop is a programming construct that repeats a block of code multiple times — either a set number of times (a `for` loop) or until a condition is no longer true (a `while` loop)."
+  },
+  {
+    "k": [
+      "css flexbox",
+      "what is flexbox"
+    ],
+    "a": "Flexbox is a CSS layout model for arranging items in a row or column, distributing space and aligning content flexibly — set with `display: flex` on a container, then control children with properties like `justify-content` and `align-items`."
+  },
+  {
+    "k": [
+      "cornell notes",
+      "cornell note taking"
+    ],
+    "a": "The Cornell method splits a page into three sections: a narrow left column for keywords/questions, a wide right column for detailed notes during class, and a summary strip at the bottom written afterward — designed to make review and self-testing faster."
+  },
+  {
+    "k": [
+      "active recall"
+    ],
+    "a": "Active recall is a study technique where you test yourself on material (e.g. with flashcards or by covering notes and trying to recall them) rather than just re-reading — it's one of the most evidence-backed ways to build lasting memory."
+  },
+  {
+    "k": [
+      "spaced repetition"
+    ],
+    "a": "Spaced repetition is reviewing material at increasing time intervals (e.g. after 1 day, then 3 days, then a week) rather than cramming all at once — it exploits how memory consolidates better with spaced, repeated exposure."
   }
 ];
 const KB_STOPWORDS = new Set(["who","what","the","is","are","was","were","a","an","of","in","on","to","do","does","did",
@@ -3700,6 +3988,28 @@ async function runQuickTool(tool){
       const translated = words.map(w=>{ const clean = w.replace(/[^\wء-ي]/g,''); return dict[clean.toLowerCase()] || dict[clean] || w; }).join(' ');
       session.messages.push({role:'assistant', content:"**Rough translation**\n\n"+translated+"\n\n_(offline dictionary — connect an API key for accurate translation)_", ts:nowISO()});
     }
+  } else if(tool==='websearch'){
+    const lastUser = [...session.messages].reverse().find(m=>m.role==='user');
+    if(!lastUser) return;
+    if(!settings.googleApiKey || !settings.googleCx){
+      session.messages.push({role:'assistant', content:"Web search isn't connected yet — add a free Google API key and Search Engine ID under Settings → Web Search, then try again.", ts:nowISO()});
+      saveAll(); renderChat();
+      return;
+    }
+    showThinking();
+    try{
+      const results = await callGoogleSearch(lastUser.content);
+      removeThinking();
+      if(!results.length){
+        session.messages.push({role:'assistant', content:"No web results came back for that search.", ts:nowISO()});
+      } else {
+        const body = results.map((r,i)=> (i+1)+". **["+r.title+"]("+r.link+")**\n"+r.link+"\n"+r.snippet).join('\n\n');
+        session.messages.push({role:'assistant', content:"**Web search results for \u201c"+lastUser.content+"\u201d**\n\n"+body, ts:nowISO()});
+      }
+    }catch(err){
+      removeThinking();
+      session.messages.push({role:'assistant', content:"Web search failed: " + (err.message || 'unknown error') + ". Double-check your API key and Search Engine ID in Settings.", ts:nowISO()});
+    }
   } else if(tool==='title'){
     session.title = session.messages[0].content.slice(0,42);
     saveAll(); renderSessionList();
@@ -3809,7 +4119,33 @@ const micBtn = document.getElementById('micBtn');
 const composerHint = document.getElementById('composerHint');
 const composerBox = document.getElementById('composerBox');
 const defaultHint = composerHint.textContent;
-if(SR){
+
+const SPEECH_ERROR_MESSAGES = {
+  'not-allowed': 'Microphone access was denied. Check your browser\'s site settings (the padlock icon in the address bar) and allow microphone access, then try again.',
+  'service-not-allowed': 'Voice input needs a secure context (https:// or localhost) — if you opened this file directly (file://), that\'s why. Run "python3 -m http.server" in this folder and open http://localhost instead.',
+  'no-speech': 'Didn\'t catch any speech — try again and speak right after tapping the mic.',
+  'audio-capture': 'No microphone was found. Check that one is connected and not being used by another app.',
+  'network': 'Voice recognition needs an internet connection (it uses your browser\'s cloud speech service, even though the rest of Zariya works offline) — check your connection and try again.',
+  'aborted': ''
+};
+
+if(!SR){
+  micBtn.title = 'Voice input isn\'t supported in this browser — try Chrome or Edge on desktop.';
+  micBtn.style.opacity = '0.35';
+  micBtn.style.cursor = 'not-allowed';
+  micBtn.addEventListener('click', ()=>{
+    composerHint.textContent = 'Voice input isn\'t supported in this browser. It needs Chrome or Edge on desktop — Firefox, Safari, and most mobile browsers don\'t implement the Web Speech API.';
+    composerHint.classList.add('listening');
+    setTimeout(()=>{ composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); }, 5000);
+  });
+} else if(!window.isSecureContext){
+  micBtn.title = 'Voice input needs http(s), not a file opened directly from disk.';
+  micBtn.addEventListener('click', ()=>{
+    composerHint.textContent = 'Voice input is blocked because this page is open directly from disk (file://). Run "python3 -m http.server" in this folder and open http://localhost instead.';
+    composerHint.classList.add('listening');
+    setTimeout(()=>{ composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); }, 6000);
+  });
+} else {
   recognizer = new SR();
   recognizer.continuous = false; recognizer.interimResults = true;
   recognizer.onresult = (e)=>{
@@ -3831,12 +4167,25 @@ if(SR){
     composerHint.textContent = defaultHint; composerHint.classList.remove('listening');
     input.focus();
   };
-  recognizer.onerror = ()=>{ listening=false; micBtn.classList.remove('active'); composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); };
+  recognizer.onerror = (e)=>{
+    listening=false; micBtn.classList.remove('active'); composerBox.classList.remove('listening');
+    const msg = SPEECH_ERROR_MESSAGES[e.error] || ('Voice input error: ' + e.error + '.');
+    if(msg){
+      composerHint.textContent = msg;
+      composerHint.classList.add('listening');
+      setTimeout(()=>{ composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); }, 6000);
+    } else {
+      composerHint.textContent = defaultHint; composerHint.classList.remove('listening');
+    }
+  };
   micBtn.addEventListener('click', ()=>{
     if(listening){ recognizer.stop(); return; }
-    try{ recognizer.lang = isUrdu(input.value) ? 'ur-PK' : 'en-US'; recognizer.start(); }catch(e){}
+    try{ recognizer.lang = isUrdu(input.value) ? 'ur-PK' : 'en-US'; recognizer.start(); }catch(e){
+      composerHint.textContent = 'Could not start voice input: ' + (e.message || e);
+      composerHint.classList.add('listening');
+    }
   });
-} else { micBtn.style.display = 'none'; }
+}
 
 /* ============ NOTEPAD ============ */
 function renderNotesList(){
@@ -3995,6 +4344,22 @@ document.getElementById('toggleKeyVisBtn').addEventListener('click', (e)=>{
   inp.type = showing ? 'password' : 'text'; e.target.textContent = showing ? 'Show' : 'Hide';
 });
 document.getElementById('saveKeyBtn').addEventListener('click', ()=>{ settings.apiKey = document.getElementById('apiKeyInput').value.trim(); saveAll(); applySettings(); });
+document.getElementById('toggleGoogleKeyVisBtn').addEventListener('click', (e)=>{
+  const inp = document.getElementById('googleKeyInput'); const showing = inp.type==='text';
+  inp.type = showing ? 'password' : 'text'; e.target.textContent = showing ? 'Show' : 'Hide';
+});
+document.getElementById('saveGoogleBtn').addEventListener('click', ()=>{
+  settings.googleApiKey = document.getElementById('googleKeyInput').value.trim();
+  settings.googleCx = document.getElementById('googleCxInput').value.trim();
+  saveAll(); applySettings();
+});
+document.getElementById('fetchGithubBtn').addEventListener('click', fetchGithubProfile);
+document.getElementById('profileNameInput').addEventListener('input', (e)=>{ settings.profileName = e.target.value; saveAll(); renderProfile(); });
+document.getElementById('clearProfileBtn').addEventListener('click', ()=>{
+  settings.profileName=''; settings.githubUsername=''; settings.githubAvatarUrl=''; settings.githubBio='';
+  saveAll(); applySettings();
+});
+document.getElementById('sbProfileRow').addEventListener('click', ()=>switchView('settings'));
 document.getElementById('exportAllBtn').addEventListener('click', ()=>{ downloadFile('zariya-export.json', JSON.stringify({sessions,notes,decks}, null, 2)); });
 document.getElementById('clearAllBtn').addEventListener('click', ()=>{
   if(!confirm('This deletes all conversations, notes and flashcards from this browser. Continue?')) return;
