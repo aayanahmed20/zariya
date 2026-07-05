@@ -241,7 +241,7 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
 }
 .edit-actions{ display:flex; gap:8px; margin-top:8px; justify-content:flex-end; }
 
-.quick-tools{ display:flex; gap:7px; padding:0 24px 10px; max-width:720px; margin:0 auto; width:100%; flex-wrap:wrap; }
+.quick-tools{ display:flex; gap:7px; padding:0 24px 10px; max-width:720px; margin:0 auto; width:100%; flex-wrap:wrap; justify-content:center; }
 .qt-btn{
   padding:6px 12px; border-radius:20px; background:var(--bg-surface); border:1px solid var(--border);
   color:var(--text-dim); font-size:12px; cursor:pointer; display:flex; align-items:center; gap:6px; transition:.15s;
@@ -438,6 +438,7 @@ img.needs-logo{ -webkit-user-drag:none; user-select:none; }
   </aside>
 
   <main id="main">
+    <div id="globalProtocolBanner" style="display:none; padding:9px 20px; background:var(--accent-wash); border-bottom:1px solid var(--accent); color:var(--text); font-size:12px; line-height:1.5; text-align:center;"></div>
     <div class="topbar">
       <button class="hamburger" id="hamburgerBtn">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
@@ -805,10 +806,16 @@ async function fetchGithubProfile(){
   const username = document.getElementById('githubUsernameInput').value.trim().replace(/^@/,'');
   if(!username) return;
   const btn = document.getElementById('fetchGithubBtn');
+  const statusEl = document.getElementById('profileStatus');
+  if(location.protocol === 'file:'){
+    statusEl.textContent = 'This needs the page served over http(s) — see the banner at the top. Run "python3 -m http.server" and open http://localhost:8000 instead of opening the file directly.';
+    return;
+  }
   btn.disabled = true; btn.textContent = 'Fetching…';
+  statusEl.textContent = 'Fetching @'+username+'…';
   try{
     const res = await fetch('https://api.github.com/users/'+encodeURIComponent(username));
-    if(!res.ok) throw new Error(res.status===404 ? 'No GitHub user found with that username' : 'HTTP '+res.status);
+    if(!res.ok) throw new Error(res.status===404 ? 'No GitHub user found with that username' : 'GitHub returned HTTP '+res.status+(res.status===403?' (likely rate-limited — try again in a bit)':''));
     const data = await res.json();
     settings.githubUsername = username;
     settings.githubAvatarUrl = data.avatar_url || '';
@@ -816,7 +823,11 @@ async function fetchGithubProfile(){
     if(!settings.profileName && data.name) settings.profileName = data.name;
     saveAll(); applySettings();
   }catch(err){
-    document.getElementById('profileStatus').textContent = 'Could not fetch that profile: ' + err.message;
+    console.error('GitHub profile fetch failed:', err);
+    const isNetworkErr = err instanceof TypeError || /failed to fetch/i.test(err.message||'');
+    statusEl.textContent = isNetworkErr
+      ? 'Could not reach GitHub — check your internet connection, or your network may be blocking api.github.com.'
+      : 'Could not fetch that profile: ' + err.message;
   }
   btn.disabled = false; btn.textContent = 'Fetch profile';
 }
@@ -882,10 +893,6 @@ document.getElementById('sessSearch').addEventListener('input', renderSessionLis
 document.getElementById('newChatBtn').addEventListener('click', newSession);
 
 /* ============ CHAT RENDER ============ */
-const suggestions = [
-  ["اردو میں ایک مختصر کہانی لکھیں", true],
-  ["Explain machine learning simply", false],
-];
 function renderChat(){
   const inner = document.getElementById('chat-inner');
   const scroll = document.getElementById('chat-scroll');
@@ -904,14 +911,8 @@ function renderChat(){
       '<div class="urdu-line">کچھ بھی پوچھیں</div>'+
       '<p>Ask anything in Urdu or English. Runs offline, right here in your browser.</p>';
     inner.appendChild(hero);
-
-    homeSug.style.display = 'flex';
-    homeSug.innerHTML = suggestions.map(function(pair){
-      return '<button class="suggest-card '+(pair[1]?'urdu':'')+'" data-sug="'+escapeHtml(pair[0])+'">'+escapeHtml(pair[0])+'</button>';
-    }).join('');
-    homeSug.querySelectorAll('[data-sug]').forEach(b=>{
-      b.addEventListener('click', ()=>{ document.getElementById('chat-input').value = b.dataset.sug; syncSendState(); sendMessage(); });
-    });
+    homeSug.style.display = 'none';
+    homeSug.innerHTML = '';
     return;
   }
   homeSug.style.display = 'none';
@@ -1155,16 +1156,23 @@ const LOCAL_MODEL_CDNS = [
 
 function setLocalModelStatus(text){ if(localModelStatusEl) localModelStatusEl.textContent = text; }
 
-// Warn immediately on load if the page was opened as a local file — WebGPU model
-// downloads and the Claude API both require http(s), not file://.
-if(location.protocol === 'file:'){
-  setLocalModelStatus('This page is open directly from disk (file://). Browsers block both on-device AI downloads and Claude API calls from local files. Run "python3 -m http.server" in this folder and open it via http://localhost instead — then come back and press Load model.');
-  const banner = document.getElementById('protocolWarning');
-  if(banner){
-    banner.style.display = 'block';
-    banner.innerHTML = '<strong>Heads up:</strong> this file is open directly from disk (file://). Both on-device AI and the Claude API key are blocked from local files by the browser. Open a terminal in this folder, run <code style="font-family:var(--font-mono)">python3 -m http.server</code>, then open <code style="font-family:var(--font-mono)">http://localhost:8000</code> instead — the offline built-in assistant works either way.';
+// Warn immediately on load, on every page, if the page can't fully function —
+// covers both file:// (double-clicked) and http served from a non-secure address.
+(function checkProtocolAndWarn(){
+  const globalBanner = document.getElementById('globalProtocolBanner');
+  const settingsBanner = document.getElementById('protocolWarning');
+  let msg = null;
+  if(location.protocol === 'file:'){
+    msg = 'This page is open directly from disk (file://) — on-device AI, the Claude API, voice input, web search, and GitHub profile lookup are all blocked from local files by the browser. Open a terminal in this folder, run <code style="font-family:var(--font-mono)">python3 -m http.server</code>, then open <code style="font-family:var(--font-mono)">http://localhost:8000</code> in Chrome or Edge instead. The offline built-in assistant, notepad, and flashcards work either way.';
+  } else if(!window.isSecureContext){
+    msg = 'This page isn\'t loaded over a secure address (https:// or localhost) — some features (voice input, on-device AI, network calls) may be blocked by your browser as a result. If you\'re running a local server, open it via <code style="font-family:var(--font-mono)">http://localhost:8000</code> specifically.';
   }
-}
+  if(msg){
+    if(globalBanner){ globalBanner.style.display = 'block'; globalBanner.innerHTML = msg; }
+    if(settingsBanner){ settingsBanner.style.display = 'block'; settingsBanner.innerHTML = '<strong>Heads up:</strong> ' + msg; }
+    setLocalModelStatus('Blocked: ' + (location.protocol==='file:' ? 'this page is open via file://.' : 'this page isn\'t on a secure address.') + ' See the banner above for the fix.');
+  }
+})();
 
 async function importWebllmWithFallback(onAttempt){
   let lastErr;
@@ -1554,7 +1562,24 @@ const dict = {
   "mosque": "مسجد",
   "festival": "تہوار",
   "celebration": "جشن",
-  "gift": "تحفہ"
+  "gift": "تحفہ",
+  "challenge": "چیلنج",
+  "opportunity": "موقع",
+  "decision": "فیصلہ",
+  "responsibility": "ذمہ داری",
+  "achievement": "کامیابی",
+  "plan": "منصوبہ",
+  "progress": "پیشرفت",
+  "smartphone": "سمارٹ فون",
+  "password": "پاس ورڈ",
+  "website": "ویب سائٹ",
+  "email": "ای میل",
+  "download": "ڈاؤن لوڈ",
+  "upload": "اپ لوڈ",
+  "account": "اکاؤنٹ",
+  "message": "پیغام",
+  "video": "ویڈیو",
+  "photo": "تصویر"
 };
 
 const kb = [
@@ -3780,6 +3805,81 @@ const kb = [
       "spaced repetition"
     ],
     "a": "Spaced repetition is reviewing material at increasing time intervals (e.g. after 1 day, then 3 days, then a week) rather than cramming all at once — it exploits how memory consolidates better with spaced, repeated exposure."
+  },
+  {
+    "k": [
+      "what is a vpn"
+    ],
+    "a": "A VPN (Virtual Private Network) routes your internet traffic through an encrypted tunnel to a remote server, hiding your real IP address and location from websites, and protecting your traffic from others on the same network."
+  },
+  {
+    "k": [
+      "what is two factor authentication",
+      "what is 2fa"
+    ],
+    "a": "Two-factor authentication (2FA) adds a second verification step beyond your password — usually a code from an app or SMS — so someone who steals your password alone still can't log in."
+  },
+  {
+    "k": [
+      "what is phishing"
+    ],
+    "a": "Phishing is a scam where attackers impersonate a trustworthy source (like a bank or company) via email, text, or fake websites to trick people into revealing passwords, card numbers, or other sensitive information."
+  },
+  {
+    "k": [
+      "how to spot a scam email"
+    ],
+    "a": "Warning signs: urgent or threatening language, requests for passwords or payment, sender addresses that look almost-but-not-quite right, generic greetings like \"Dear Customer,\" and links that don't match the company's real domain when you hover over them."
+  },
+  {
+    "k": [
+      "how to back up my phone"
+    ],
+    "a": "Most phones offer built-in cloud backup (iCloud for iPhone, Google Backup for Android) that can be turned on in Settings — for extra safety, also periodically copy photos and important files to a computer or separate storage."
+  },
+  {
+    "k": [
+      "what is qawwali"
+    ],
+    "a": "Qawwali is a form of Sufi devotional music, traditionally performed at shrines and gatherings, combining rhythmic clapping, harmonium, tabla, and passionate vocal delivery — Nusrat Fateh Ali Khan is its most internationally famous performer."
+  },
+  {
+    "k": [
+      "famous pakistani poets"
+    ],
+    "a": "Notable Urdu/Pakistani poets include Allama Iqbal, Mirza Ghalib, Faiz Ahmed Faiz, and Ahmad Faraz, each known for blending romantic, philosophical, and socio-political themes in their verse."
+  },
+  {
+    "k": [
+      "what does insha'allah mean",
+      "what does inshallah mean"
+    ],
+    "a": "\"In shā' Allāh\" (ان شاء اللہ) means \"God willing\" — commonly said when talking about future plans, expressing that the outcome ultimately depends on God's will."
+  },
+  {
+    "k": [
+      "what does mashallah mean"
+    ],
+    "a": "\"Mā shā' Allāh\" (ماشاء اللہ) roughly means \"what God has willed\" — an expression of appreciation or praise, often said upon seeing something good or beautiful, partly to ward off envy."
+  },
+  {
+    "k": [
+      "how to write a cover letter"
+    ],
+    "a": "Address it to a specific person if possible, open by naming the role and where you found it, connect 2–3 of your specific experiences to what the job needs, and close with a clear, confident call to action — keep it under one page."
+  },
+  {
+    "k": [
+      "how to prepare for a job interview"
+    ],
+    "a": "Research the company and role beforehand, prepare specific examples of past work using a structure like STAR (Situation, Task, Action, Result), prepare a few thoughtful questions to ask them, and do a mock run-through out loud, not just in your head."
+  },
+  {
+    "k": [
+      "what is the pareto principle",
+      "80 20 rule"
+    ],
+    "a": "The Pareto Principle (80/20 rule) observes that roughly 80% of outcomes often come from 20% of causes or efforts — commonly used as a prompt to identify and focus on the highest-impact tasks rather than spreading effort evenly."
   }
 ];
 const KB_STOPWORDS = new Set(["who","what","the","is","are","was","were","a","an","of","in","on","to","do","does","did",
@@ -4121,70 +4221,79 @@ const composerBox = document.getElementById('composerBox');
 const defaultHint = composerHint.textContent;
 
 const SPEECH_ERROR_MESSAGES = {
-  'not-allowed': 'Microphone access was denied. Check your browser\'s site settings (the padlock icon in the address bar) and allow microphone access, then try again.',
-  'service-not-allowed': 'Voice input needs a secure context (https:// or localhost) — if you opened this file directly (file://), that\'s why. Run "python3 -m http.server" in this folder and open http://localhost instead.',
+  'not-allowed': 'Microphone access was denied. Check your browser\'s site settings (the padlock/info icon in the address bar) and allow microphone access, then try again.',
+  'service-not-allowed': 'Your browser blocked the voice-recognition service. This can happen without https/localhost, or if a browser policy disables it.',
   'no-speech': 'Didn\'t catch any speech — try again and speak right after tapping the mic.',
   'audio-capture': 'No microphone was found. Check that one is connected and not being used by another app.',
   'network': 'Voice recognition needs an internet connection (it uses your browser\'s cloud speech service, even though the rest of Zariya works offline) — check your connection and try again.',
   'aborted': ''
 };
 
-if(!SR){
-  micBtn.title = 'Voice input isn\'t supported in this browser — try Chrome or Edge on desktop.';
-  micBtn.style.opacity = '0.35';
-  micBtn.style.cursor = 'not-allowed';
-  micBtn.addEventListener('click', ()=>{
-    composerHint.textContent = 'Voice input isn\'t supported in this browser. It needs Chrome or Edge on desktop — Firefox, Safari, and most mobile browsers don\'t implement the Web Speech API.';
-    composerHint.classList.add('listening');
-    setTimeout(()=>{ composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); }, 5000);
-  });
-} else if(!window.isSecureContext){
-  micBtn.title = 'Voice input needs http(s), not a file opened directly from disk.';
-  micBtn.addEventListener('click', ()=>{
-    composerHint.textContent = 'Voice input is blocked because this page is open directly from disk (file://). Run "python3 -m http.server" in this folder and open http://localhost instead.';
-    composerHint.classList.add('listening');
-    setTimeout(()=>{ composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); }, 6000);
-  });
-} else {
-  recognizer = new SR();
-  recognizer.continuous = false; recognizer.interimResults = true;
-  recognizer.onresult = (e)=>{
-    let transcript = '';
-    for(let i=0;i<e.results.length;i++) transcript += e.results[i][0].transcript;
-    const base = recognizer._baseValue || '';
-    input.value = (base ? base+' ' : '') + transcript;
-    input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,160)+'px';
-    syncSendState();
-  };
-  recognizer.onstart = ()=>{
-    listening = true; micBtn.classList.add('active'); composerBox.classList.add('listening');
-    recognizer._baseValue = input.value.trim();
-    composerHint.textContent = 'Listening… speak now, then tap the mic again to stop';
-    composerHint.classList.add('listening');
-  };
-  recognizer.onend = ()=>{
-    listening=false; micBtn.classList.remove('active'); composerBox.classList.remove('listening');
-    composerHint.textContent = defaultHint; composerHint.classList.remove('listening');
-    input.focus();
-  };
-  recognizer.onerror = (e)=>{
-    listening=false; micBtn.classList.remove('active'); composerBox.classList.remove('listening');
-    const msg = SPEECH_ERROR_MESSAGES[e.error] || ('Voice input error: ' + e.error + '.');
-    if(msg){
-      composerHint.textContent = msg;
+try{
+  if(!SR){
+    micBtn.title = 'Voice input isn\'t supported in this browser — try Chrome or Edge on desktop.';
+    micBtn.style.opacity = '0.35';
+    micBtn.style.cursor = 'not-allowed';
+    micBtn.addEventListener('click', ()=>{
+      composerHint.textContent = 'Voice input isn\'t supported in this browser. It needs Chrome or Edge on desktop — Firefox, Safari, and most mobile browsers don\'t implement the Web Speech API.';
       composerHint.classList.add('listening');
-      setTimeout(()=>{ composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); }, 6000);
-    } else {
+      setTimeout(()=>{ composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); }, 5000);
+    });
+  } else if(!window.isSecureContext){
+    const reason = location.protocol==='file:'
+      ? 'this page is open directly from disk (file://)'
+      : 'this page isn\'t loaded over https or localhost';
+    micBtn.title = 'Voice input needs a secure context (https or localhost).';
+    micBtn.addEventListener('click', ()=>{
+      composerHint.textContent = 'Voice input is blocked because ' + reason + '. Run "python3 -m http.server" in this folder and open it via http://localhost (not a different address, and not the file directly).';
+      composerHint.classList.add('listening');
+      setTimeout(()=>{ composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); }, 7000);
+    });
+  } else {
+    recognizer = new SR();
+    recognizer.continuous = false; recognizer.interimResults = true;
+    recognizer.onresult = (e)=>{
+      let transcript = '';
+      for(let i=0;i<e.results.length;i++) transcript += e.results[i][0].transcript;
+      const base = recognizer._baseValue || '';
+      input.value = (base ? base+' ' : '') + transcript;
+      input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,160)+'px';
+      syncSendState();
+    };
+    recognizer.onstart = ()=>{
+      listening = true; micBtn.classList.add('active'); composerBox.classList.add('listening');
+      recognizer._baseValue = input.value.trim();
+      composerHint.textContent = 'Listening… speak now, then tap the mic again to stop';
+      composerHint.classList.add('listening');
+    };
+    recognizer.onend = ()=>{
+      listening=false; micBtn.classList.remove('active'); composerBox.classList.remove('listening');
       composerHint.textContent = defaultHint; composerHint.classList.remove('listening');
-    }
-  };
-  micBtn.addEventListener('click', ()=>{
-    if(listening){ recognizer.stop(); return; }
-    try{ recognizer.lang = isUrdu(input.value) ? 'ur-PK' : 'en-US'; recognizer.start(); }catch(e){
-      composerHint.textContent = 'Could not start voice input: ' + (e.message || e);
-      composerHint.classList.add('listening');
-    }
-  });
+      input.focus();
+    };
+    recognizer.onerror = (e)=>{
+      listening=false; micBtn.classList.remove('active'); composerBox.classList.remove('listening');
+      const msg = SPEECH_ERROR_MESSAGES[e.error] || ('Voice input error: ' + e.error + '.');
+      if(msg){
+        composerHint.textContent = msg;
+        composerHint.classList.add('listening');
+        setTimeout(()=>{ composerHint.textContent = defaultHint; composerHint.classList.remove('listening'); }, 6000);
+      } else {
+        composerHint.textContent = defaultHint; composerHint.classList.remove('listening');
+      }
+    };
+    micBtn.addEventListener('click', ()=>{
+      if(listening){ try{ recognizer.stop(); }catch(e){} return; }
+      try{ recognizer.lang = isUrdu(input.value) ? 'ur-PK' : 'en-US'; recognizer.start(); }catch(e){
+        composerHint.textContent = 'Could not start voice input: ' + (e.message || e);
+        composerHint.classList.add('listening');
+      }
+    });
+  }
+}catch(setupErr){
+  console.error('Voice input setup failed:', setupErr);
+  micBtn.title = 'Voice input failed to initialize: ' + (setupErr.message || setupErr);
+  micBtn.style.opacity = '0.35';
 }
 
 /* ============ NOTEPAD ============ */
