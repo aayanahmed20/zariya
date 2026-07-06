@@ -105,12 +105,34 @@ def learned_lookup(text: str):
     return best["a"] if best_score > 0 else None
 
 
+def _significant_words(text: str):
+    return {w for w in re.findall(r"[\w']+", text.lower()) if len(w) > 2 and w not in KB_STOPWORDS}
+
+
+# Inverted index: significant word -> set of KB entry indices whose keyword phrases contain it.
+# Built once at import time so lookups only ever score a small candidate set instead of
+# scanning every entry in the knowledge base on every single message.
+_KB_INDEX: dict[str, set[int]] = {}
+for _idx, _entry in enumerate(KB):
+    _entry_words = set()
+    for _phrase in _entry["k"]:
+        _entry_words |= _significant_words(_phrase)
+    for _w in _entry_words:
+        _KB_INDEX.setdefault(_w, set()).add(_idx)
+
+
 def knowledge_base_lookup(text: str):
     lower = text.lower()
     normalized = _normalize_query(text)
     query_words = {w for w in normalized.split() if len(w) > 2 and w not in KB_STOPWORDS}
+
+    candidate_idxs: set[int] = set()
+    for w in query_words:
+        candidate_idxs |= _KB_INDEX.get(w, set())
+
     best, best_score = None, 0
-    for entry in KB:
+    for idx in candidate_idxs:
+        entry = KB[idx]
         score = 0
         for phrase in entry["k"]:
             if phrase in lower:
