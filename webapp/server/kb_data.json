@@ -1,0 +1,2834 @@
+{
+  "dict": {
+    "hello": "سلام",
+    "hi": "سلام",
+    "hey": "ارے",
+    "thank you": "شکریہ",
+    "thanks": "شکریہ",
+    "good morning": "صبح بخیر",
+    "good night": "شب بخیر",
+    "good evening": "شام بخیر",
+    "how are you": "آپ کیسے ہیں",
+    "i am fine": "میں ٹھیک ہوں",
+    "yes": "جی ہاں",
+    "no": "نہیں",
+    "maybe": "شاید",
+    "please": "براہ مہربانی",
+    "sorry": "معذرت",
+    "welcome": "خوش آمدید",
+    "goodbye": "خدا حافظ",
+    "see you": "پھر ملیں گے",
+    "congratulations": "مبارک ہو",
+    "excuse me": "معاف کیجیے گا",
+    "friend": "دوست",
+    "family": "خاندان",
+    "mother": "ماں",
+    "father": "باپ",
+    "brother": "بھائی",
+    "sister": "بہن",
+    "son": "بیٹا",
+    "daughter": "بیٹی",
+    "husband": "شوہر",
+    "wife": "بیوی",
+    "grandfather": "دادا",
+    "grandmother": "دادی",
+    "uncle": "چچا",
+    "aunt": "خالہ",
+    "child": "بچہ",
+    "baby": "بچہ",
+    "book": "کتاب",
+    "pen": "قلم",
+    "school": "سکول",
+    "teacher": "استاد",
+    "student": "طالب علم",
+    "work": "کام",
+    "house": "گھر",
+    "city": "شہر",
+    "country": "ملک",
+    "world": "دنیا",
+    "road": "سڑک",
+    "market": "بازار",
+    "car": "گاڑی",
+    "door": "دروازہ",
+    "window": "کھڑکی",
+    "chair": "کرسی",
+    "table": "میز",
+    "key": "چابی",
+    "phone": "فون",
+    "computer": "کمپیوٹر",
+    "money": "پیسے",
+    "clothes": "کپڑے",
+    "shoes": "جوتے",
+    "water": "پانی",
+    "food": "کھانا",
+    "bread": "روٹی",
+    "milk": "دودھ",
+    "tea": "چائے",
+    "fruit": "پھل",
+    "rice": "چاول",
+    "sugar": "چینی",
+    "salt": "نمک",
+    "meat": "گوشت",
+    "vegetable": "سبزی",
+    "egg": "انڈا",
+    "love": "محبت",
+    "happiness": "خوشی",
+    "sadness": "غم",
+    "peace": "امن",
+    "hope": "امید",
+    "dream": "خواب",
+    "fear": "خوف",
+    "anger": "غصہ",
+    "patience": "صبر",
+    "truth": "سچ",
+    "lie": "جھوٹ",
+    "respect": "عزت",
+    "trust": "بھروسہ",
+    "courage": "ہمت",
+    "wisdom": "عقل",
+    "today": "آج",
+    "tomorrow": "کل",
+    "yesterday": "گزشتہ کل",
+    "now": "ابھی",
+    "morning": "صبح",
+    "night": "رات",
+    "week": "ہفتہ",
+    "month": "مہینہ",
+    "year": "سال",
+    "hour": "گھنٹہ",
+    "minute": "منٹ",
+    "sun": "سورج",
+    "moon": "چاند",
+    "star": "ستارہ",
+    "sky": "آسمان",
+    "earth": "زمین",
+    "fire": "آگ",
+    "wind": "ہوا",
+    "rain": "بارش",
+    "tree": "درخت",
+    "flower": "پھول",
+    "mountain": "پہاڑ",
+    "river": "دریا",
+    "sea": "سمندر",
+    "animal": "جانور",
+    "bird": "پرندہ",
+    "dog": "کتا",
+    "cat": "بلی",
+    "life": "زندگی",
+    "health": "صحت",
+    "beautiful": "خوبصورت",
+    "good": "اچھا",
+    "bad": "برا",
+    "big": "بڑا",
+    "small": "چھوٹا",
+    "fast": "تیز",
+    "slow": "آہستہ",
+    "hot": "گرم",
+    "cold": "ٹھنڈا",
+    "new": "نیا",
+    "old": "پرانا",
+    "easy": "آسان",
+    "difficult": "مشکل",
+    "strong": "مضبوط",
+    "weak": "کمزور",
+    "rich": "امیر",
+    "poor": "غریب",
+    "red": "سرخ",
+    "blue": "نیلا",
+    "green": "سبز",
+    "yellow": "پیلا",
+    "black": "کالا",
+    "white": "سفید",
+    "one": "ایک",
+    "two": "دو",
+    "three": "تین",
+    "four": "چار",
+    "five": "پانچ",
+    "six": "چھ",
+    "seven": "سات",
+    "eight": "آٹھ",
+    "nine": "نو",
+    "ten": "دس",
+    "hundred": "سو",
+    "thousand": "ہزار",
+    "monday": "پیر",
+    "tuesday": "منگل",
+    "wednesday": "بدھ",
+    "thursday": "جمعرات",
+    "friday": "جمعہ",
+    "saturday": "ہفتہ",
+    "sunday": "اتوار",
+    "eat": "کھانا",
+    "drink": "پینا",
+    "sleep": "سونا",
+    "walk": "چلنا",
+    "run": "دوڑنا",
+    "speak": "بولنا",
+    "listen": "سننا",
+    "read": "پڑھنا",
+    "write": "لکھنا",
+    "see": "دیکھنا",
+    "go": "جانا",
+    "come": "آنا",
+    "give": "دینا",
+    "take": "لینا",
+    "understand": "سمجھنا",
+    "help": "مدد",
+    "سلام": "hi",
+    "شکریہ": "thanks",
+    "دوست": "friend",
+    "کتاب": "book",
+    "پانی": "water",
+    "کھانا": "eat",
+    "محبت": "love",
+    "گھر": "house",
+    "خوشی": "happiness",
+    "زندگی": "life",
+    "استاد": "teacher",
+    "طالب علم": "student",
+    "ماں": "mother",
+    "باپ": "father",
+    "بھائی": "brother",
+    "بہن": "sister",
+    "صبح بخیر": "good morning",
+    "شب بخیر": "good night",
+    "خدا حافظ": "goodbye",
+    "الحمدللہ": "praise be to God (Alhamdulillah)",
+    "ان شاء اللہ": "God willing (Insha'Allah)",
+    "ماشاءاللہ": "as God has willed (Masha'Allah)",
+    "جزاک اللہ": "may God reward you (JazakAllah)",
+    "doctor": "ڈاکٹر",
+    "engineer": "انجینئر",
+    "lawyer": "وکیل",
+    "farmer": "کسان",
+    "businessman": "تاجر",
+    "nurse": "نرس",
+    "police": "پولیس",
+    "soldier": "فوجی",
+    "artist": "فنکار",
+    "writer": "مصنف",
+    "weather": "موسم",
+    "summer": "گرمی",
+    "winter": "سردی",
+    "spring": "بہار",
+    "autumn": "خزاں",
+    "cloud": "بادل",
+    "storm": "طوفان",
+    "snow": "برف",
+    "fog": "دھند",
+    "internet": "انٹرنیٹ",
+    "mobile": "موبائل",
+    "laptop": "لیپ ٹاپ",
+    "camera": "کیمرہ",
+    "game": "کھیل",
+    "football": "فٹبال",
+    "cricket": "کرکٹ",
+    "hockey": "ہاکی",
+    "team": "ٹیم",
+    "player": "کھلاڑی",
+    "match": "میچ",
+    "angry": "غصہ",
+    "tired": "تھکا ہوا",
+    "excited": "پرجوش",
+    "worried": "پریشان",
+    "proud": "فخر",
+    "jealous": "حسد",
+    "success": "کامیابی",
+    "failure": "ناکامی",
+    "dream job": "خوابوں کی نوکری",
+    "goal": "مقصد",
+    "effort": "کوشش",
+    "question": "سوال",
+    "answer": "جواب",
+    "problem": "مسئلہ",
+    "solution": "حل",
+    "idea": "خیال",
+    "opinion": "رائے",
+    "true": "سچ",
+    "false": "جھوٹ",
+    "important": "اہم",
+    "possible": "ممکن",
+    "impossible": "ناممکن",
+    "north": "شمال",
+    "south": "جنوب",
+    "east": "مشرق",
+    "west": "مغرب",
+    "spring water": "چشمہ",
+    "desert": "صحرا",
+    "forest": "جنگل",
+    "island": "جزیرہ",
+    "valley": "وادی",
+    "up": "اوپر",
+    "down": "نیچے",
+    "left": "بائیں",
+    "right": "دائیں",
+    "big city": "بڑا شہر",
+    "village": "گاؤں",
+    "street": "گلی",
+    "bridge": "پل",
+    "hospital": "ہسپتال",
+    "university": "یونیورسٹی",
+    "office": "دفتر",
+    "factory": "فیکٹری",
+    "shop": "دکان",
+    "restaurant": "ہوٹل",
+    "airport": "ہوائی اڈا",
+    "station": "اسٹیشن",
+    "letter": "خط",
+    "newspaper": "اخبار",
+    "magazine": "رسالہ",
+    "story": "کہانی",
+    "poem": "نظم",
+    "song": "گانا",
+    "music": "موسیقی",
+    "dance": "رقص",
+    "art": "فن",
+    "color": "رنگ",
+    "light": "روشنی",
+    "dark": "اندھیرا",
+    "hard work": "محنت",
+    "laziness": "سستی",
+    "honesty": "ایمانداری",
+    "justice": "انصاف",
+    "freedom": "آزادی",
+    "unity": "اتحاد",
+    "history": "تاریخ",
+    "future": "مستقبل",
+    "past": "ماضی",
+    "present": "حال",
+    "culture": "ثقافت",
+    "tradition": "روایت",
+    "religion": "مذہب",
+    "prayer": "دعا",
+    "mosque": "مسجد",
+    "festival": "تہوار",
+    "celebration": "جشن",
+    "gift": "تحفہ",
+    "challenge": "چیلنج",
+    "opportunity": "موقع",
+    "decision": "فیصلہ",
+    "responsibility": "ذمہ داری",
+    "achievement": "کامیابی",
+    "plan": "منصوبہ",
+    "progress": "پیشرفت",
+    "smartphone": "سمارٹ فون",
+    "password": "پاس ورڈ",
+    "website": "ویب سائٹ",
+    "email": "ای میل",
+    "download": "ڈاؤن لوڈ",
+    "upload": "اپ لوڈ",
+    "account": "اکاؤنٹ",
+    "message": "پیغام",
+    "video": "ویڈیو",
+    "photo": "تصویر",
+    "morning prayer": "نماز فجر",
+    "noon prayer": "نماز ظہر",
+    "evening prayer": "نماز مغرب",
+    "night prayer": "نماز عشاء",
+    "fasting": "روزہ",
+    "charity": "صدقہ",
+    "pilgrimage": "حج",
+    "holy book": "مقدس کتاب",
+    "prophet": "نبی",
+    "kindness": "مہربانی",
+    "forgiveness": "معافی",
+    "gratitude": "شکرگزاری",
+    "humility": "عاجزی",
+    "neighbor": "پڑوسی",
+    "stranger": "اجنبی",
+    "guest": "مہمان",
+    "host": "میزبان"
+  },
+  "kb": [
+    {
+      "k": [
+        "who are you",
+        "what are you",
+        "your name"
+      ],
+      "a": "I'm **Zariya** (ذریعہ — \"channel\" or \"medium\"), a bilingual Urdu/English assistant. Offline, I run on a fairly large built-in knowledge base rather than a full language model, so I can cover a lot of common questions but I'm not truly open-ended. Connect a Claude API key in Settings and I switch to real Claude responses for anything you ask."
+    },
+    {
+      "k": [
+        "what can you do",
+        "help me",
+        "features"
+      ],
+      "a": "Offline I can: do arithmetic, unit conversions, translate common English/Urdu words and phrases, answer a wide set of general-knowledge questions (geography, science, history, Islam, Pakistan), share small code snippets, explain common concepts, and give study/productivity tips. I can also summarize this chat, pull out key points, and turn a conversation or note into flashcards using the tools bar above the message box."
+    },
+    {
+      "k": [
+        "why is your database small",
+        "why can't you answer everything",
+        "you don't know much",
+        "limited knowledge",
+        "how much do you know"
+      ],
+      "a": "Fair question — offline I'm a curated set of a few hundred hand-written answers and rules, not a trained model, so I'll always have gaps. For genuinely open-ended answers on anything, add a Claude API key in Settings — that routes your questions to the real Claude model instead of me guessing from a fixed list."
+    },
+    {
+      "k": [
+        "capital of pakistan"
+      ],
+      "a": "**Islamabad** is the capital of Pakistan."
+    },
+    {
+      "k": [
+        "capital of france"
+      ],
+      "a": "**Paris** is the capital of France."
+    },
+    {
+      "k": [
+        "capital of japan"
+      ],
+      "a": "**Tokyo** is the capital of Japan."
+    },
+    {
+      "k": [
+        "capital of uk"
+      ],
+      "a": "**London** is the capital of Uk."
+    },
+    {
+      "k": [
+        "capital of united kingdom"
+      ],
+      "a": "**London** is the capital of United Kingdom."
+    },
+    {
+      "k": [
+        "capital of england"
+      ],
+      "a": "**London** is the capital of England."
+    },
+    {
+      "k": [
+        "capital of usa"
+      ],
+      "a": "**Washington, D.C.** is the capital of Usa."
+    },
+    {
+      "k": [
+        "capital of united states"
+      ],
+      "a": "**Washington, D.C.** is the capital of United States."
+    },
+    {
+      "k": [
+        "capital of america"
+      ],
+      "a": "**Washington, D.C.** is the capital of America."
+    },
+    {
+      "k": [
+        "capital of india"
+      ],
+      "a": "**New Delhi** is the capital of India."
+    },
+    {
+      "k": [
+        "capital of china"
+      ],
+      "a": "**Beijing** is the capital of China."
+    },
+    {
+      "k": [
+        "capital of germany"
+      ],
+      "a": "**Berlin** is the capital of Germany."
+    },
+    {
+      "k": [
+        "capital of italy"
+      ],
+      "a": "**Rome** is the capital of Italy."
+    },
+    {
+      "k": [
+        "capital of spain"
+      ],
+      "a": "**Madrid** is the capital of Spain."
+    },
+    {
+      "k": [
+        "capital of russia"
+      ],
+      "a": "**Moscow** is the capital of Russia."
+    },
+    {
+      "k": [
+        "capital of canada"
+      ],
+      "a": "**Ottawa** is the capital of Canada."
+    },
+    {
+      "k": [
+        "capital of australia"
+      ],
+      "a": "**Canberra** is the capital of Australia."
+    },
+    {
+      "k": [
+        "capital of egypt"
+      ],
+      "a": "**Cairo** is the capital of Egypt."
+    },
+    {
+      "k": [
+        "capital of turkey"
+      ],
+      "a": "**Ankara** is the capital of Turkey."
+    },
+    {
+      "k": [
+        "capital of iran"
+      ],
+      "a": "**Tehran** is the capital of Iran."
+    },
+    {
+      "k": [
+        "capital of saudi arabia"
+      ],
+      "a": "**Riyadh** is the capital of Saudi Arabia."
+    },
+    {
+      "k": [
+        "capital of bangladesh"
+      ],
+      "a": "**Dhaka** is the capital of Bangladesh."
+    },
+    {
+      "k": [
+        "capital of afghanistan"
+      ],
+      "a": "**Kabul** is the capital of Afghanistan."
+    },
+    {
+      "k": [
+        "capital of brazil"
+      ],
+      "a": "**Brasília** is the capital of Brazil."
+    },
+    {
+      "k": [
+        "capital of mexico"
+      ],
+      "a": "**Mexico City** is the capital of Mexico."
+    },
+    {
+      "k": [
+        "capital of south korea"
+      ],
+      "a": "**Seoul** is the capital of South Korea."
+    },
+    {
+      "k": [
+        "capital of indonesia"
+      ],
+      "a": "**Jakarta** is the capital of Indonesia."
+    },
+    {
+      "k": [
+        "capital of nigeria"
+      ],
+      "a": "**Abuja** is the capital of Nigeria."
+    },
+    {
+      "k": [
+        "capital of south africa"
+      ],
+      "a": "**Pretoria** is the capital of South Africa."
+    },
+    {
+      "k": [
+        "capital of kenya"
+      ],
+      "a": "**Nairobi** is the capital of Kenya."
+    },
+    {
+      "k": [
+        "capital of uae"
+      ],
+      "a": "**Abu Dhabi** is the capital of Uae."
+    },
+    {
+      "k": [
+        "capital of sri lanka"
+      ],
+      "a": "**Sri Jayawardenepura Kotte** is the capital of Sri Lanka."
+    },
+    {
+      "k": [
+        "capital of nepal"
+      ],
+      "a": "**Kathmandu** is the capital of Nepal."
+    },
+    {
+      "k": [
+        "largest ocean"
+      ],
+      "a": "The Pacific Ocean is the largest and deepest ocean on Earth."
+    },
+    {
+      "k": [
+        "smallest ocean"
+      ],
+      "a": "The Arctic Ocean is the smallest and shallowest of the world's oceans."
+    },
+    {
+      "k": [
+        "largest country"
+      ],
+      "a": "Russia is the largest country in the world by land area."
+    },
+    {
+      "k": [
+        "smallest country"
+      ],
+      "a": "Vatican City is the smallest country in the world by both area and population."
+    },
+    {
+      "k": [
+        "largest continent"
+      ],
+      "a": "Asia is the largest continent, both by area and population."
+    },
+    {
+      "k": [
+        "smallest continent"
+      ],
+      "a": "Australia is the smallest continent."
+    },
+    {
+      "k": [
+        "largest desert"
+      ],
+      "a": "Antarctica is technically the largest desert in the world; the Sahara is the largest hot desert."
+    },
+    {
+      "k": [
+        "tallest mountain",
+        "highest mountain"
+      ],
+      "a": "Mount Everest, on the border of Nepal and Tibet, is the tallest mountain above sea level at about 8,849 metres."
+    },
+    {
+      "k": [
+        "longest river"
+      ],
+      "a": "The Nile is generally considered the longest river in the world, at roughly 6,650 km, though some measurements favour the Amazon."
+    },
+    {
+      "k": [
+        "largest river by volume"
+      ],
+      "a": "The Amazon River carries by far the largest volume of water of any river in the world."
+    },
+    {
+      "k": [
+        "provinces of pakistan"
+      ],
+      "a": "Pakistan has four provinces: **Punjab, Sindh, Khyber Pakhtunkhwa, and Balochistan**, plus the federal territory of Islamabad and the regions of Azad Kashmir and Gilgit-Baltistan."
+    },
+    {
+      "k": [
+        "national language of pakistan"
+      ],
+      "a": "Urdu is the national language of Pakistan, though many regional languages such as Punjabi, Sindhi, Pashto, and Balochi are also widely spoken."
+    },
+    {
+      "k": [
+        "currency of pakistan"
+      ],
+      "a": "The currency of Pakistan is the **Pakistani Rupee (PKR)**."
+    },
+    {
+      "k": [
+        "national flower of pakistan"
+      ],
+      "a": "The jasmine (چنبیلی) is the national flower of Pakistan."
+    },
+    {
+      "k": [
+        "national bird of pakistan"
+      ],
+      "a": "The chukar partridge is the national bird of Pakistan."
+    },
+    {
+      "k": [
+        "national animal of pakistan"
+      ],
+      "a": "The markhor, a wild goat species, is the national animal of Pakistan."
+    },
+    {
+      "k": [
+        "when did pakistan gain independence",
+        "pakistan independence"
+      ],
+      "a": "Pakistan gained independence from British rule on **14 August 1947**."
+    },
+    {
+      "k": [
+        "founder of pakistan"
+      ],
+      "a": "Muhammad Ali Jinnah, known as Quaid-e-Azam, is regarded as the founder of Pakistan."
+    },
+    {
+      "k": [
+        "national poet of pakistan"
+      ],
+      "a": "Allama Muhammad Iqbal is regarded as the national poet (Shair-e-Mashriq) of Pakistan."
+    },
+    {
+      "k": [
+        "largest planet"
+      ],
+      "a": "Jupiter is the largest planet in our solar system."
+    },
+    {
+      "k": [
+        "smallest planet"
+      ],
+      "a": "Mercury is the smallest planet in our solar system."
+    },
+    {
+      "k": [
+        "how many planets"
+      ],
+      "a": "There are eight planets in our solar system: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune."
+    },
+    {
+      "k": [
+        "closest planet to the sun"
+      ],
+      "a": "Mercury is the closest planet to the Sun."
+    },
+    {
+      "k": [
+        "farthest planet from the sun"
+      ],
+      "a": "Neptune is the farthest planet from the Sun."
+    },
+    {
+      "k": [
+        "speed of light"
+      ],
+      "a": "Light travels at about **299,792 kilometres per second** (roughly 186,282 miles per second) in a vacuum."
+    },
+    {
+      "k": [
+        "speed of sound"
+      ],
+      "a": "Sound travels at about **343 metres per second** (1,235 km/h) through air at room temperature."
+    },
+    {
+      "k": [
+        "boiling point of water"
+      ],
+      "a": "Water boils at 100°C (212°F) at standard atmospheric pressure."
+    },
+    {
+      "k": [
+        "freezing point of water"
+      ],
+      "a": "Water freezes at 0°C (32°F) at standard atmospheric pressure."
+    },
+    {
+      "k": [
+        "what is photosynthesis"
+      ],
+      "a": "Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to produce glucose and oxygen, mainly in their chloroplasts."
+    },
+    {
+      "k": [
+        "what is gravity"
+      ],
+      "a": "Gravity is the force of attraction between masses — it's what pulls objects toward each other, like keeping planets in orbit and keeping you on the ground."
+    },
+    {
+      "k": [
+        "what is dna"
+      ],
+      "a": "DNA (deoxyribonucleic acid) is the molecule that carries the genetic instructions used in the growth, development, and functioning of all known living organisms."
+    },
+    {
+      "k": [
+        "how many bones in the human body"
+      ],
+      "a": "An adult human body has **206 bones**."
+    },
+    {
+      "k": [
+        "how many chromosomes do humans have"
+      ],
+      "a": "Humans typically have **46 chromosomes**, arranged in 23 pairs."
+    },
+    {
+      "k": [
+        "what is the largest organ"
+      ],
+      "a": "The skin is the largest organ of the human body."
+    },
+    {
+      "k": [
+        "periodic table",
+        "how many elements"
+      ],
+      "a": "The periodic table currently has **118 confirmed chemical elements**, organised by atomic number."
+    },
+    {
+      "k": [
+        "chemical formula of water"
+      ],
+      "a": "The chemical formula of water is **H₂O** — two hydrogen atoms bonded to one oxygen atom."
+    },
+    {
+      "k": [
+        "what is an atom"
+      ],
+      "a": "An atom is the basic building block of matter, made of a nucleus (protons and neutrons) surrounded by electrons."
+    },
+    {
+      "k": [
+        "what is a black hole"
+      ],
+      "a": "A black hole is a region of space where gravity is so strong that nothing, not even light, can escape from it, formed when massive stars collapse."
+    },
+    {
+      "k": [
+        "area of a circle",
+        "circle area formula"
+      ],
+      "a": "The area of a circle is **π × r²**, where r is the radius."
+    },
+    {
+      "k": [
+        "circumference of a circle"
+      ],
+      "a": "The circumference of a circle is **2 × π × r**, where r is the radius."
+    },
+    {
+      "k": [
+        "area of a triangle"
+      ],
+      "a": "The area of a triangle is **½ × base × height**."
+    },
+    {
+      "k": [
+        "area of a rectangle"
+      ],
+      "a": "The area of a rectangle is **length × width**."
+    },
+    {
+      "k": [
+        "pythagorean theorem"
+      ],
+      "a": "The Pythagorean theorem states that in a right triangle, **a² + b² = c²**, where c is the hypotenuse and a, b are the other two sides."
+    },
+    {
+      "k": [
+        "value of pi"
+      ],
+      "a": "π (pi) is approximately **3.14159**, the ratio of a circle's circumference to its diameter."
+    },
+    {
+      "k": [
+        "what is an api"
+      ],
+      "a": "An API (Application Programming Interface) is a set of rules that lets one piece of software talk to another — for example, letting an app fetch weather data from a weather service."
+    },
+    {
+      "k": [
+        "what is the internet"
+      ],
+      "a": "The internet is a global network of interconnected computers that communicate using standard protocols, allowing information to be shared worldwide."
+    },
+    {
+      "k": [
+        "what is the cloud",
+        "cloud computing"
+      ],
+      "a": "\"The cloud\" refers to storing and processing data on remote servers accessed over the internet, rather than on your own local device."
+    },
+    {
+      "k": [
+        "what is a database"
+      ],
+      "a": "A database is an organised collection of data, typically stored and accessed electronically, structured so it can be efficiently queried and updated."
+    },
+    {
+      "k": [
+        "what is open source"
+      ],
+      "a": "Open-source software has its source code made publicly available, so anyone can view, modify, and distribute it, usually under a specific license."
+    },
+    {
+      "k": [
+        "what is machine learning"
+      ],
+      "a": "Machine learning is a branch of AI where systems learn patterns from data rather than being explicitly programmed with rules, improving at a task as they see more examples."
+    },
+    {
+      "k": [
+        "what is artificial intelligence",
+        "what is ai"
+      ],
+      "a": "Artificial intelligence refers to computer systems built to perform tasks that normally need human intelligence — recognising speech, understanding language, or making decisions."
+    },
+    {
+      "k": [
+        "what is an algorithm"
+      ],
+      "a": "An algorithm is a step-by-step set of instructions for solving a problem or completing a task, the way a recipe is a set of instructions for cooking a dish."
+    },
+    {
+      "k": [
+        "difference between http and https"
+      ],
+      "a": "HTTPS is HTTP with an added layer of encryption (TLS/SSL), so data exchanged between your browser and a website is protected from eavesdropping — HTTP alone sends data in plain text."
+    },
+    {
+      "k": [
+        "define love",
+        "what does love mean",
+        "meaning of love"
+      ],
+      "a": "**Love** — a deep feeling of affection, care, or attachment toward someone or something."
+    },
+    {
+      "k": [
+        "define hope",
+        "what does hope mean",
+        "meaning of hope"
+      ],
+      "a": "**Hope** — a feeling of expectation and desire for a particular thing to happen."
+    },
+    {
+      "k": [
+        "define patience",
+        "what does patience mean",
+        "meaning of patience"
+      ],
+      "a": "**Patience** — the capacity to accept delay, difficulty, or suffering calmly, without becoming upset."
+    },
+    {
+      "k": [
+        "define wisdom",
+        "what does wisdom mean",
+        "meaning of wisdom"
+      ],
+      "a": "**Wisdom** — the quality of having good judgement, built from experience and knowledge."
+    },
+    {
+      "k": [
+        "define courage",
+        "what does courage mean",
+        "meaning of courage"
+      ],
+      "a": "**Courage** — the ability to do something that frightens you; strength in the face of fear."
+    },
+    {
+      "k": [
+        "define integrity",
+        "what does integrity mean",
+        "meaning of integrity"
+      ],
+      "a": "**Integrity** — the quality of being honest and having strong moral principles that you refuse to compromise."
+    },
+    {
+      "k": [
+        "define empathy",
+        "what does empathy mean",
+        "meaning of empathy"
+      ],
+      "a": "**Empathy** — the ability to understand and share the feelings of another person."
+    },
+    {
+      "k": [
+        "define resilience",
+        "what does resilience mean",
+        "meaning of resilience"
+      ],
+      "a": "**Resilience** — the capacity to recover quickly from difficulties; toughness."
+    },
+    {
+      "k": [
+        "define gratitude",
+        "what does gratitude mean",
+        "meaning of gratitude"
+      ],
+      "a": "**Gratitude** — the quality of being thankful and appreciative."
+    },
+    {
+      "k": [
+        "define humility",
+        "what does humility mean",
+        "meaning of humility"
+      ],
+      "a": "**Humility** — a modest view of one's own importance; freedom from pride or arrogance."
+    },
+    {
+      "k": [
+        "reverse a string python"
+      ],
+      "a": "Here's how to reverse a string in Python:\n\n```python\ntext = \"zariya\"\nreversed_text = text[::-1]\nprint(reversed_text)  # ayiraz\n```"
+    },
+    {
+      "k": [
+        "fibonacci python"
+      ],
+      "a": "A simple Fibonacci sequence generator in Python:\n\n```python\ndef fibonacci(n):\n    a, b = 0, 1\n    result = []\n    for _ in range(n):\n        result.append(a)\n        a, b = b, a + b\n    return result\n\nprint(fibonacci(10))\n```"
+    },
+    {
+      "k": [
+        "hello world python"
+      ],
+      "a": "```python\nprint(\"Hello, world!\")\n```"
+    },
+    {
+      "k": [
+        "hello world javascript"
+      ],
+      "a": "```javascript\nconsole.log(\"Hello, world!\");\n```"
+    },
+    {
+      "k": [
+        "sort a list python",
+        "sort array python"
+      ],
+      "a": "```python\nnumbers = [5, 2, 9, 1]\nnumbers.sort()\nprint(numbers)  # [1, 2, 5, 9]\n```"
+    },
+    {
+      "k": [
+        "for loop python"
+      ],
+      "a": "```python\nfor i in range(5):\n    print(i)\n```"
+    },
+    {
+      "k": [
+        "for loop javascript"
+      ],
+      "a": "```javascript\nfor (let i = 0; i < 5; i++) {\n  console.log(i);\n}\n```"
+    },
+    {
+      "k": [
+        "function python"
+      ],
+      "a": "```python\ndef greet(name):\n    return f\"Hello, {name}!\"\n\nprint(greet(\"Zariya\"))\n```"
+    },
+    {
+      "k": [
+        "function javascript"
+      ],
+      "a": "```javascript\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\nconsole.log(greet(\"Zariya\"));\n```"
+    },
+    {
+      "k": [
+        "class python"
+      ],
+      "a": "```python\nclass Person:\n    def __init__(self, name):\n        self.name = name\n\n    def greet(self):\n        return f\"Hi, I'm {self.name}\"\n\np = Person(\"Ali\")\nprint(p.greet())\n```"
+    },
+    {
+      "k": [
+        "read a file python"
+      ],
+      "a": "```python\nwith open(\"file.txt\", \"r\") as f:\n    content = f.read()\nprint(content)\n```"
+    },
+    {
+      "k": [
+        "html boilerplate",
+        "basic html template"
+      ],
+      "a": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Page title</title>\n</head>\n<body>\n  <h1>Hello, world!</h1>\n</body>\n</html>\n```"
+    },
+    {
+      "k": [
+        "pomodoro",
+        "study tip",
+        "how to focus",
+        "time management"
+      ],
+      "a": "A simple, well-tested study method is the **Pomodoro Technique**: work with full focus for 25 minutes, then take a 5-minute break; after four rounds, take a longer 15–30 minute break. Keeping a written to-do list and studying your hardest subject when your energy is highest also helps a lot."
+    },
+    {
+      "k": [
+        "how to learn a language"
+      ],
+      "a": "Consistency beats intensity: a little practice every day (vocabulary, listening, and speaking) works better than long, occasional sessions. Try labelling objects around your home in the language you're learning, and consume media — songs, shows — in it."
+    },
+    {
+      "k": [
+        "how to memorize"
+      ],
+      "a": "Spaced repetition (reviewing material at increasing intervals) and active recall (testing yourself instead of just re-reading) are the two most evidence-backed memorisation techniques. That's exactly what the Flashcards tab in this app is built for."
+    },
+    {
+      "k": [
+        "how to write a resume",
+        "how to write a cv"
+      ],
+      "a": "Keep a resume to one page where possible: lead with a short summary, list experience in reverse-chronological order with measurable achievements (not just duties), and tailor keywords to each job description."
+    },
+    {
+      "k": [
+        "what is eid"
+      ],
+      "a": "Eid refers to two major Islamic festivals: **Eid-ul-Fitr**, marking the end of Ramadan's fasting month, and **Eid-ul-Adha**, commemorating the Prophet Ibrahim's willingness to sacrifice, marked by the sacrifice of an animal and sharing the meat."
+    },
+    {
+      "k": [
+        "what is ramadan"
+      ],
+      "a": "Ramadan is the ninth month of the Islamic lunar calendar, observed by Muslims worldwide with fasting from dawn to sunset, increased prayer, reflection, and charity."
+    },
+    {
+      "k": [
+        "five pillars of islam"
+      ],
+      "a": "The Five Pillars of Islam are: **Shahada** (declaration of faith), **Salah** (five daily prayers), **Zakat** (charity), **Sawm** (fasting in Ramadan), and **Hajj** (pilgrimage to Mecca, once in a lifetime if able)."
+    },
+    {
+      "k": [
+        "what is zakat"
+      ],
+      "a": "Zakat is obligatory almsgiving in Islam — typically 2.5% of a Muslim's savings and qualifying wealth given annually to those in need."
+    },
+    {
+      "k": [
+        "what is hajj"
+      ],
+      "a": "Hajj is the annual Islamic pilgrimage to Mecca, Saudi Arabia, which every able-bodied Muslim who can afford it is required to undertake at least once in their lifetime."
+    },
+    {
+      "k": [
+        "who wrote romeo and juliet"
+      ],
+      "a": "William Shakespeare wrote *Romeo and Juliet*."
+    },
+    {
+      "k": [
+        "who discovered gravity"
+      ],
+      "a": "Sir Isaac Newton formulated the laws of gravity after observing that objects fall toward the Earth, formalising it in his 1687 work *Principia*."
+    },
+    {
+      "k": [
+        "who invented the telephone"
+      ],
+      "a": "Alexander Graham Bell is credited with inventing the first practical telephone in 1876."
+    },
+    {
+      "k": [
+        "who invented the light bulb"
+      ],
+      "a": "Thomas Edison developed the first commercially practical incandescent light bulb in 1879, building on earlier work by other inventors."
+    },
+    {
+      "k": [
+        "when did world war 2 end"
+      ],
+      "a": "World War II ended in 1945 — in Europe on 8 May (V-E Day) and in the Pacific on 2 September after Japan's surrender."
+    },
+    {
+      "k": [
+        "when did world war 1 start"
+      ],
+      "a": "World War I began in **1914**, following the assassination of Archduke Franz Ferdinand of Austria."
+    },
+    {
+      "k": [
+        "who was the first man on the moon"
+      ],
+      "a": "Neil Armstrong was the first person to walk on the Moon, on 20 July 1969, during NASA's Apollo 11 mission."
+    },
+    {
+      "k": [
+        "break the ice"
+      ],
+      "a": "**\"Break The Ice\"** — to do or say something that relieves tension or awkwardness, especially when meeting someone new."
+    },
+    {
+      "k": [
+        "piece of cake"
+      ],
+      "a": "**\"Piece Of Cake\"** — something very easy to do."
+    },
+    {
+      "k": [
+        "hit the books"
+      ],
+      "a": "**\"Hit The Books\"** — to study hard."
+    },
+    {
+      "k": [
+        "under the weather"
+      ],
+      "a": "**\"Under The Weather\"** — feeling slightly unwell."
+    },
+    {
+      "k": [
+        "once in a blue moon"
+      ],
+      "a": "**\"Once In A Blue Moon\"** — very rarely."
+    },
+    {
+      "k": [
+        "cost an arm and a leg"
+      ],
+      "a": "**\"Cost An Arm And A Leg\"** — to be very expensive."
+    },
+    {
+      "k": [
+        "bite the bullet"
+      ],
+      "a": "**\"Bite The Bullet\"** — to face a difficult or unpleasant situation with courage."
+    },
+    {
+      "k": [
+        "the ball is in your court"
+      ],
+      "a": "**\"The Ball Is In Your Court\"** — it's your turn to take action or make a decision."
+    },
+    {
+      "k": [
+        "capital of netherlands"
+      ],
+      "a": "**Amsterdam** is the capital of Netherlands."
+    },
+    {
+      "k": [
+        "capital of sweden"
+      ],
+      "a": "**Stockholm** is the capital of Sweden."
+    },
+    {
+      "k": [
+        "capital of norway"
+      ],
+      "a": "**Oslo** is the capital of Norway."
+    },
+    {
+      "k": [
+        "capital of poland"
+      ],
+      "a": "**Warsaw** is the capital of Poland."
+    },
+    {
+      "k": [
+        "capital of greece"
+      ],
+      "a": "**Athens** is the capital of Greece."
+    },
+    {
+      "k": [
+        "capital of portugal"
+      ],
+      "a": "**Lisbon** is the capital of Portugal."
+    },
+    {
+      "k": [
+        "capital of switzerland"
+      ],
+      "a": "**Bern** is the capital of Switzerland."
+    },
+    {
+      "k": [
+        "capital of austria"
+      ],
+      "a": "**Vienna** is the capital of Austria."
+    },
+    {
+      "k": [
+        "capital of belgium"
+      ],
+      "a": "**Brussels** is the capital of Belgium."
+    },
+    {
+      "k": [
+        "capital of thailand"
+      ],
+      "a": "**Bangkok** is the capital of Thailand."
+    },
+    {
+      "k": [
+        "capital of vietnam"
+      ],
+      "a": "**Hanoi** is the capital of Vietnam."
+    },
+    {
+      "k": [
+        "capital of malaysia"
+      ],
+      "a": "**Kuala Lumpur** is the capital of Malaysia."
+    },
+    {
+      "k": [
+        "capital of philippines"
+      ],
+      "a": "**Manila** is the capital of Philippines."
+    },
+    {
+      "k": [
+        "capital of iraq"
+      ],
+      "a": "**Baghdad** is the capital of Iraq."
+    },
+    {
+      "k": [
+        "capital of israel"
+      ],
+      "a": "**Jerusalem** is the capital of Israel."
+    },
+    {
+      "k": [
+        "capital of jordan"
+      ],
+      "a": "**Amman** is the capital of Jordan."
+    },
+    {
+      "k": [
+        "capital of qatar"
+      ],
+      "a": "**Doha** is the capital of Qatar."
+    },
+    {
+      "k": [
+        "capital of kuwait"
+      ],
+      "a": "**Kuwait City** is the capital of Kuwait."
+    },
+    {
+      "k": [
+        "capital of oman"
+      ],
+      "a": "**Muscat** is the capital of Oman."
+    },
+    {
+      "k": [
+        "capital of morocco"
+      ],
+      "a": "**Rabat** is the capital of Morocco."
+    },
+    {
+      "k": [
+        "capital of algeria"
+      ],
+      "a": "**Algiers** is the capital of Algeria."
+    },
+    {
+      "k": [
+        "capital of argentina"
+      ],
+      "a": "**Buenos Aires** is the capital of Argentina."
+    },
+    {
+      "k": [
+        "capital of chile"
+      ],
+      "a": "**Santiago** is the capital of Chile."
+    },
+    {
+      "k": [
+        "capital of colombia"
+      ],
+      "a": "**Bogotá** is the capital of Colombia."
+    },
+    {
+      "k": [
+        "capital of peru"
+      ],
+      "a": "**Lima** is the capital of Peru."
+    },
+    {
+      "k": [
+        "capital of new zealand"
+      ],
+      "a": "**Wellington** is the capital of New Zealand."
+    },
+    {
+      "k": [
+        "how many players in a football team",
+        "football team players"
+      ],
+      "a": "A football (soccer) team has **11 players** on the field at a time, including the goalkeeper."
+    },
+    {
+      "k": [
+        "how many players in a cricket team"
+      ],
+      "a": "A cricket team has **11 players** on the field at a time."
+    },
+    {
+      "k": [
+        "how often are the olympics held",
+        "olympics every"
+      ],
+      "a": "The Summer and Winter Olympic Games are each held every **4 years**, staggered two years apart."
+    },
+    {
+      "k": [
+        "who has won the most cricket world cups"
+      ],
+      "a": "Australia has won the most Cricket World Cup titles, with six championships as of the most recent tournaments in my training data — check a live source for the very latest count."
+    },
+    {
+      "k": [
+        "what is the offside rule"
+      ],
+      "a": "In football, a player is offside if they're nearer to the opponent's goal line than both the ball and the second-last defender when the ball is played to them, unless they're in their own half."
+    },
+    {
+      "k": [
+        "who wrote hamlet"
+      ],
+      "a": "William Shakespeare wrote *Hamlet*."
+    },
+    {
+      "k": [
+        "who wrote pride and prejudice"
+      ],
+      "a": "Jane Austen wrote *Pride and Prejudice*, published in 1813."
+    },
+    {
+      "k": [
+        "who wrote 1984"
+      ],
+      "a": "George Orwell wrote *1984*, published in 1949."
+    },
+    {
+      "k": [
+        "who wrote to kill a mockingbird"
+      ],
+      "a": "Harper Lee wrote *To Kill a Mockingbird*, published in 1960."
+    },
+    {
+      "k": [
+        "who is allama iqbal"
+      ],
+      "a": "Allama Muhammad Iqbal (1877–1938) was a poet, philosopher, and politician, widely regarded as the spiritual father of Pakistan and the national poet, famous for works like *Bang-e-Dara* and *Bal-e-Jibril*."
+    },
+    {
+      "k": [
+        "who is mirza ghalib"
+      ],
+      "a": "Mirza Ghalib (1797–1869) was one of the most celebrated Urdu and Persian poets, known for his ghazals exploring love, philosophy, and the human condition."
+    },
+    {
+      "k": [
+        "difference between affect and effect"
+      ],
+      "a": "**Affect** is usually a verb meaning to influence something (\"the rain affected our plans\"). **Effect** is usually a noun meaning the result (\"the effect of the rain was a delay\")."
+    },
+    {
+      "k": [
+        "difference between their there they're"
+      ],
+      "a": "**Their** shows possession (\"their house\"), **there** refers to a place (\"put it there\"), and **they're** is a contraction of \"they are\" (\"they're coming\")."
+    },
+    {
+      "k": [
+        "difference between its and it's"
+      ],
+      "a": "**Its** shows possession (\"the dog wagged its tail\"). **It's** is a contraction of \"it is\" or \"it has\" (\"it's raining\")."
+    },
+    {
+      "k": [
+        "past tense of go"
+      ],
+      "a": "The past tense of **go** is **went** (and the past participle is **gone**)."
+    },
+    {
+      "k": [
+        "plural of child"
+      ],
+      "a": "The plural of **child** is **children** — an irregular plural."
+    },
+    {
+      "k": [
+        "hello world java"
+      ],
+      "a": "```java\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, world!\");\n    }\n}\n```"
+    },
+    {
+      "k": [
+        "hello world c++",
+        "hello world cpp"
+      ],
+      "a": "```cpp\n#include <iostream>\nint main() {\n    std::cout << \"Hello, world!\" << std::endl;\n    return 0;\n}\n```"
+    },
+    {
+      "k": [
+        "sql select query",
+        "basic sql query"
+      ],
+      "a": "```sql\nSELECT name, age FROM users WHERE age > 18 ORDER BY name;\n```"
+    },
+    {
+      "k": [
+        "center a div css",
+        "css center div"
+      ],
+      "a": "```css\n.container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n```"
+    },
+    {
+      "k": [
+        "what is a for loop"
+      ],
+      "a": "A for loop repeats a block of code a set number of times — useful when you know in advance how many iterations you need, unlike a while loop which repeats until a condition becomes false."
+    },
+    {
+      "k": [
+        "difference between let and var javascript"
+      ],
+      "a": "**var** is function-scoped and can be re-declared, which often causes bugs. **let** is block-scoped and can't be re-declared in the same scope — modern JavaScript generally prefers `let` (and `const` for values that don't change)."
+    },
+    {
+      "k": [
+        "what is recursion"
+      ],
+      "a": "Recursion is when a function calls itself to solve a smaller version of the same problem, until it reaches a base case that stops the calls — commonly used for things like factorials, tree traversal, and the Fibonacci sequence."
+    },
+    {
+      "k": [
+        "how much water should i drink"
+      ],
+      "a": "A commonly cited general guideline is about **8 glasses (roughly 2 litres) a day**, though needs vary with body size, climate, and activity level — this isn't medical advice, so check with a doctor for anything specific to you."
+    },
+    {
+      "k": [
+        "how many hours of sleep"
+      ],
+      "a": "Most adults generally need **7–9 hours** of sleep per night for good health; teenagers typically need a bit more, around 8–10 hours."
+    },
+    {
+      "k": [
+        "benefits of exercise"
+      ],
+      "a": "Regular exercise is linked to better cardiovascular health, stronger muscles and bones, improved mood, better sleep, and lower risk of chronic disease — even 30 minutes of brisk walking most days makes a real difference."
+    },
+    {
+      "k": [
+        "who founded microsoft"
+      ],
+      "a": "Bill Gates and Paul Allen founded Microsoft in 1975."
+    },
+    {
+      "k": [
+        "who founded apple"
+      ],
+      "a": "Steve Jobs, Steve Wozniak, and Ronald Wayne founded Apple in 1976."
+    },
+    {
+      "k": [
+        "who founded google"
+      ],
+      "a": "Larry Page and Sergey Brin founded Google in 1998, while they were PhD students at Stanford."
+    },
+    {
+      "k": [
+        "who founded amazon"
+      ],
+      "a": "Jeff Bezos founded Amazon in 1994, initially as an online bookstore."
+    },
+    {
+      "k": [
+        "who created python"
+      ],
+      "a": "Guido van Rossum created the Python programming language, first released in 1991."
+    },
+    {
+      "k": [
+        "who created javascript"
+      ],
+      "a": "Brendan Eich created JavaScript in 1995, in just 10 days, while working at Netscape."
+    },
+    {
+      "k": [
+        "what does cpu stand for"
+      ],
+      "a": "CPU stands for **Central Processing Unit** — the primary component of a computer that executes instructions."
+    },
+    {
+      "k": [
+        "what does ram stand for"
+      ],
+      "a": "RAM stands for **Random Access Memory** — the computer's short-term, high-speed memory used to hold data actively being worked on."
+    },
+    {
+      "k": [
+        "my phone is slow",
+        "phone running slow"
+      ],
+      "a": "A few quick fixes: restart the phone, close unused apps, clear cached data, delete unused apps/photos to free storage, and check for pending software updates — these solve most slowdown issues."
+    },
+    {
+      "k": [
+        "forgot my password"
+      ],
+      "a": "Most services have a \"Forgot password\" link on the sign-in page that emails or texts you a reset link — if you don't have access to that email/phone anymore, look for the platform's account-recovery support page."
+    },
+    {
+      "k": [
+        "how to write a thesis statement"
+      ],
+      "a": "A strong thesis statement makes a specific, arguable claim (not just a topic) and previews your main reasons — e.g. \"Social media harms teen mental health because it increases comparison, disrupts sleep, and displaces in-person friendships\" rather than just \"Social media affects teens.\""
+    },
+    {
+      "k": [
+        "how to cite apa",
+        "apa citation format"
+      ],
+      "a": "A basic APA (7th edition) in-text citation looks like **(Author, Year)**, e.g. (Khan, 2021). A reference list entry looks like: Khan, A. (2021). *Title of the work*. Publisher."
+    },
+    {
+      "k": [
+        "how to cite mla",
+        "mla citation format"
+      ],
+      "a": "A basic MLA in-text citation looks like **(Author Page)**, e.g. (Khan 45). A Works Cited entry looks like: Khan, Ahmed. *Title of the Work*. Publisher, Year."
+    },
+    {
+      "k": [
+        "what is plagiarism"
+      ],
+      "a": "Plagiarism is presenting someone else's words, ideas, or work as your own without proper credit — this includes copying text directly, closely paraphrasing without citation, and even reusing your own previously submitted work without permission (self-plagiarism)."
+    },
+    {
+      "k": [
+        "how to write an abstract"
+      ],
+      "a": "A good academic abstract (usually 150–250 words) briefly covers: the problem/purpose, your method, key results, and the main conclusion — written so someone can understand your paper's contribution without reading the full text."
+    },
+    {
+      "k": [
+        "how to reduce exam stress",
+        "exam anxiety tips"
+      ],
+      "a": "Practical steps: start revising early rather than cramming, break topics into small daily chunks, practice with past papers under timed conditions, sleep properly the night before rather than staying up late, and do a few slow breaths before you start if you feel anxious in the exam itself."
+    },
+    {
+      "k": [
+        "how to make a study schedule",
+        "study timetable"
+      ],
+      "a": "Work backward from your exam date, list topics by priority (weakest or highest-weight first), assign specific days/times using short focused blocks (like Pomodoro sessions), and build in regular review days to revisit older material rather than only moving forward."
+    },
+    {
+      "k": [
+        "tips for group projects",
+        "group project tips"
+      ],
+      "a": "Agree on roles and deadlines in writing early on, use a shared document or task board so progress is visible to everyone, schedule short regular check-ins rather than one big meeting at the end, and address problems (like an unresponsive teammate) directly and early rather than letting them build up."
+    },
+    {
+      "k": [
+        "how to write a literature review"
+      ],
+      "a": "A literature review isn't just a list of summaries — group sources by theme or argument, show how they relate to or disagree with each other, and end by identifying the gap your own work addresses."
+    },
+    {
+      "k": [
+        "difference between qualitative and quantitative research"
+      ],
+      "a": "**Quantitative research** collects numerical data and looks for statistical patterns (surveys, experiments). **Qualitative research** collects non-numerical data like interviews or observations to understand experiences, meanings, and context in depth."
+    },
+    {
+      "k": [
+        "how to improve gpa",
+        "how to get good grades"
+      ],
+      "a": "Attend classes consistently, start assignments as soon as they're given rather than near the deadline, actively review notes within a day or two of the lecture (not just before exams), and ask for help from professors or TAs early when confused rather than after falling behind."
+    },
+    {
+      "k": [
+        "what is a hypothesis"
+      ],
+      "a": "A hypothesis is a specific, testable prediction about the relationship between variables — e.g. \"increasing study time will improve test scores\" — that an experiment or study is designed to support or refute."
+    },
+    {
+      "k": [
+        "how to write a good introduction paragraph"
+      ],
+      "a": "A strong introduction typically: opens with a hook (a question, fact, or scenario), gives brief background/context, and ends with a clear thesis statement that tells the reader exactly what the piece will argue or cover."
+    },
+    {
+      "k": [
+        "actions speak louder than words"
+      ],
+      "a": "**\"Actions Speak Louder Than Words\"** — What you do matters more than what you say."
+    },
+    {
+      "k": [
+        "better late than never"
+      ],
+      "a": "**\"Better Late Than Never\"** — It's better to do something late than not at all."
+    },
+    {
+      "k": [
+        "practice makes perfect"
+      ],
+      "a": "**\"Practice Makes Perfect\"** — Repeated practice leads to improvement and mastery."
+    },
+    {
+      "k": [
+        "don't judge a book by its cover"
+      ],
+      "a": "**\"Don'T Judge A Book By Its Cover\"** — Don't judge something's worth based only on appearance."
+    },
+    {
+      "k": [
+        "when in rome, do as the romans do"
+      ],
+      "a": "**\"When In Rome, Do As The Romans Do\"** — Adapt to the customs of the place or situation you're in."
+    },
+    {
+      "k": [
+        "the early bird catches the worm"
+      ],
+      "a": "**\"The Early Bird Catches The Worm\"** — Those who act early gain an advantage."
+    },
+    {
+      "k": [
+        "every cloud has a silver lining"
+      ],
+      "a": "**\"Every Cloud Has A Silver Lining\"** — Even difficult situations have some positive aspect."
+    },
+    {
+      "k": [
+        "a friend in need is a friend indeed"
+      ],
+      "a": "**\"A Friend In Need Is A Friend Indeed\"** — A true friend is one who helps you in difficult times."
+    },
+    {
+      "k": [
+        "boond boond se darya banta hai"
+      ],
+      "a": "**\"Boond boond se darya banta hai\"** (بوند بوند سے دریا بنتا ہے) — a river is formed drop by drop; small consistent efforts add up to something big."
+    },
+    {
+      "k": [
+        "jaisi karni waisi bharni"
+      ],
+      "a": "**\"Jaisi karni waisi bharni\"** (جیسی کرنی ویسی بھرنی) — you reap what you sow; your actions determine your outcomes."
+    },
+    {
+      "k": [
+        "sabar ka phal meetha hota hai"
+      ],
+      "a": "**\"Sabar ka phal meetha hota hai\"** (صبر کا پھل میٹھا ہوتا ہے) — the fruit of patience is sweet; good things come to those who wait patiently."
+    },
+    {
+      "k": [
+        "capital of singapore"
+      ],
+      "a": "**Singapore** is the capital of Singapore."
+    },
+    {
+      "k": [
+        "capital of finland"
+      ],
+      "a": "**Helsinki** is the capital of Finland."
+    },
+    {
+      "k": [
+        "capital of denmark"
+      ],
+      "a": "**Copenhagen** is the capital of Denmark."
+    },
+    {
+      "k": [
+        "capital of ireland"
+      ],
+      "a": "**Dublin** is the capital of Ireland."
+    },
+    {
+      "k": [
+        "capital of ukraine"
+      ],
+      "a": "**Kyiv** is the capital of Ukraine."
+    },
+    {
+      "k": [
+        "capital of czech republic"
+      ],
+      "a": "**Prague** is the capital of Czech Republic."
+    },
+    {
+      "k": [
+        "capital of hungary"
+      ],
+      "a": "**Budapest** is the capital of Hungary."
+    },
+    {
+      "k": [
+        "capital of romania"
+      ],
+      "a": "**Bucharest** is the capital of Romania."
+    },
+    {
+      "k": [
+        "capital of israel palestine"
+      ],
+      "a": "**Jerusalem** is the capital of Israel Palestine."
+    },
+    {
+      "k": [
+        "capital of libya"
+      ],
+      "a": "**Tripoli** is the capital of Libya."
+    },
+    {
+      "k": [
+        "capital of tunisia"
+      ],
+      "a": "**Tunis** is the capital of Tunisia."
+    },
+    {
+      "k": [
+        "capital of ethiopia"
+      ],
+      "a": "**Addis Ababa** is the capital of Ethiopia."
+    },
+    {
+      "k": [
+        "capital of ghana"
+      ],
+      "a": "**Accra** is the capital of Ghana."
+    },
+    {
+      "k": [
+        "capital of tanzania"
+      ],
+      "a": "**Dodoma** is the capital of Tanzania."
+    },
+    {
+      "k": [
+        "capital of myanmar"
+      ],
+      "a": "**Naypyidaw** is the capital of Myanmar."
+    },
+    {
+      "k": [
+        "capital of cambodia"
+      ],
+      "a": "**Phnom Penh** is the capital of Cambodia."
+    },
+    {
+      "k": [
+        "capital of laos"
+      ],
+      "a": "**Vientiane** is the capital of Laos."
+    },
+    {
+      "k": [
+        "capital of mongolia"
+      ],
+      "a": "**Ulaanbaatar** is the capital of Mongolia."
+    },
+    {
+      "k": [
+        "how many chambers does the heart have"
+      ],
+      "a": "The human heart has **four chambers**: two atria (upper) and two ventricles (lower)."
+    },
+    {
+      "k": [
+        "what is the function of the liver"
+      ],
+      "a": "The liver filters toxins from the blood, produces bile to help digest fats, stores energy as glycogen, and helps process nutrients and medications."
+    },
+    {
+      "k": [
+        "what is the function of the kidneys"
+      ],
+      "a": "The kidneys filter waste and excess fluid from the blood to form urine, helping regulate blood pressure, electrolyte balance, and overall fluid balance in the body."
+    },
+    {
+      "k": [
+        "how many teeth do adults have"
+      ],
+      "a": "Adults typically have **32 teeth**, including wisdom teeth (though some people never develop all four wisdom teeth)."
+    },
+    {
+      "k": [
+        "what is the largest bone in the human body"
+      ],
+      "a": "The femur (thigh bone) is the largest and strongest bone in the human body."
+    },
+    {
+      "k": [
+        "what is a stack data structure"
+      ],
+      "a": "A stack is a Last-In-First-Out (LIFO) data structure — the most recently added item is the first one removed, like a stack of plates. Common operations are push (add) and pop (remove)."
+    },
+    {
+      "k": [
+        "what is a queue data structure"
+      ],
+      "a": "A queue is a First-In-First-Out (FIFO) data structure — items are removed in the order they were added, like a line of people waiting. Common operations are enqueue (add) and dequeue (remove)."
+    },
+    {
+      "k": [
+        "difference between array and linked list"
+      ],
+      "a": "An **array** stores elements in contiguous memory with fast index-based access but costly insertion/deletion. A **linked list** stores elements as nodes with pointers to the next node — insertion/deletion is cheaper, but accessing an element requires traversing from the start."
+    },
+    {
+      "k": [
+        "what is big o notation"
+      ],
+      "a": "Big O notation describes how an algorithm's run time or memory use grows as the input size grows — e.g. O(n) means time grows linearly with input size, O(n²) means it grows quadratically (like nested loops over the same list)."
+    },
+    {
+      "k": [
+        "what is object oriented programming",
+        "what is oop"
+      ],
+      "a": "Object-oriented programming (OOP) organizes code around **objects** that bundle data (attributes) and behavior (methods) together, built around concepts like classes, inheritance, encapsulation, and polymorphism."
+    },
+    {
+      "k": [
+        "what is a compiler"
+      ],
+      "a": "A compiler translates source code written in a programming language (like C++ or Java) into machine code or an intermediate form, all at once before the program runs — as opposed to an interpreter, which executes code line by line."
+    },
+    {
+      "k": [
+        "define justice",
+        "what does justice mean",
+        "meaning of justice"
+      ],
+      "a": "**Justice** — the quality of being fair and reasonable in the way people are treated or decisions are made."
+    },
+    {
+      "k": [
+        "define freedom",
+        "what does freedom mean",
+        "meaning of freedom"
+      ],
+      "a": "**Freedom** — the power or right to act, speak, or think as one wants without hindrance or restraint."
+    },
+    {
+      "k": [
+        "define discipline",
+        "what does discipline mean",
+        "meaning of discipline"
+      ],
+      "a": "**Discipline** — training oneself to follow rules or a code of behaviour, using controlled, ordered conduct."
+    },
+    {
+      "k": [
+        "define ambition",
+        "what does ambition mean",
+        "meaning of ambition"
+      ],
+      "a": "**Ambition** — a strong desire to achieve something, typically requiring determination and hard work."
+    },
+    {
+      "k": [
+        "define loyalty",
+        "what does loyalty mean",
+        "meaning of loyalty"
+      ],
+      "a": "**Loyalty** — a strong feeling of support or allegiance to a person, group, or cause."
+    },
+    {
+      "k": [
+        "define sincerity",
+        "what does sincerity mean",
+        "meaning of sincerity"
+      ],
+      "a": "**Sincerity** — the quality of being free from pretence or deceit; genuine and honest intent."
+    },
+    {
+      "k": [
+        "define diplomacy",
+        "what does diplomacy mean",
+        "meaning of diplomacy"
+      ],
+      "a": "**Diplomacy** — the skilled and tactful handling of relationships and negotiations, especially between groups or nations."
+    },
+    {
+      "k": [
+        "define innovation",
+        "what does innovation mean",
+        "meaning of innovation"
+      ],
+      "a": "**Innovation** — the introduction of new ideas, methods, or products that create value."
+    },
+    {
+      "k": [
+        "define sustainability",
+        "what does sustainability mean",
+        "meaning of sustainability"
+      ],
+      "a": "**Sustainability** — meeting present needs without compromising the ability of future generations to meet their own."
+    },
+    {
+      "k": [
+        "define democracy",
+        "what does democracy mean",
+        "meaning of democracy"
+      ],
+      "a": "**Democracy** — a system of government in which power is held by the people, typically through elected representatives."
+    },
+    {
+      "k": [
+        "what is inflation"
+      ],
+      "a": "Inflation is the rate at which the general level of prices for goods and services rises over time, reducing the purchasing power of a given amount of money."
+    },
+    {
+      "k": [
+        "what is gdp"
+      ],
+      "a": "GDP (Gross Domestic Product) is the total monetary value of all goods and services produced within a country in a given period — a common measure of the size of an economy."
+    },
+    {
+      "k": [
+        "what is supply and demand"
+      ],
+      "a": "Supply and demand describes how price is determined: when demand for a good rises relative to its supply, prices tend to rise; when supply exceeds demand, prices tend to fall."
+    },
+    {
+      "k": [
+        "what is interest rate"
+      ],
+      "a": "An interest rate is the cost of borrowing money (or the return on saved/lent money), usually expressed as a percentage of the amount over a year."
+    },
+    {
+      "k": [
+        "what is a stock market"
+      ],
+      "a": "A stock market is where shares of publicly listed companies are bought and sold, letting companies raise capital and investors buy partial ownership in businesses."
+    },
+    {
+      "k": [
+        "what is entrepreneurship"
+      ],
+      "a": "Entrepreneurship is the process of designing, launching, and running a new business, typically involving significant risk in pursuit of profit and innovation."
+    },
+    {
+      "k": [
+        "what is maslow's hierarchy of needs"
+      ],
+      "a": "Maslow's hierarchy of needs is a theory proposing that human motivation follows a pyramid: basic physiological needs (food, water) and safety at the base, then belonging/love, esteem, and self-actualization at the top — lower needs generally must be met before higher ones become motivating."
+    },
+    {
+      "k": [
+        "what is classical conditioning"
+      ],
+      "a": "Classical conditioning is a learning process where a neutral stimulus becomes associated with a meaningful one until it triggers a similar response on its own — famously demonstrated by Pavlov's dogs learning to salivate at a bell paired with food."
+    },
+    {
+      "k": [
+        "what is cognitive dissonance"
+      ],
+      "a": "Cognitive dissonance is the mental discomfort felt when holding two contradictory beliefs, or when actions conflict with beliefs — people often resolve it by changing a belief, adding a justification, or downplaying the conflict."
+    },
+    {
+      "k": [
+        "what is extrinsic and intrinsic motivation"
+      ],
+      "a": "**Intrinsic motivation** comes from internal satisfaction — doing something because it's inherently interesting or enjoyable. **Extrinsic motivation** comes from external rewards or pressures, like money, grades, or approval."
+    },
+    {
+      "k": [
+        "what causes climate change"
+      ],
+      "a": "The scientific consensus is that human activity — mainly burning fossil fuels, deforestation, and industrial processes — releases greenhouse gases like CO₂ that trap heat in the atmosphere, driving long-term global warming."
+    },
+    {
+      "k": [
+        "what is the greenhouse effect"
+      ],
+      "a": "The greenhouse effect is the natural process where certain gases (CO₂, methane, water vapour) trap heat in Earth's atmosphere, keeping the planet warm enough to support life — human emissions have intensified this effect beyond natural levels."
+    },
+    {
+      "k": [
+        "what are the layers of the earth"
+      ],
+      "a": "Earth has four main layers: the **crust** (thin outer layer), the **mantle** (thick, mostly solid rock that flows slowly), the **outer core** (liquid iron and nickel), and the **inner core** (solid iron and nickel under immense pressure)."
+    },
+    {
+      "k": [
+        "what causes earthquakes"
+      ],
+      "a": "Earthquakes are mostly caused by the sudden release of stress along fault lines where tectonic plates meet, grind, or slip past each other, sending shockwaves through the ground."
+    },
+    {
+      "k": [
+        "what causes volcanoes"
+      ],
+      "a": "Volcanoes form where molten rock (magma) from beneath the Earth's crust finds a path to the surface, often at tectonic plate boundaries or over hotspots, erupting as lava, ash, and gases."
+    },
+    {
+      "k": [
+        "what is the water cycle"
+      ],
+      "a": "The water cycle describes water's continuous movement: it **evaporates** from oceans/lakes into vapour, **condenses** into clouds, falls as **precipitation** (rain/snow), and **collects** in bodies of water or groundwater before evaporating again."
+    },
+    {
+      "k": [
+        "how many tablespoons in a cup"
+      ],
+      "a": "There are **16 tablespoons in 1 US cup** (and 3 teaspoons in 1 tablespoon)."
+    },
+    {
+      "k": [
+        "how many grams in a kilogram"
+      ],
+      "a": "There are **1,000 grams in 1 kilogram**."
+    },
+    {
+      "k": [
+        "how many ml in a liter",
+        "how many ml in a litre"
+      ],
+      "a": "There are **1,000 millilitres in 1 litre**."
+    },
+    {
+      "k": [
+        "how many days in a year"
+      ],
+      "a": "A standard year has **365 days** (366 in a leap year, which occurs roughly every 4 years)."
+    },
+    {
+      "k": [
+        "how many weeks in a year"
+      ],
+      "a": "There are approximately **52 weeks** in a year."
+    },
+    {
+      "k": [
+        "who invented the internet"
+      ],
+      "a": "There's no single inventor — the internet grew out of ARPANET (a US Department of Defense project from the late 1960s), with key contributions from figures like Vint Cerf and Bob Kahn (who developed TCP/IP), and later Tim Berners-Lee, who invented the World Wide Web in 1989."
+    },
+    {
+      "k": [
+        "who invented the airplane"
+      ],
+      "a": "The Wright brothers, Orville and Wilbur, are credited with inventing and flying the first successful powered airplane, in 1903."
+    },
+    {
+      "k": [
+        "who invented printing press"
+      ],
+      "a": "Johannes Gutenberg invented the mechanical movable-type printing press in Europe around 1440, revolutionizing the spread of written information."
+    },
+    {
+      "k": [
+        "spill the beans"
+      ],
+      "a": "**\"Spill The Beans\"** — to reveal a secret, often accidentally."
+    },
+    {
+      "k": [
+        "let the cat out of the bag"
+      ],
+      "a": "**\"Let The Cat Out Of The Bag\"** — to reveal a secret, similar to 'spill the beans'."
+    },
+    {
+      "k": [
+        "burn the midnight oil"
+      ],
+      "a": "**\"Burn The Midnight Oil\"** — to work late into the night."
+    },
+    {
+      "k": [
+        "kill two birds with one stone"
+      ],
+      "a": "**\"Kill Two Birds With One Stone\"** — to accomplish two things with a single action."
+    },
+    {
+      "k": [
+        "the last straw"
+      ],
+      "a": "**\"The Last Straw\"** — the final problem in a series that causes someone to lose patience."
+    },
+    {
+      "k": [
+        "add insult to injury"
+      ],
+      "a": "**\"Add Insult To Injury\"** — to make a bad situation worse."
+    },
+    {
+      "k": [
+        "beat around the bush"
+      ],
+      "a": "**\"Beat Around The Bush\"** — to avoid getting to the point, speaking indirectly."
+    },
+    {
+      "k": [
+        "get cold feet"
+      ],
+      "a": "**\"Get Cold Feet\"** — to become nervous or hesitant about doing something, often before an important event."
+    },
+    {
+      "k": [
+        "binary search python"
+      ],
+      "a": "```python\ndef binary_search(arr, target):\n    low, high = 0, len(arr) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1\n```"
+    },
+    {
+      "k": [
+        "bubble sort python"
+      ],
+      "a": "```python\ndef bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(n - i - 1):\n            if arr[j] > arr[j + 1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr\n```"
+    },
+    {
+      "k": [
+        "what does git commit do",
+        "what is git"
+      ],
+      "a": "Git is a distributed version control system that tracks changes to files over time. `git commit` saves a snapshot of your currently staged changes to the project history with a message describing what changed."
+    },
+    {
+      "k": [
+        "what is a rest api"
+      ],
+      "a": "A REST API is a web API that follows REST principles — using standard HTTP methods (GET, POST, PUT, DELETE) to let clients create, read, update, and delete resources identified by URLs."
+    },
+    {
+      "k": [
+        "what is a light year"
+      ],
+      "a": "A light year is a unit of distance (not time) — the distance light travels in one year, about **9.46 trillion kilometres**."
+    },
+    {
+      "k": [
+        "what is the milky way"
+      ],
+      "a": "The Milky Way is the galaxy that contains our solar system, a barred spiral galaxy with an estimated 100–400 billion stars."
+    },
+    {
+      "k": [
+        "how old is the universe"
+      ],
+      "a": "The universe is estimated to be about **13.8 billion years old**, based on measurements of cosmic background radiation and the expansion rate of space."
+    },
+    {
+      "k": [
+        "what is a supernova"
+      ],
+      "a": "A supernova is the powerful explosion of a star at the end of its life cycle, briefly outshining an entire galaxy and scattering heavy elements into space."
+    },
+    {
+      "k": [
+        "what is zariya learning feature",
+        "how does zariya learn"
+      ],
+      "a": "When Claude or the on-device AI is connected, Zariya saves each question/answer pair on this device after a real response. If you (or offline mode) ask something similar again, it reuses that saved answer instead of the generic offline reply. This is a local cache, not model retraining — you can review, export, or clear it anytime in Settings."
+    },
+    {
+      "k": [
+        "capital of yemen"
+      ],
+      "a": "**Sana'a** is the capital of Yemen."
+    },
+    {
+      "k": [
+        "capital of syria"
+      ],
+      "a": "**Damascus** is the capital of Syria."
+    },
+    {
+      "k": [
+        "capital of lebanon"
+      ],
+      "a": "**Beirut** is the capital of Lebanon."
+    },
+    {
+      "k": [
+        "capital of cuba"
+      ],
+      "a": "**Havana** is the capital of Cuba."
+    },
+    {
+      "k": [
+        "capital of venezuela"
+      ],
+      "a": "**Caracas** is the capital of Venezuela."
+    },
+    {
+      "k": [
+        "capital of ecuador"
+      ],
+      "a": "**Quito** is the capital of Ecuador."
+    },
+    {
+      "k": [
+        "capital of bolivia"
+      ],
+      "a": "**Sucre** is the capital of Bolivia."
+    },
+    {
+      "k": [
+        "capital of paraguay"
+      ],
+      "a": "**Asunción** is the capital of Paraguay."
+    },
+    {
+      "k": [
+        "capital of uruguay"
+      ],
+      "a": "**Montevideo** is the capital of Uruguay."
+    },
+    {
+      "k": [
+        "capital of panama"
+      ],
+      "a": "**Panama City** is the capital of Panama."
+    },
+    {
+      "k": [
+        "capital of iceland"
+      ],
+      "a": "**Reykjavik** is the capital of Iceland."
+    },
+    {
+      "k": [
+        "capital of croatia"
+      ],
+      "a": "**Zagreb** is the capital of Croatia."
+    },
+    {
+      "k": [
+        "capital of serbia"
+      ],
+      "a": "**Belgrade** is the capital of Serbia."
+    },
+    {
+      "k": [
+        "capital of bulgaria"
+      ],
+      "a": "**Sofia** is the capital of Bulgaria."
+    },
+    {
+      "k": [
+        "capital of slovakia"
+      ],
+      "a": "**Bratislava** is the capital of Slovakia."
+    },
+    {
+      "k": [
+        "capital of azerbaijan"
+      ],
+      "a": "**Baku** is the capital of Azerbaijan."
+    },
+    {
+      "k": [
+        "capital of kazakhstan"
+      ],
+      "a": "**Astana** is the capital of Kazakhstan."
+    },
+    {
+      "k": [
+        "capital of uzbekistan"
+      ],
+      "a": "**Tashkent** is the capital of Uzbekistan."
+    },
+    {
+      "k": [
+        "capital of georgia"
+      ],
+      "a": "**Tbilisi** is the capital of Georgia."
+    },
+    {
+      "k": [
+        "empathy vs sympathy"
+      ],
+      "a": "**Empathy Vs Sympathy** — Empathy is feeling *with* someone — sharing or understanding their emotional state as if it were your own. Sympathy is feeling *for* someone — recognizing their pain and caring about it, from more of a distance."
+    },
+    {
+      "k": [
+        "resilience vs perseverance"
+      ],
+      "a": "**Resilience Vs Perseverance** — Resilience is the ability to recover and adapt after a setback. Perseverance is continuing to try despite difficulty — resilience is about bouncing back, perseverance is about pushing through."
+    },
+    {
+      "k": [
+        "what is newton's first law"
+      ],
+      "a": "Newton's first law (the law of inertia) states that an object at rest stays at rest, and an object in motion stays in motion at constant velocity, unless acted on by an external force."
+    },
+    {
+      "k": [
+        "what is newton's second law"
+      ],
+      "a": "Newton's second law states that force equals mass times acceleration (**F = ma**) — the more mass an object has, the more force is needed to accelerate it."
+    },
+    {
+      "k": [
+        "what is newton's third law"
+      ],
+      "a": "Newton's third law states that for every action, there is an equal and opposite reaction — when one object exerts a force on another, the second exerts an equal force back in the opposite direction."
+    },
+    {
+      "k": [
+        "what is the theory of relativity"
+      ],
+      "a": "Einstein's theory of relativity has two parts: **special relativity** (1905), which shows time and space are relative to the observer's speed, and **general relativity** (1915), which describes gravity as the curvature of spacetime caused by mass."
+    },
+    {
+      "k": [
+        "what is evolution"
+      ],
+      "a": "Evolution is the process by which species change over generations through natural selection — traits that improve survival and reproduction become more common in a population over time."
+    },
+    {
+      "k": [
+        "what is an ecosystem"
+      ],
+      "a": "An ecosystem is a community of living organisms (plants, animals, microbes) interacting with each other and their physical environment (soil, water, climate) as a functional unit."
+    },
+    {
+      "k": [
+        "famous mountains in pakistan",
+        "k2 pakistan"
+      ],
+      "a": "K2, in the Karakoram range of Pakistan, is the world's second-highest mountain at 8,611 metres, and is considered one of the most technically difficult and dangerous peaks to climb."
+    },
+    {
+      "k": [
+        "famous rivers in pakistan"
+      ],
+      "a": "The Indus River is Pakistan's longest and most important river, along with its major tributaries: the Jhelum, Chenab, Ravi, and Sutlej — collectively giving Punjab (\"land of five rivers\") its name."
+    },
+    {
+      "k": [
+        "what is basant"
+      ],
+      "a": "Basant is a traditional spring kite-flying festival historically celebrated in Lahore and parts of Punjab, marking the arrival of spring, though it has faced restrictions in recent years due to safety concerns around kite string."
+    },
+    {
+      "k": [
+        "what is a nikah"
+      ],
+      "a": "A Nikah is the Islamic marriage contract ceremony — a formal agreement between a bride and groom, made in the presence of witnesses, that establishes them as legally and religiously married."
+    },
+    {
+      "k": [
+        "how to write a formal email"
+      ],
+      "a": "Start with a clear subject line, a proper greeting (\"Dear Mr./Ms. [Name]\"), state your purpose in the first line or two, keep paragraphs short, and close formally (\"Best regards,\" / \"Sincerely,\") followed by your name."
+    },
+    {
+      "k": [
+        "how to make a good first impression"
+      ],
+      "a": "Be on time, make eye contact, offer a firm handshake or appropriate greeting, listen more than you talk early on, and follow up on anything you promised to do."
+    },
+    {
+      "k": [
+        "how to negotiate salary"
+      ],
+      "a": "Research the market rate for the role beforehand, let the employer name a number first if possible, justify your ask with specific achievements or skills, and consider the full package (benefits, growth, flexibility) — not just the base number."
+    },
+    {
+      "k": [
+        "how do i search the web",
+        "can zariya search the internet",
+        "does zariya have internet access"
+      ],
+      "a": "Yes — use the \"Search web\" button above the message box. It needs your own free Google Custom Search API key and Search Engine ID, set up once under Settings → Web Search, since real internet search needs a real search provider behind it."
+    },
+    {
+      "k": [
+        "what is the equator"
+      ],
+      "a": "The equator is an imaginary line around the Earth's middle, equidistant from the North and South Poles, dividing the planet into the Northern and Southern Hemispheres."
+    },
+    {
+      "k": [
+        "what are tectonic plates"
+      ],
+      "a": "Tectonic plates are large slabs of the Earth's lithosphere that float on the semi-fluid mantle beneath them, slowly moving and interacting at their boundaries — causing earthquakes, volcanoes, and mountain formation over millions of years."
+    },
+    {
+      "k": [
+        "how many continents are there"
+      ],
+      "a": "There are generally considered to be **7 continents**: Asia, Africa, North America, South America, Antarctica, Europe, and Australia (Oceania)."
+    },
+    {
+      "k": [
+        "how many oceans are there"
+      ],
+      "a": "There are **5 oceans**: the Pacific, Atlantic, Indian, Southern (Antarctic), and Arctic Ocean."
+    },
+    {
+      "k": [
+        "biggest city in the world by population"
+      ],
+      "a": "Tokyo's greater metropolitan area is typically cited as the largest urban area in the world by population, though rankings vary depending on how city boundaries are measured."
+    },
+    {
+      "k": [
+        "define bias",
+        "what does bias mean",
+        "meaning of bias"
+      ],
+      "a": "**Bias** — a tendency to favour or disfavour something unfairly, often without full awareness of it."
+    },
+    {
+      "k": [
+        "define ethics",
+        "what does ethics mean",
+        "meaning of ethics"
+      ],
+      "a": "**Ethics** — the branch of philosophy concerned with what is morally right and wrong, and how people ought to act."
+    },
+    {
+      "k": [
+        "define philosophy",
+        "what does philosophy mean",
+        "meaning of philosophy"
+      ],
+      "a": "**Philosophy** — the study of fundamental questions about existence, knowledge, values, reason, and reality."
+    },
+    {
+      "k": [
+        "define irony",
+        "what does irony mean",
+        "meaning of irony"
+      ],
+      "a": "**Irony** — a situation or expression where the intended meaning is opposite to, or strikingly different from, the literal meaning."
+    },
+    {
+      "k": [
+        "define metaphor",
+        "what does metaphor mean",
+        "meaning of metaphor"
+      ],
+      "a": "**Metaphor** — a figure of speech that describes something by referring to it as if it were something else, to suggest a resemblance."
+    },
+    {
+      "k": [
+        "define context",
+        "what does context mean",
+        "meaning of context"
+      ],
+      "a": "**Context** — the circumstances or background surrounding an event, statement, or idea that help explain its meaning."
+    },
+    {
+      "k": [
+        "what is json"
+      ],
+      "a": "JSON (JavaScript Object Notation) is a lightweight, text-based data format used to store and exchange structured data — built from key-value pairs and arrays, and readable by both humans and machines. Example: `{\"name\": \"Ali\", \"age\": 21}`"
+    },
+    {
+      "k": [
+        "what is an array"
+      ],
+      "a": "An array is an ordered collection of values stored under a single variable name, accessed by index — e.g. in Python, `fruits = [\"apple\", \"banana\", \"mango\"]` and `fruits[0]` gives `\"apple\"`."
+    },
+    {
+      "k": [
+        "what is a variable"
+      ],
+      "a": "A variable is a named container that stores a value in a program, which can usually be read or changed later — e.g. `age = 21` stores the number 21 under the name `age`."
+    },
+    {
+      "k": [
+        "what is a loop"
+      ],
+      "a": "A loop is a programming construct that repeats a block of code multiple times — either a set number of times (a `for` loop) or until a condition is no longer true (a `while` loop)."
+    },
+    {
+      "k": [
+        "css flexbox",
+        "what is flexbox"
+      ],
+      "a": "Flexbox is a CSS layout model for arranging items in a row or column, distributing space and aligning content flexibly — set with `display: flex` on a container, then control children with properties like `justify-content` and `align-items`."
+    },
+    {
+      "k": [
+        "cornell notes",
+        "cornell note taking"
+      ],
+      "a": "The Cornell method splits a page into three sections: a narrow left column for keywords/questions, a wide right column for detailed notes during class, and a summary strip at the bottom written afterward — designed to make review and self-testing faster."
+    },
+    {
+      "k": [
+        "active recall"
+      ],
+      "a": "Active recall is a study technique where you test yourself on material (e.g. with flashcards or by covering notes and trying to recall them) rather than just re-reading — it's one of the most evidence-backed ways to build lasting memory."
+    },
+    {
+      "k": [
+        "spaced repetition"
+      ],
+      "a": "Spaced repetition is reviewing material at increasing time intervals (e.g. after 1 day, then 3 days, then a week) rather than cramming all at once — it exploits how memory consolidates better with spaced, repeated exposure."
+    },
+    {
+      "k": [
+        "what is a vpn"
+      ],
+      "a": "A VPN (Virtual Private Network) routes your internet traffic through an encrypted tunnel to a remote server, hiding your real IP address and location from websites, and protecting your traffic from others on the same network."
+    },
+    {
+      "k": [
+        "what is two factor authentication",
+        "what is 2fa"
+      ],
+      "a": "Two-factor authentication (2FA) adds a second verification step beyond your password — usually a code from an app or SMS — so someone who steals your password alone still can't log in."
+    },
+    {
+      "k": [
+        "what is phishing"
+      ],
+      "a": "Phishing is a scam where attackers impersonate a trustworthy source (like a bank or company) via email, text, or fake websites to trick people into revealing passwords, card numbers, or other sensitive information."
+    },
+    {
+      "k": [
+        "how to spot a scam email"
+      ],
+      "a": "Warning signs: urgent or threatening language, requests for passwords or payment, sender addresses that look almost-but-not-quite right, generic greetings like \"Dear Customer,\" and links that don't match the company's real domain when you hover over them."
+    },
+    {
+      "k": [
+        "how to back up my phone"
+      ],
+      "a": "Most phones offer built-in cloud backup (iCloud for iPhone, Google Backup for Android) that can be turned on in Settings — for extra safety, also periodically copy photos and important files to a computer or separate storage."
+    },
+    {
+      "k": [
+        "what is qawwali"
+      ],
+      "a": "Qawwali is a form of Sufi devotional music, traditionally performed at shrines and gatherings, combining rhythmic clapping, harmonium, tabla, and passionate vocal delivery — Nusrat Fateh Ali Khan is its most internationally famous performer."
+    },
+    {
+      "k": [
+        "famous pakistani poets"
+      ],
+      "a": "Notable Urdu/Pakistani poets include Allama Iqbal, Mirza Ghalib, Faiz Ahmed Faiz, and Ahmad Faraz, each known for blending romantic, philosophical, and socio-political themes in their verse."
+    },
+    {
+      "k": [
+        "what does insha'allah mean",
+        "what does inshallah mean"
+      ],
+      "a": "\"In shā' Allāh\" (ان شاء اللہ) means \"God willing\" — commonly said when talking about future plans, expressing that the outcome ultimately depends on God's will."
+    },
+    {
+      "k": [
+        "what does mashallah mean"
+      ],
+      "a": "\"Mā shā' Allāh\" (ماشاء اللہ) roughly means \"what God has willed\" — an expression of appreciation or praise, often said upon seeing something good or beautiful, partly to ward off envy."
+    },
+    {
+      "k": [
+        "how to write a cover letter"
+      ],
+      "a": "Address it to a specific person if possible, open by naming the role and where you found it, connect 2–3 of your specific experiences to what the job needs, and close with a clear, confident call to action — keep it under one page."
+    },
+    {
+      "k": [
+        "how to prepare for a job interview"
+      ],
+      "a": "Research the company and role beforehand, prepare specific examples of past work using a structure like STAR (Situation, Task, Action, Result), prepare a few thoughtful questions to ask them, and do a mock run-through out loud, not just in your head."
+    },
+    {
+      "k": [
+        "what is the pareto principle",
+        "80 20 rule"
+      ],
+      "a": "The Pareto Principle (80/20 rule) observes that roughly 80% of outcomes often come from 20% of causes or efforts — commonly used as a prompt to identify and focus on the highest-impact tasks rather than spreading effort evenly."
+    },
+    {
+      "k": [
+        "how do i know this is really your github profile",
+        "is the github lookup verified",
+        "does the github feature prove identity"
+      ],
+      "a": "It doesn't — and it isn't meant to. Typing a GitHub username just displays that account's already-public avatar, name, and bio; it never checks that you actually own it, because there's no real sign-in happening (that would need a backend server, which this single file intentionally doesn't have). If you want your sidebar photo to genuinely be yours, use \"Upload a photo\" in Settings → Profile instead — that file only ever comes from your own device."
+    },
+    {
+      "k": [
+        "what is the largest mammal"
+      ],
+      "a": "The blue whale is the largest animal ever known to have existed, reaching lengths of up to 30 metres and weighing as much as 200 tonnes."
+    },
+    {
+      "k": [
+        "fastest land animal"
+      ],
+      "a": "The cheetah is the fastest land animal, capable of reaching speeds of about 100–120 km/h in short bursts."
+    },
+    {
+      "k": [
+        "what is the tallest animal"
+      ],
+      "a": "The giraffe is the tallest living land animal, with adult males reaching up to about 5.5 metres tall."
+    },
+    {
+      "k": [
+        "how long do elephants live"
+      ],
+      "a": "Elephants typically live 60–70 years in the wild, among the longest lifespans of any land mammal besides humans."
+    },
+    {
+      "k": [
+        "what is the smallest country in the world"
+      ],
+      "a": "Vatican City is the smallest country in the world, at just about 0.44 square kilometres."
+    },
+    {
+      "k": [
+        "define procrastination",
+        "what does procrastination mean",
+        "meaning of procrastination"
+      ],
+      "a": "**Procrastination** — the act of unnecessarily delaying or postponing tasks, often despite knowing it may cause problems."
+    },
+    {
+      "k": [
+        "define productivity",
+        "what does productivity mean",
+        "meaning of productivity"
+      ],
+      "a": "**Productivity** — the effectiveness of effort in producing a desired result, often measured as output relative to time or resources invested."
+    },
+    {
+      "k": [
+        "define mindfulness",
+        "what does mindfulness mean",
+        "meaning of mindfulness"
+      ],
+      "a": "**Mindfulness** — the practice of being fully present and aware of the current moment, without judgment."
+    },
+    {
+      "k": [
+        "define burnout",
+        "what does burnout mean",
+        "meaning of burnout"
+      ],
+      "a": "**Burnout** — a state of physical and emotional exhaustion caused by prolonged stress, often from work or overcommitment."
+    },
+    {
+      "k": [
+        "define networking (professional)",
+        "what does networking (professional) mean",
+        "meaning of networking (professional)"
+      ],
+      "a": "**Networking (Professional)** — building and maintaining relationships with people who can offer support, advice, or opportunities in your field."
+    },
+    {
+      "k": [
+        "how to open a bank account"
+      ],
+      "a": "Typically you'll need a valid ID (CNIC/passport), proof of address, and sometimes proof of income — visit a bank branch or use their app, fill out the application, and often make a small minimum deposit to activate the account."
+    },
+    {
+      "k": [
+        "how to renew a passport in pakistan"
+      ],
+      "a": "In Pakistan, passport renewal is handled through NADRA/Directorate General of Immigration & Passports — you can apply online via the Pak-ID / DGIP portal, submit required documents (CNIC, old passport, photos), pay the applicable fee, and visit a Passport Office if biometrics are needed."
+    },
+    {
+      "k": [
+        "how to apply for a visa"
+      ],
+      "a": "Requirements vary by country, but generally involve: a valid passport, a completed application form, passport-size photos, proof of funds, travel/accommodation details, and sometimes an interview — check the specific destination country's embassy or consulate website for exact requirements."
+    },
+    {
+      "k": [
+        "how to beat procrastination"
+      ],
+      "a": "Break tasks into the smallest possible first step (\"open the document\" rather than \"write the essay\"), remove distractions before starting rather than relying on willpower mid-task, and use a timer to commit to just 10–15 minutes — often the hardest part is starting, not continuing."
+    },
+    {
+      "k": [
+        "difference between summative and formative assessment"
+      ],
+      "a": "**Formative assessment** happens during learning to give feedback and guide improvement (quizzes, drafts). **Summative assessment** happens at the end to evaluate overall learning (final exams, final projects)."
+    },
+    {
+      "k": [
+        "why doesn't this work on github",
+        "opening this on github doesn't work",
+        "github file doesn't run"
+      ],
+      "a": "Viewing an HTML file on github.com (or its \"raw\" link) only ever shows the source code — GitHub never executes JavaScript for safety reasons, on any repository, for anyone. To actually run this as a live app from a link, GitHub Pages needs to be turned on for the repo (Settings → Pages → pick a branch/folder → Save), which then serves it as a real website instead of just showing code. Downloading the file and opening it yourself works too."
+    },
+    {
+      "k": [
+        "what is the five pillars of islam in order"
+      ],
+      "a": "In order: **1) Shahada** (declaration of faith), **2) Salah** (five daily prayers), **3) Zakat** (charity), **4) Sawm** (fasting in Ramadan), **5) Hajj** (pilgrimage to Mecca, once in a lifetime if able)."
+    },
+    {
+      "k": [
+        "how many surahs in the quran"
+      ],
+      "a": "The Quran has **114 surahs (chapters)**, of varying lengths, revealed over about 23 years."
+    },
+    {
+      "k": [
+        "what is the first surah of the quran"
+      ],
+      "a": "Surah Al-Fatiha (\"The Opening\") is the first chapter of the Quran, recited in every unit of the five daily prayers."
+    },
+    {
+      "k": [
+        "define leadership",
+        "what does leadership mean",
+        "meaning of leadership"
+      ],
+      "a": "**Leadership** — the ability to guide, influence, or direct a group of people toward a common goal."
+    },
+    {
+      "k": [
+        "define teamwork",
+        "what does teamwork mean",
+        "meaning of teamwork"
+      ],
+      "a": "**Teamwork** — the combined, coordinated effort of a group working together toward a shared objective."
+    },
+    {
+      "k": [
+        "define creativity",
+        "what does creativity mean",
+        "meaning of creativity"
+      ],
+      "a": "**Creativity** — the ability to generate novel and valuable ideas, solutions, or works."
+    },
+    {
+      "k": [
+        "define critical thinking",
+        "what does critical thinking mean",
+        "meaning of critical thinking"
+      ],
+      "a": "**Critical Thinking** — the objective analysis and evaluation of an issue in order to form a sound judgement."
+    },
+    {
+      "k": [
+        "define adaptability",
+        "what does adaptability mean",
+        "meaning of adaptability"
+      ],
+      "a": "**Adaptability** — the ability to adjust effectively to new conditions, information, or challenges."
+    },
+    {
+      "k": [
+        "how to take a screenshot"
+      ],
+      "a": "On Windows: press **PrtScn** (or Win+Shift+S for a selection tool). On Mac: press **Cmd+Shift+4** for a selection, or **Cmd+Shift+3** for the full screen. On most Android phones: hold **Power + Volume Down**. On iPhone: press **Side button + Volume Up** together."
+    },
+    {
+      "k": [
+        "how to clear browser cache"
+      ],
+      "a": "In most browsers: open Settings → Privacy/History → Clear browsing data, then select \"Cached images and files\" (and cookies if needed) and confirm. Keyboard shortcut in Chrome/Edge/Firefox: **Ctrl+Shift+Delete** (Windows) or **Cmd+Shift+Delete** (Mac)."
+    },
+    {
+      "k": [
+        "how to free up storage on phone"
+      ],
+      "a": "Delete unused apps, clear cached data in Settings, back up and remove old photos/videos, clear downloaded files you no longer need, and check for duplicate files — most phones have a built-in storage manager showing what's taking the most space."
+    }
+  ]
+}

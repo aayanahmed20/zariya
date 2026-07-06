@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.pyc
+server/store.json
+server/learned.json
+server/models/*.gguf

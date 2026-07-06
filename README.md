@@ -18,6 +18,26 @@
 
 ---
 
+## Web App (recommended)
+
+The actively developed version of Zariya now lives in [`webapp/`](webapp/) — a
+Flask backend plus browser frontend, with a genuinely offline knowledge engine,
+optional Claude API / web search / real GitHub OAuth sign-in (all server-side,
+so no one using the app ever has to enter a key), and an optional local
+llama.cpp-based model in the same spirit as the original design below.
+
+```bash
+cd webapp
+pip install -r requirements.txt
+cp .env.example .env
+python app.py
+```
+
+Then open `http://localhost:5000`. See [`webapp/README.md`](webapp/README.md)
+for the full setup (Claude API, web search, GitHub OAuth, local model).
+
+---
+
 ## Overview
 
 Zariya is an **offline-first AI assistant platform** designed to make intelligent language models accessible in **low-resource languages such as Urdu**.
