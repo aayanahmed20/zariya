@@ -111,11 +111,11 @@ function renderAccountUI(){
   }
   configNote.textContent = serverConfig.githubConfigured
     ? ''
-    : 'GitHub sign-in isn\'t configured on this server yet (needs GITHUB_CLIENT_ID/SECRET in .env).';
+    : 'GitHub sign-in isn\'t set up on this server yet.';
   document.getElementById('githubSignInBtn').disabled = !serverConfig.githubConfigured;
 
   document.getElementById('claudeStatusText').textContent = serverConfig.claudeConfigured ? 'Connected' : 'Not configured';
-  document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded' : (serverConfig.localModelStatus || 'Not configured');
+  document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded' : 'Not configured';
   document.getElementById('searchStatusText').textContent = serverConfig.searchConfigured ? 'Connected' : 'Not configured';
 }
 document.getElementById('sbProfileRow').addEventListener('click', ()=>switchView('settings'));

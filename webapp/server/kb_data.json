@@ -337,7 +337,71 @@
     "neighbor": "پڑوسی",
     "stranger": "اجنبی",
     "guest": "مہمان",
-    "host": "میزبان"
+    "host": "میزبان",
+    "scientist": "سائنسدان",
+    "singer": "گلوکار",
+    "actor": "اداکار",
+    "driver": "ڈرائیور",
+    "cook": "باورچی",
+    "cleaner": "صفائی کرنے والا",
+    "guard": "محافظ",
+    "manager": "منیجر",
+    "officer": "افسر",
+    "judge": "جج",
+    "library": "لائبریری",
+    "museum": "عجائب گھر",
+    "park": "پارک",
+    "stadium": "اسٹیڈیم",
+    "keyboard": "کی بورڈ",
+    "screen": "اسکرین",
+    "battery": "بیٹری",
+    "charger": "چارجر",
+    "printer": "پرنٹر",
+    "speaker": "اسپیکر",
+    "thunder": "گرج",
+    "lightning": "بجلی کوندنا",
+    "earthquake": "زلزلہ",
+    "flood": "سیلاب",
+    "drought": "خشک سالی",
+    "volcano": "آتش فشاں",
+    "jungle": "جنگل",
+    "waterfall": "آبشار",
+    "nervous": "گھبرایا ہوا",
+    "confident": "پراعتماد",
+    "confused": "الجھا ہوا",
+    "curious": "متجسس",
+    "ashamed": "شرمندہ",
+    "grateful": "شکرگزار",
+    "hopeful": "پرامید",
+    "friendship": "دوستی",
+    "marriage": "شادی",
+    "childhood": "بچپن",
+    "youth": "جوانی",
+    "old age": "بڑھاپا",
+    "birthday": "سالگرہ",
+    "anniversary": "سالگرہ منانا",
+    "funeral": "جنازہ",
+    "wedding": "شادی کی تقریب",
+    "breakfast": "ناشتہ",
+    "lunch": "دوپہر کا کھانا",
+    "dinner": "رات کا کھانا",
+    "snack": "ہلکا ناشتہ",
+    "spice": "مصالحہ",
+    "oil": "تیل",
+    "butter": "مکھن",
+    "yogurt": "دہی",
+    "honey": "شہد",
+    "shirt": "قمیض",
+    "trousers": "پتلون",
+    "jacket": "جیکٹ",
+    "hat": "ٹوپی",
+    "socks": "موزے",
+    "scarf": "مفلر",
+    "north star": "قطبی ستارہ",
+    "universe": "کائنات",
+    "galaxy": "کہکشاں",
+    "planet": "سیارہ",
+    "comet": "دم دار ستارہ"
   },
   "kb": [
     {
@@ -2829,6 +2893,359 @@
         "how to free up storage on phone"
       ],
       "a": "Delete unused apps, clear cached data in Settings, back up and remove old photos/videos, clear downloaded files you no longer need, and check for duplicate files — most phones have a built-in storage manager showing what's taking the most space."
+    },
+    {
+      "k": [
+        "who wrote don quixote"
+      ],
+      "a": "Miguel de Cervantes wrote *Don Quixote*, published in two parts (1605 and 1615), often cited as one of the first modern novels."
+    },
+    {
+      "k": [
+        "who wrote war and peace"
+      ],
+      "a": "Leo Tolstoy wrote *War and Peace*, a sweeping novel set during the Napoleonic Wars, first published in the 1860s."
+    },
+    {
+      "k": [
+        "who painted the mona lisa"
+      ],
+      "a": "Leonardo da Vinci painted the *Mona Lisa*, likely between 1503 and 1519, now housed in the Louvre in Paris."
+    },
+    {
+      "k": [
+        "who painted the starry night"
+      ],
+      "a": "Vincent van Gogh painted *The Starry Night* in 1889, during his stay at an asylum in Saint-Rémy-de-Provence."
+    },
+    {
+      "k": [
+        "who composed the fifth symphony"
+      ],
+      "a": "Ludwig van Beethoven composed his famous Symphony No. 5, known for its four-note opening motif, premiered in 1808."
+    },
+    {
+      "k": [
+        "who wrote the quran"
+      ],
+      "a": "Muslims believe the Quran is the literal word of God, revealed to the Prophet Muhammad (peace be upon him) through the angel Gabriel over about 23 years."
+    },
+    {
+      "k": [
+        "what caused world war 1"
+      ],
+      "a": "World War I was triggered by the assassination of Archduke Franz Ferdinand of Austria-Hungary in 1914, but underlying causes included militarism, alliances, imperial rivalries, and nationalism across Europe."
+    },
+    {
+      "k": [
+        "what was the cold war"
+      ],
+      "a": "The Cold War (roughly 1947–1991) was a prolonged period of political and military tension between the United States and the Soviet Union and their respective allies, marked by proxy wars, an arms race, and ideological rivalry, without direct large-scale fighting between the two superpowers."
+    },
+    {
+      "k": [
+        "what was the industrial revolution"
+      ],
+      "a": "The Industrial Revolution (roughly late 1700s to mid-1800s) was a period of major transition from hand production to machines, new manufacturing processes, and factory systems, beginning in Britain and spreading worldwide."
+    },
+    {
+      "k": [
+        "who was alexander the great"
+      ],
+      "a": "Alexander the Great (356–323 BCE) was a king of Macedon who built one of history's largest empires by age thirty, stretching from Greece to northwestern India."
+    },
+    {
+      "k": [
+        "who was genghis khan"
+      ],
+      "a": "Genghis Khan founded the Mongol Empire in the 13th century, eventually the largest contiguous land empire in history, through a combination of military innovation and political organization."
+    },
+    {
+      "k": [
+        "what was the silk road"
+      ],
+      "a": "The Silk Road was a network of trade routes connecting East Asia to the Mediterranean, active for centuries, carrying silk, spices, and ideas between civilizations including China, Persia, India, and Rome."
+    },
+    {
+      "k": [
+        "what was the renaissance"
+      ],
+      "a": "The Renaissance (roughly 14th–17th century) was a period of renewed interest in art, science, and classical learning that began in Italy and spread across Europe, producing figures like Leonardo da Vinci and Michelangelo."
+    },
+    {
+      "k": [
+        "what is a peninsula"
+      ],
+      "a": "A peninsula is a piece of land almost entirely surrounded by water but connected to the mainland — examples include the Arabian Peninsula and the Iberian Peninsula."
+    },
+    {
+      "k": [
+        "what is a strait"
+      ],
+      "a": "A strait is a narrow channel of water connecting two larger bodies of water — for example, the Strait of Hormuz connects the Persian Gulf to the Gulf of Oman."
+    },
+    {
+      "k": [
+        "what is the ring of fire"
+      ],
+      "a": "The Ring of Fire is a horseshoe-shaped zone around the Pacific Ocean with intense volcanic and seismic activity, home to about 75% of the world's active volcanoes and most of its earthquakes."
+    },
+    {
+      "k": [
+        "largest desert in the world"
+      ],
+      "a": "Antarctica is technically the largest desert in the world by area (a desert is defined by low precipitation, not just heat); the Sahara is the largest *hot* desert."
+    },
+    {
+      "k": [
+        "what is a monsoon"
+      ],
+      "a": "A monsoon is a seasonal reversal of wind patterns that brings heavy rainfall to regions like South Asia, typically occurring in summer and vital for agriculture in countries like Pakistan and India."
+    },
+    {
+      "k": [
+        "what is momentum"
+      ],
+      "a": "Momentum is the product of an object's mass and velocity (p = mv) — a measure of how much force is needed to stop it, or how much force it would exert on impact."
+    },
+    {
+      "k": [
+        "what is friction"
+      ],
+      "a": "Friction is the resistive force that opposes relative motion between two surfaces in contact, converting kinetic energy into heat."
+    },
+    {
+      "k": [
+        "what is an acid and a base"
+      ],
+      "a": "An acid releases hydrogen ions (H⁺) in water and has a pH below 7 (like vinegar). A base releases hydroxide ions (OH⁻) and has a pH above 7 (like soap). Water itself is neutral, at pH 7."
+    },
+    {
+      "k": [
+        "what is the periodic table"
+      ],
+      "a": "The periodic table organizes all known chemical elements by increasing atomic number, arranged so elements with similar chemical properties fall in the same column (group)."
+    },
+    {
+      "k": [
+        "what is kinetic energy"
+      ],
+      "a": "Kinetic energy is the energy an object has due to its motion, calculated as ½mv² — the faster or heavier the object, the more kinetic energy it has."
+    },
+    {
+      "k": [
+        "what is potential energy"
+      ],
+      "a": "Potential energy is stored energy based on an object's position or state — like a ball held above the ground, or a stretched spring, ready to convert into motion."
+    },
+    {
+      "k": [
+        "what is dna made of"
+      ],
+      "a": "DNA is made of two strands twisted into a double helix, built from four chemical bases — adenine (A), thymine (T), guanine (G), and cytosine (C) — paired together (A with T, G with C) to encode genetic information."
+    },
+    {
+      "k": [
+        "what is a cell"
+      ],
+      "a": "A cell is the basic structural and functional unit of all living organisms — some organisms are single-celled (like bacteria), while humans are made of trillions of cells working together."
+    },
+    {
+      "k": [
+        "difference between plant and animal cells"
+      ],
+      "a": "Plant cells have a rigid cell wall, chloroplasts for photosynthesis, and a large central vacuole. Animal cells lack these, having only a flexible cell membrane and smaller vacuoles."
+    },
+    {
+      "k": [
+        "what is the immune system"
+      ],
+      "a": "The immune system is the body's defence network against infection and disease, made up of organs, cells (like white blood cells), and proteins (like antibodies) that identify and neutralize harmful invaders."
+    },
+    {
+      "k": [
+        "what is a virus"
+      ],
+      "a": "A virus is a microscopic infectious agent that can only reproduce inside the living cells of a host organism, hijacking the host's cellular machinery to make copies of itself."
+    },
+    {
+      "k": [
+        "what is cloud computing"
+      ],
+      "a": "Cloud computing is the delivery of computing services — servers, storage, databases, software — over the internet, letting people and businesses use computing resources without owning physical hardware."
+    },
+    {
+      "k": [
+        "what is a firewall"
+      ],
+      "a": "A firewall is a network security system that monitors and controls incoming and outgoing traffic based on defined security rules, acting as a barrier between a trusted internal network and untrusted external networks like the internet."
+    },
+    {
+      "k": [
+        "what is encryption"
+      ],
+      "a": "Encryption is the process of converting information into a coded form (ciphertext) that can only be read by someone with the correct key to decrypt it back to its original form."
+    },
+    {
+      "k": [
+        "what is a database index"
+      ],
+      "a": "A database index is a data structure that improves the speed of data retrieval, similar to an index in a book — it lets the database find rows without scanning the entire table, at the cost of extra storage and slower writes."
+    },
+    {
+      "k": [
+        "what is version control"
+      ],
+      "a": "Version control is a system that records changes to files over time, letting you track history, revert to previous versions, and collaborate with others without overwriting each other's work — Git is the most widely used example."
+    },
+    {
+      "k": [
+        "what is the durand line"
+      ],
+      "a": "The Durand Line is the roughly 2,600 km border between Pakistan and Afghanistan, established in 1893 through an agreement between British India and Afghanistan."
+    },
+    {
+      "k": [
+        "what is the wagah border"
+      ],
+      "a": "Wagah is a border town between Pakistan and India, famous for its daily 'Beating Retreat' military ceremony performed by Pakistan Rangers and India's Border Security Force, drawing large crowds from both sides."
+    },
+    {
+      "k": [
+        "what is truck art in pakistan"
+      ],
+      "a": "Pakistani truck art is a vibrant folk-art tradition of elaborately decorating trucks and buses with intricate paintings, calligraphy, mirror-work, and poetry — most famously associated with the city of Karachi and the region of Punjab."
+    },
+    {
+      "k": [
+        "what is the lahore fort"
+      ],
+      "a": "The Lahore Fort (Shahi Qila) is a historic fortress in Lahore, Pakistan, built and expanded mainly during the Mughal era, and is a UNESCO World Heritage Site."
+    },
+    {
+      "k": [
+        "what is the minar-e-pakistan"
+      ],
+      "a": "Minar-e-Pakistan is a national monument in Lahore marking the site where the 1940 Lahore Resolution was passed, a key step toward the creation of Pakistan."
+    },
+    {
+      "k": [
+        "actions speak louder"
+      ],
+      "a": "**\"Actions Speak Louder\"** — What you do matters more than what you say."
+    },
+    {
+      "k": [
+        "back to square one"
+      ],
+      "a": "**\"Back To Square One\"** — starting over again from the very beginning after a failed attempt."
+    },
+    {
+      "k": [
+        "barking up the wrong tree"
+      ],
+      "a": "**\"Barking Up The Wrong Tree\"** — pursuing a mistaken or misguided course of action."
+    },
+    {
+      "k": [
+        "cut corners"
+      ],
+      "a": "**\"Cut Corners\"** — to do something the easiest, cheapest, or fastest way, often sacrificing quality."
+    },
+    {
+      "k": [
+        "hit the nail on the head"
+      ],
+      "a": "**\"Hit The Nail On The Head\"** — to describe exactly what is causing a situation or problem."
+    },
+    {
+      "k": [
+        "in the same boat"
+      ],
+      "a": "**\"In The Same Boat\"** — in the same difficult situation as someone else."
+    },
+    {
+      "k": [
+        "on thin ice"
+      ],
+      "a": "**\"On Thin Ice\"** — in a risky or precarious situation, where one mistake could cause trouble."
+    },
+    {
+      "k": [
+        "under the radar"
+      ],
+      "a": "**\"Under The Radar\"** — without being noticed."
+    },
+    {
+      "k": [
+        "define empathy",
+        "what does empathy mean",
+        "meaning of empathy"
+      ],
+      "a": "**Empathy** — the capacity to understand and share the feelings of another person."
+    },
+    {
+      "k": [
+        "define integrity",
+        "what does integrity mean",
+        "meaning of integrity"
+      ],
+      "a": "**Integrity** — consistently acting in line with your stated values and principles, even when no one is watching."
+    },
+    {
+      "k": [
+        "define accountability",
+        "what does accountability mean",
+        "meaning of accountability"
+      ],
+      "a": "**Accountability** — taking ownership of one's actions and their outcomes, including mistakes."
+    },
+    {
+      "k": [
+        "define curiosity",
+        "what does curiosity mean",
+        "meaning of curiosity"
+      ],
+      "a": "**Curiosity** — a strong desire to know or learn something."
+    },
+    {
+      "k": [
+        "define perseverance",
+        "what does perseverance mean",
+        "meaning of perseverance"
+      ],
+      "a": "**Perseverance** — continued effort and determination despite difficulty or delay in achieving success."
+    },
+    {
+      "k": [
+        "what is a dictionary python"
+      ],
+      "a": "```python\nperson = {\"name\": \"Ali\", \"age\": 21}\nprint(person[\"name\"])  # Ali\n```"
+    },
+    {
+      "k": [
+        "what is a tuple python"
+      ],
+      "a": "A tuple is an ordered, immutable collection in Python — once created, its values can't be changed:\n\n```python\npoint = (4, 5)\nprint(point[0])  # 4\n```"
+    },
+    {
+      "k": [
+        "list comprehension python"
+      ],
+      "a": "```python\nsquares = [x**2 for x in range(10)]\nprint(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]\n```"
+    },
+    {
+      "k": [
+        "try except python",
+        "error handling python"
+      ],
+      "a": "```python\ntry:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero\")\n```"
+    },
+    {
+      "k": [
+        "what is an api key"
+      ],
+      "a": "An API key is a unique identifier used to authenticate requests to an API, letting the service track and control who's using it — it should be kept secret, similar to a password."
     }
   ]
 }
