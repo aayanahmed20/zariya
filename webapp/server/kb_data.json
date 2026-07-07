@@ -542,7 +542,73 @@
     "correct": "درست",
     "wrong": "غلط",
     "real": "حقیقی",
-    "fake": "جعلی"
+    "fake": "جعلی",
+    "fact": "حقیقت",
+    "secret": "راز",
+    "promise": "وعدہ",
+    "advice": "مشورہ",
+    "warning": "انتباہ",
+    "permission": "اجازت",
+    "excuse": "بہانہ",
+    "apology": "معذرت",
+    "victory": "فتح",
+    "defeat": "شکست",
+    "competition": "مقابلہ",
+    "punishment": "سزا",
+    "rule": "قانون",
+    "law": "قانون",
+    "duty": "فرض",
+    "border": "سرحد",
+    "territory": "علاقہ",
+    "government": "حکومت",
+    "president": "صدر",
+    "minister": "وزیر",
+    "election": "انتخاب",
+    "vote": "ووٹ",
+    "citizen": "شہری",
+    "population": "آبادی",
+    "economy": "معیشت",
+    "trade": "تجارت",
+    "export": "برآمد",
+    "import": "درآمد",
+    "industry": "صنعت",
+    "agriculture": "زراعت",
+    "harvest": "فصل کاٹنا",
+    "crop": "فصل",
+    "irrigation": "آبپاشی",
+    "fertilizer": "کھاد",
+    "medicine": "دوا",
+    "treatment": "علاج",
+    "surgery": "سرجری",
+    "injury": "چوٹ",
+    "disease": "بیماری",
+    "vaccine": "ٹیکہ",
+    "infection": "انفیکشن",
+    "recovery": "صحت یابی",
+    "exercise": "ورزش",
+    "diet": "خوراک",
+    "planet earth": "سیارہ زمین",
+    "ocean": "سمندر",
+    "continent": "براعظم",
+    "climate": "موسمیات",
+    "pollution": "آلودگی",
+    "recycle": "دوبارہ استعمال",
+    "environment": "ماحول",
+    "energy": "توانائی",
+    "electricity": "بجلی",
+    "solar power": "شمسی توانائی",
+    "invention": "ایجاد",
+    "discovery": "دریافت",
+    "experiment": "تجربہ",
+    "theory": "نظریہ",
+    "research": "تحقیق",
+    "century": "صدی",
+    "decade": "دہائی",
+    "era": "دور",
+    "ancient": "قدیم",
+    "modern": "جدید",
+    "custom": "رواج",
+    "ceremony": "تقریب"
   },
   "kb": [
     {
@@ -3502,6 +3568,140 @@
         "difference between frontend and backend"
       ],
       "a": "**Frontend** is everything the user sees and interacts with directly in their browser or app (layout, buttons, styling). **Backend** is the server-side logic, database, and infrastructure that powers the app behind the scenes."
+    },
+    {
+      "k": [
+        "what is democracy"
+      ],
+      "a": "Democracy is a system of government where power comes from the people, typically exercised through voting for representatives or directly on issues, with protections like free elections, rule of law, and civil rights."
+    },
+    {
+      "k": [
+        "what is a constitution"
+      ],
+      "a": "A constitution is the fundamental set of principles or rules that establishes how a country or organization is governed, defining the powers of government and the rights of citizens."
+    },
+    {
+      "k": [
+        "what is the united nations"
+      ],
+      "a": "The United Nations (UN), founded in 1945, is an international organization of member states working on peacekeeping, human rights, humanitarian aid, and international cooperation."
+    },
+    {
+      "k": [
+        "what is nato"
+      ],
+      "a": "NATO (North Atlantic Treaty Organization) is a military alliance formed in 1949, originally between North American and European countries, based on the principle of collective defence — an attack on one member is treated as an attack on all."
+    },
+    {
+      "k": [
+        "what is the parliament of pakistan"
+      ],
+      "a": "Pakistan's Parliament is bicameral, made up of the National Assembly (directly elected, lower house) and the Senate (upper house, representing the provinces), together responsible for federal legislation."
+    },
+    {
+      "k": [
+        "what is unemployment"
+      ],
+      "a": "Unemployment refers to people who are actively seeking work but unable to find a job — usually measured as a percentage of the total labour force."
+    },
+    {
+      "k": [
+        "what is a recession"
+      ],
+      "a": "A recession is a significant, widespread decline in economic activity lasting more than a few months, typically marked by falling GDP, rising unemployment, and reduced spending."
+    },
+    {
+      "k": [
+        "what is globalization"
+      ],
+      "a": "Globalization is the increasing interconnection of the world's economies, cultures, and populations through trade, investment, technology, and the movement of people and information across borders."
+    },
+    {
+      "k": [
+        "what is renewable energy"
+      ],
+      "a": "Renewable energy comes from naturally replenishing sources like sunlight, wind, and water — such as solar panels, wind turbines, and hydroelectric dams — as opposed to finite fossil fuels like coal and oil."
+    },
+    {
+      "k": [
+        "what is deforestation"
+      ],
+      "a": "Deforestation is the large-scale clearing of forests, often for agriculture, logging, or urban development, contributing to habitat loss, soil erosion, and increased greenhouse gas levels."
+    },
+    {
+      "k": [
+        "what is biodiversity"
+      ],
+      "a": "Biodiversity refers to the variety of life on Earth — the range of species, genetic variation within species, and the ecosystems they form — which supports resilience and balance in nature."
+    },
+    {
+      "k": [
+        "what is anxiety"
+      ],
+      "a": "Anxiety is a natural stress response involving feelings of worry or fear, which becomes a concern when it's persistent, disproportionate to the situation, or interferes with daily life — in which case speaking with a doctor or therapist can help."
+    },
+    {
+      "k": [
+        "what is depression"
+      ],
+      "a": "Clinical depression is a mental health condition marked by persistent sadness, loss of interest in activities, and other symptoms lasting weeks or longer — it's treatable, and support from a doctor or mental health professional is important if you or someone you know may be experiencing it."
+    },
+    {
+      "k": [
+        "how to manage stress"
+      ],
+      "a": "Common evidence-based approaches include regular physical activity, adequate sleep, breaking large tasks into smaller steps, talking to someone you trust, and structured relaxation techniques like deep breathing — persistent or overwhelming stress is worth discussing with a doctor."
+    },
+    {
+      "k": [
+        "what is a hash table",
+        "what is a hashmap"
+      ],
+      "a": "A hash table (or hashmap) stores key-value pairs and uses a hash function to compute an index for fast lookup, insertion, and deletion — typically averaging O(1) time complexity for these operations."
+    },
+    {
+      "k": [
+        "what is asynchronous programming",
+        "what is async await"
+      ],
+      "a": "Asynchronous programming lets code start a long-running task (like a network request) without blocking the rest of the program — in JavaScript, `async`/`await` lets you write asynchronous code that reads like sequential, synchronous code."
+    },
+    {
+      "k": [
+        "git clone vs git pull"
+      ],
+      "a": "`git clone` downloads a full copy of a remote repository for the first time. `git pull` updates an existing local repository with new changes from the remote — it's `git fetch` followed by `git merge`."
+    },
+    {
+      "k": [
+        "the whole nine yards"
+      ],
+      "a": "**\"The Whole Nine Yards\"** — everything possible; all of it."
+    },
+    {
+      "k": [
+        "throw in the towel"
+      ],
+      "a": "**\"Throw In The Towel\"** — to give up."
+    },
+    {
+      "k": [
+        "a piece of the pie"
+      ],
+      "a": "**\"A Piece Of The Pie\"** — a share of something, usually profits or benefits."
+    },
+    {
+      "k": [
+        "burn bridges"
+      ],
+      "a": "**\"Burn Bridges\"** — to destroy relationships or opportunities for future cooperation."
+    },
+    {
+      "k": [
+        "cut to the chase"
+      ],
+      "a": "**\"Cut To The Chase\"** — to get to the point without wasting time."
     }
   ]
 }
