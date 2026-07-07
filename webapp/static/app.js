@@ -397,7 +397,7 @@ try{
 /* ============ NOTEPAD ============ */
 function renderNotesList(){
   const wrap = document.getElementById('notesList'); wrap.innerHTML='';
-  if(!notes.length) wrap.innerHTML = '<div style="padding:12px 8px;color:var(--text-muted);font-size:12px;">No notes yet.</div>';
+  if(!notes.length) wrap.innerHTML = '<div class="empty-mini"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span>No notes yet</span></div>';
   notes.forEach(n=>{
     const div = document.createElement('div');
     div.className = 'note-card'+(n.id===currentNoteId?' active':'');
@@ -456,7 +456,7 @@ document.getElementById('noteToFlashBtn').addEventListener('click', ()=>{
 function renderDeckGrid(){
   document.getElementById('studyArea').style.display='none';
   const grid = document.getElementById('deckGrid'); grid.style.display='grid'; grid.innerHTML='';
-  if(!decks.length){ grid.innerHTML='<div style="color:var(--text-muted);font-size:12.5px;grid-column:1/-1;">No decks yet.</div>'; return; }
+  if(!decks.length){ grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M6 2h16v12"/></svg><span>No decks yet — chat, then use "Make flashcards" above the message box</span></div>'; return; }
   decks.forEach(d=>{
     const known = d.cards.filter(c=>c.known).length;
     const pct = d.cards.length? Math.round(known/d.cards.length*100):0;

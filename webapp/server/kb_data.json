@@ -3387,6 +3387,121 @@
         "what is an api key"
       ],
       "a": "An API key is a unique identifier used to authenticate requests to an API, letting the service track and control who's using it — it should be kept secret, similar to a password."
+    },
+    {
+      "k": [
+        "what is a solar eclipse"
+      ],
+      "a": "A solar eclipse happens when the Moon passes between the Sun and Earth, blocking some or all of the Sun's light — a total eclipse occurs only along a narrow path where the Moon fully covers the Sun."
+    },
+    {
+      "k": [
+        "what is a lunar eclipse"
+      ],
+      "a": "A lunar eclipse happens when Earth passes between the Sun and the Moon, casting its shadow on the Moon — often giving it a reddish tint, sometimes called a 'blood moon'."
+    },
+    {
+      "k": [
+        "how many moons does jupiter have"
+      ],
+      "a": "Jupiter has over 90 confirmed moons, the largest being Ganymede, Callisto, Io, and Europa — collectively known as the Galilean moons."
+    },
+    {
+      "k": [
+        "what is a satellite"
+      ],
+      "a": "A satellite is an object that orbits a larger body — natural ones like the Moon, or artificial ones like communication and weather satellites launched by humans."
+    },
+    {
+      "k": [
+        "what is compound interest"
+      ],
+      "a": "Compound interest is interest calculated on both the original amount and the interest already earned, so the total grows faster over time than simple interest, which only applies to the original amount."
+    },
+    {
+      "k": [
+        "what is a budget"
+      ],
+      "a": "A budget is a plan for how you'll spend and save money over a period, typically listing expected income against planned expenses to help avoid overspending and build savings."
+    },
+    {
+      "k": [
+        "difference between saving and investing"
+      ],
+      "a": "**Saving** means setting money aside safely, usually in a bank account, with low risk and low return. **Investing** means putting money into assets like stocks or property with the goal of growing it over time, accepting more risk for potentially higher returns."
+    },
+    {
+      "k": [
+        "what is a balanced diet"
+      ],
+      "a": "A balanced diet includes a variety of foods across food groups — fruits, vegetables, whole grains, protein, and healthy fats — in proportions that meet the body's nutritional needs without excess."
+    },
+    {
+      "k": [
+        "benefits of drinking water"
+      ],
+      "a": "Adequate water intake supports digestion, regulates body temperature, keeps joints lubricated, helps deliver nutrients to cells, and supports kidney function — dehydration can cause fatigue, headaches, and difficulty concentrating."
+    },
+    {
+      "k": [
+        "what is mental health"
+      ],
+      "a": "Mental health refers to emotional, psychological, and social well-being — affecting how a person thinks, feels, and handles stress, relationships, and decisions. It's just as important as physical health, and support is available through counselling, therapy, and healthcare providers."
+    },
+    {
+      "k": [
+        "what is the state bank of pakistan"
+      ],
+      "a": "The State Bank of Pakistan (SBP), established in 1948, is the central bank of Pakistan, responsible for monetary policy, currency issuance, and regulating the banking sector."
+    },
+    {
+      "k": [
+        "what are the seasons in pakistan"
+      ],
+      "a": "Pakistan generally experiences four seasons: a cool winter (Dec–Feb), a hot spring/pre-monsoon summer (Mar–Jun), the monsoon season (Jul–Sep) bringing most annual rainfall, and a mild post-monsoon autumn (Oct–Nov)."
+    },
+    {
+      "k": [
+        "what is the karakoram highway"
+      ],
+      "a": "The Karakoram Highway (KKH) is a high-altitude road connecting Pakistan and China through the Karakoram mountain range, often called the 'Eighth Wonder of the World' for its engineering feat through extreme terrain."
+    },
+    {
+      "k": [
+        "what is a metaphor vs simile"
+      ],
+      "a": "A **simile** compares two things using \"like\" or \"as\" (\"brave as a lion\"). A **metaphor** states one thing IS another, without those words (\"he is a lion in battle\")."
+    },
+    {
+      "k": [
+        "how to write a strong conclusion"
+      ],
+      "a": "A strong conclusion restates your main point in fresh words, briefly ties together your key supporting ideas, and ends with a final thought, implication, or call to action — avoid introducing brand-new arguments here."
+    },
+    {
+      "k": [
+        "active vs passive voice"
+      ],
+      "a": "**Active voice**: the subject performs the action (\"The cat chased the mouse\"). **Passive voice**: the subject receives the action (\"The mouse was chased by the cat\"). Active voice is usually clearer and more direct."
+    },
+    {
+      "k": [
+        "what is a null pointer exception",
+        "null pointer exception"
+      ],
+      "a": "A null pointer (or null reference) exception occurs when code tries to use an object reference that hasn't been assigned an actual object — essentially trying to access something that doesn't exist yet."
+    },
+    {
+      "k": [
+        "what is an ide"
+      ],
+      "a": "An IDE (Integrated Development Environment) is software that combines a code editor, debugger, and build tools in one application, making it easier to write, test, and fix code — examples include VS Code, PyCharm, and IntelliJ."
+    },
+    {
+      "k": [
+        "difference between frontend and backend"
+      ],
+      "a": "**Frontend** is everything the user sees and interacts with directly in their browser or app (layout, buttons, styling). **Backend** is the server-side logic, database, and infrastructure that powers the app behind the scenes."
     }
   ]
 }
