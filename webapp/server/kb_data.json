@@ -608,7 +608,54 @@
     "ancient": "قدیم",
     "modern": "جدید",
     "custom": "رواج",
-    "ceremony": "تقریب"
+    "ceremony": "تقریب",
+    "milestone": "سنگ میل",
+    "strategy": "حکمت عملی",
+    "tactic": "چال",
+    "method": "طریقہ",
+    "process": "عمل",
+    "system": "نظام",
+    "structure": "ڈھانچہ",
+    "function": "کام",
+    "purpose": "مقصد",
+    "meeting": "میٹنگ",
+    "appointment": "ملاقات کا وقت",
+    "schedule": "شیڈول",
+    "deadline": "آخری تاریخ",
+    "project": "منصوبہ",
+    "leader": "رہنما",
+    "member": "رکن",
+    "partner": "ساتھی",
+    "client": "گاہک",
+    "salary": "تنخواہ",
+    "bonus": "بونس",
+    "promotion": "ترقی",
+    "resignation": "استعفیٰ",
+    "retirement": "ریٹائرمنٹ",
+    "contract": "معاہدہ",
+    "agreement": "معاہدہ",
+    "negotiation": "مذاکرات",
+    "deal": "سودا",
+    "offer": "پیشکش",
+    "customer": "گاہک",
+    "service": "خدمت",
+    "product": "پروڈکٹ",
+    "brand": "برانڈ",
+    "advertisement": "اشتہار",
+    "signal": "سگنل",
+    "connection": "کنکشن",
+    "network": "نیٹ ورک",
+    "server": "سرور",
+    "device": "آلہ",
+    "update": "اپ ڈیٹ",
+    "version": "ورژن",
+    "feature": "خصوصیت",
+    "bug": "خرابی",
+    "gratitude journal": "شکرگزاری کی ڈائری",
+    "meditation": "مراقبہ",
+    "breathing": "سانس لینا",
+    "balance": "توازن",
+    "routine": "معمول"
   },
   "kb": [
     {
@@ -3702,6 +3749,90 @@
         "cut to the chase"
       ],
       "a": "**\"Cut To The Chase\"** — to get to the point without wasting time."
+    },
+    {
+      "k": [
+        "what is the great wall of china"
+      ],
+      "a": "The Great Wall of China is a series of fortifications built over centuries (starting as early as the 7th century BCE, most famously extended under the Ming dynasty) to protect Chinese states from invasions, stretching thousands of kilometres."
+    },
+    {
+      "k": [
+        "what is the eiffel tower"
+      ],
+      "a": "The Eiffel Tower is a wrought-iron lattice tower in Paris, France, built by Gustave Eiffel's company for the 1889 World's Fair, standing about 330 metres tall and one of the most recognisable structures in the world."
+    },
+    {
+      "k": [
+        "what is the taj mahal"
+      ],
+      "a": "The Taj Mahal is an ivory-white marble mausoleum in Agra, India, built by Mughal emperor Shah Jahan in memory of his wife Mumtaz Mahal, completed around 1653, and a UNESCO World Heritage Site."
+    },
+    {
+      "k": [
+        "what is the great barrier reef"
+      ],
+      "a": "The Great Barrier Reef, off the coast of Queensland, Australia, is the world's largest coral reef system, visible even from space, and home to thousands of species of marine life."
+    },
+    {
+      "k": [
+        "what is stonehenge"
+      ],
+      "a": "Stonehenge is a prehistoric monument in England made of large standing stones arranged in a circle, built in stages from around 3000–2000 BCE, with its exact purpose still debated by historians."
+    },
+    {
+      "k": [
+        "what is a rainbow"
+      ],
+      "a": "A rainbow forms when sunlight is refracted, reflected, and dispersed inside water droplets in the air, splitting white light into its spectrum of colours — red, orange, yellow, green, blue, indigo, and violet."
+    },
+    {
+      "k": [
+        "why is the sky blue"
+      ],
+      "a": "The sky appears blue because sunlight is scattered by gases in Earth's atmosphere, and blue light — with its shorter wavelength — scatters more than other colours, reaching our eyes from all directions across the sky."
+    },
+    {
+      "k": [
+        "why do we dream"
+      ],
+      "a": "The exact purpose of dreaming isn't fully settled scientifically, but leading theories suggest it helps process emotions, consolidate memories, and may be a byproduct of the brain's activity during REM sleep."
+    },
+    {
+      "k": [
+        "how does vaccination work"
+      ],
+      "a": "Vaccines train the immune system to recognise a specific pathogen (virus or bacteria) by introducing a harmless piece or weakened form of it, so the body can respond quickly and effectively if it encounters the real thing later."
+    },
+    {
+      "k": [
+        "who is allama iqbal simple"
+      ],
+      "a": "Allama Iqbal (1877–1938) was a poet and philosopher whose vision of a separate Muslim homeland in South Asia helped inspire the movement that led to Pakistan's creation — he's honoured as the country's national poet."
+    },
+    {
+      "k": [
+        "what is the pakistan resolution"
+      ],
+      "a": "The Lahore Resolution (often called the Pakistan Resolution), passed on 23 March 1940, formally called for the creation of independent states for Muslims in the northwestern and eastern regions of British India, becoming a foundational step toward Pakistan's independence."
+    },
+    {
+      "k": [
+        "what is defence day pakistan"
+      ],
+      "a": "Defence Day (Youm-e-Difa), observed on 6 September, commemorates Pakistan's defence during the 1965 war with India, honouring the armed forces."
+    },
+    {
+      "k": [
+        "how to give a good presentation"
+      ],
+      "a": "Structure it with a clear beginning, middle, and end; lead with your key message rather than saving it for last; use slides to support you, not replace you (minimal text, more visuals); and practice out loud enough times that you're not reading directly from notes."
+    },
+    {
+      "k": [
+        "how to manage time better"
+      ],
+      "a": "Track where your time actually goes for a few days first, then prioritize using a method like urgent-vs-important, block dedicated time for deep work without interruptions, and build in buffer time since tasks often take longer than expected."
     }
   ]
 }
