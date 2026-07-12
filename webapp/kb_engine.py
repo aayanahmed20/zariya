@@ -109,6 +109,25 @@ def _significant_words(text: str):
     return {w for w in re.findall(r"[\w']+", text.lower()) if len(w) > 2 and w not in KB_STOPWORDS}
 
 
+def _edit_distance(a: str, b: str) -> int:
+    """Standard Levenshtein distance, used to tolerate small typos in queries.
+    Kept dependency-free since the offline engine can't rely on external packages."""
+    if a == b:
+        return 0
+    if not a:
+        return len(b)
+    if not b:
+        return len(a)
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        curr = [i] + [0] * len(b)
+        for j, cb in enumerate(b, 1):
+            cost = 0 if ca == cb else 1
+            curr[j] = min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost)
+        prev = curr
+    return prev[-1]
+
+
 # Inverted index: significant word -> set of KB entry indices whose keyword phrases contain it.
 # Built once at import time so lookups only ever score a small candidate set instead of
 # scanning every entry in the knowledge base on every single message.
@@ -120,6 +139,32 @@ for _idx, _entry in enumerate(KB):
     for _w in _entry_words:
         _KB_INDEX.setdefault(_w, set()).add(_idx)
 
+_KB_INDEX_WORDS = sorted(_KB_INDEX.keys())
+# Bucket index words by length so a typo'd query word only gets compared against
+# words of a similar length, instead of the whole vocabulary, on every lookup.
+_KB_WORDS_BY_LEN: dict[int, list[str]] = {}
+for _w in _KB_INDEX_WORDS:
+    _KB_WORDS_BY_LEN.setdefault(len(_w), []).append(_w)
+
+
+def _fuzzy_correct(word: str):
+    """Find the closest known index word for a possibly-misspelled query word.
+    Only tries words within 1 character of length, and only accepts a match within
+    a small edit-distance budget that scales with word length, so short words don't
+    get falsely corrected into unrelated short words."""
+    if word in _KB_INDEX:
+        return word
+    if len(word) < 4:
+        return None
+    max_dist = 1 if len(word) <= 5 else 2
+    best, best_dist = None, max_dist + 1
+    for length in (len(word) - 1, len(word), len(word) + 1):
+        for candidate in _KB_WORDS_BY_LEN.get(length, []):
+            d = _edit_distance(word, candidate)
+            if d < best_dist:
+                best, best_dist = candidate, d
+    return best if best_dist <= max_dist else None
+
 
 def knowledge_base_lookup(text: str):
     lower = text.lower()
@@ -127,8 +172,16 @@ def knowledge_base_lookup(text: str):
     query_words = {w for w in normalized.split() if len(w) > 2 and w not in KB_STOPWORDS}
 
     candidate_idxs: set[int] = set()
+    matched_words = set(query_words)
     for w in query_words:
-        candidate_idxs |= _KB_INDEX.get(w, set())
+        hits = _KB_INDEX.get(w)
+        if hits:
+            candidate_idxs |= hits
+        else:
+            corrected = _fuzzy_correct(w)
+            if corrected:
+                candidate_idxs |= _KB_INDEX[corrected]
+                matched_words.add(corrected)
 
     best, best_score = None, 0
     for idx in candidate_idxs:
@@ -140,7 +193,7 @@ def knowledge_base_lookup(text: str):
             else:
                 phrase_words = [w for w in phrase.split() if len(w) > 2 and w not in KB_STOPWORDS]
                 if phrase_words:
-                    overlap = len([w for w in phrase_words if w in query_words])
+                    overlap = len([w for w in phrase_words if w in matched_words])
                     ratio = overlap / len(phrase_words)
                     if ratio >= 0.6:
                         score += overlap
@@ -203,6 +256,99 @@ def try_convert(text: str):
     if m:
         v = float(m.group(1))
         return f"{v} cm is about **{v/2.54:.2f} inches**."
+    m = re.search(r"(-?\d+(\.\d+)?)\s*(l|litres?|liters?)\b.*\bgallons?\b", lower)
+    if m:
+        v = float(m.group(1))
+        return f"{v} litres is about **{v*0.264172:.2f} gallons** (US)."
+    m = re.search(r"(-?\d+(\.\d+)?)\s*gallons?\b.*\b(l|litres?|liters?)\b", lower)
+    if m:
+        v = float(m.group(1))
+        return f"{v} gallons (US) is about **{v*3.78541:.2f} litres**."
+    m = re.search(r"(-?\d+(\.\d+)?)\s*km\s*/?\s*h(r|our)?\b.*\bmph\b", lower)
+    if m:
+        v = float(m.group(1))
+        return f"{v} km/h is about **{v*0.621371:.2f} mph**."
+    m = re.search(r"(-?\d+(\.\d+)?)\s*mph\b.*\bkm\s*/?\s*h(r|our)?\b", lower)
+    if m:
+        v = float(m.group(1))
+        return f"{v} mph is about **{v*1.60934:.2f} km/h**."
+    m = re.search(r"(-?\d+(\.\d+)?)\s*(sq\s*km|square\s*kilomet(re|er)s?)\b.*\b(sq\s*miles?|square\s*miles?)\b", lower)
+    if m:
+        v = float(m.group(1))
+        return f"{v} square kilometres is about **{v*0.386102:.2f} square miles**."
+    m = re.search(r"(-?\d+(\.\d+)?)\s*(sq\s*miles?|square\s*miles?)\b.*\b(sq\s*km|square\s*kilomet(re|er)s?)\b", lower)
+    if m:
+        v = float(m.group(1))
+        return f"{v} square miles is about **{v*2.58999:.2f} square kilometres**."
+    return None
+
+
+def try_number_ops(text: str):
+    """Small standalone number utilities: factorial, primality, gcd/lcm, and
+    base conversion. Kept separate from try_math so try_math's generic
+    expression evaluator doesn't have to guess at these special forms."""
+    lower = text.lower().strip()
+
+    m = re.search(r"factorial\s*of\s*(\d+)|(\d+)\s*!", lower)
+    if m:
+        n = int(m.group(1) or m.group(2))
+        if 0 <= n <= 170:
+            return f"{n}! (factorial) is **{math.factorial(n)}**."
+        return "That number is too large to compute a factorial for here."
+
+    m = re.search(r"is\s+(\d+)\s+(a\s+)?prime", lower)
+    if m:
+        n = int(m.group(1))
+        if n < 2:
+            is_prime = False
+        else:
+            is_prime = all(n % d != 0 for d in range(2, int(n**0.5) + 1))
+        return f"**{n}** is {'a prime number' if is_prime else 'not a prime number'}."
+
+    m = re.search(r"gcd\s*(of)?\s*(\d+)\D+(\d+)|greatest common (divisor|factor)\s*(of)?\s*(\d+)\D+(\d+)", lower)
+    if m:
+        nums = [g for g in m.groups() if g and g.isdigit()]
+        if len(nums) >= 2:
+            a, b = int(nums[0]), int(nums[1])
+            return f"The GCD of {a} and {b} is **{math.gcd(a, b)}**."
+
+    m = re.search(r"lcm\s*(of)?\s*(\d+)\D+(\d+)|least common multiple\s*(of)?\s*(\d+)\D+(\d+)", lower)
+    if m:
+        nums = [g for g in m.groups() if g and g.isdigit()]
+        if len(nums) >= 2:
+            a, b = int(nums[0]), int(nums[1])
+            return f"The LCM of {a} and {b} is **{math.lcm(a, b)}**."
+
+    m = re.search(r"(\d+)\s*to\s*binary|binary\s*(of|for)\s*(\d+)", lower)
+    if m:
+        n = int(m.group(1) or m.group(3))
+        return f"{n} in binary is **{bin(n)[2:]}**."
+    m = re.search(r"(\d+)\s*to\s*hex(adecimal)?|hex(adecimal)?\s*(of|for)\s*(\d+)", lower)
+    if m:
+        n = int(m.group(1) or m.group(5))
+        return f"{n} in hexadecimal is **{hex(n)[2:].upper()}**."
+    m = re.search(r"(binary|0b[01]+)\s+([01]+)\s*to\s*decimal", lower) or re.search(r"^0b([01]+)$", lower)
+    if m:
+        bits = next(g for g in reversed(m.groups()) if g and set(g) <= {"0", "1"})
+        return f"Binary {bits} is **{int(bits, 2)}** in decimal."
+
+    m = re.search(r"(?P<op>average|mean|median|min(?:imum)?|max(?:imum)?)\s*of\s*(?P<nums>[\d,.\s]+)", lower)
+    if m:
+        op = m.group("op")
+        nums = [float(n) for n in re.findall(r"-?\d+(?:\.\d+)?", m.group("nums"))]
+        if nums:
+            display = ", ".join(f"{n:g}" for n in nums)
+            if op in ("average", "mean"):
+                return f"The average of [{display}] is **{sum(nums)/len(nums):.4g}**."
+            if op == "median":
+                s = sorted(nums)
+                mid = len(s) // 2
+                med = s[mid] if len(s) % 2 else (s[mid - 1] + s[mid]) / 2
+                return f"The median of [{display}] is **{med:.4g}**."
+            if op.startswith("min"):
+                return f"The minimum of [{display}] is **{min(nums):g}**."
+            if op.startswith("max"):
+                return f"The maximum of [{display}] is **{max(nums):g}**."
     return None
 
 
@@ -261,6 +407,9 @@ def offline_reply(messages: list[dict]) -> str:
     conv = try_convert(last)
     if conv:
         return conv
+    nums = try_number_ops(last)
+    if nums:
+        return nums
     m = try_math(last)
     if m:
         return m
