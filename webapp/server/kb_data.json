@@ -4679,6 +4679,136 @@
         "what is the ozone layer"
       ],
       "a": "The **ozone layer** is a region of Earth's stratosphere with a high concentration of ozone (O₃) that absorbs most of the Sun's harmful ultraviolet radiation, protecting life on the surface."
+    },
+    {
+      "k": [
+        "who was muhammad ali jinnah",
+        "quaid-e-azam",
+        "jinnah"
+      ],
+      "a": "**Muhammad Ali Jinnah** (1876–1948) was the founder of Pakistan and its first Governor-General. Known as **Quaid-e-Azam** (\"Great Leader\"), he led the All-India Muslim League and the Pakistan Movement that resulted in Pakistan's independence on August 14, 1947."
+    },
+    {
+      "k": [
+        "what was the pakistan movement"
+      ],
+      "a": "The **Pakistan Movement** was the political campaign led primarily by the All-India Muslim League, under Muhammad Ali Jinnah, for a separate independent state for Muslims of British India, culminating in the creation of Pakistan on August 14, 1947."
+    },
+    {
+      "k": [
+        "what was the partition of india",
+        "partition of india 1947"
+      ],
+      "a": "The **Partition of India** in 1947 divided British India into two independent countries, India and Pakistan, along largely religious lines. It triggered one of the largest mass migrations in history and widespread communal violence, with an estimated 10–15 million people displaced."
+    },
+    {
+      "k": [
+        "what was the lahore resolution",
+        "lahore resolution 1940"
+      ],
+      "a": "The **Lahore Resolution**, passed by the All-India Muslim League on March 23, 1940, formally called for independent states for Muslims in the northwestern and eastern regions of British India — a foundational step toward the creation of Pakistan. March 23 is now observed as Pakistan Day."
+    },
+    {
+      "k": [
+        "who was fatima jinnah"
+      ],
+      "a": "**Fatima Jinnah** (1893–1967), sister of Muhammad Ali Jinnah, was a dentist, political leader, and one of the founding figures of Pakistan, known as **Madar-e-Millat** (\"Mother of the Nation\") for her role in the independence movement and later opposition politics."
+    },
+    {
+      "k": [
+        "what is pakistan's national anthem"
+      ],
+      "a": "Pakistan's national anthem is **\"Qaumi Taranah\"**, with lyrics written by Hafeez Jalandhari and music composed by Ahmed Ghulamali Chagla, officially adopted in 1954."
+    },
+    {
+      "k": [
+        "when did east pakistan become bangladesh"
+      ],
+      "a": "**East Pakistan** became the independent nation of **Bangladesh** in 1971, following the Bangladesh Liberation War."
+    },
+    {
+      "k": [
+        "what is a wave"
+      ],
+      "a": "A **wave** is a disturbance that transfers energy from one place to another without permanently moving matter — examples include sound waves, water waves, and light (electromagnetic) waves."
+    },
+    {
+      "k": [
+        "difference between transverse and longitudinal waves"
+      ],
+      "a": "In a **transverse wave**, particles vibrate perpendicular to the direction the wave travels (like light or a shaken rope). In a **longitudinal wave**, particles vibrate parallel to the wave's direction of travel (like sound moving through air)."
+    },
+    {
+      "k": [
+        "what is refraction"
+      ],
+      "a": "**Refraction** is the bending of a wave, such as light, as it passes from one medium into another with a different density — for example, light bending when it enters water from air, which is why a straw looks bent in a glass of water."
+    },
+    {
+      "k": [
+        "what is reflection of light"
+      ],
+      "a": "**Reflection** occurs when light bounces off a surface rather than passing through it, following the law that the angle of incidence equals the angle of reflection — the basic principle behind how mirrors work."
+    },
+    {
+      "k": [
+        "what is the electromagnetic spectrum"
+      ],
+      "a": "The **electromagnetic spectrum** is the full range of electromagnetic radiation, ordered by wavelength — from radio waves and microwaves, through infrared, visible light, ultraviolet, to X-rays and gamma rays."
+    },
+    {
+      "k": [
+        "what is oxygen"
+      ],
+      "a": "**Oxygen** (symbol O, atomic number 8) is a colorless, odorless gas that makes up about 21% of Earth's atmosphere and is essential for respiration in most living organisms."
+    },
+    {
+      "k": [
+        "what is hydrogen"
+      ],
+      "a": "**Hydrogen** (symbol H, atomic number 1) is the lightest and most abundant element in the universe, making up about 75% of its elemental mass, and is a key component of water and organic molecules."
+    },
+    {
+      "k": [
+        "what is carbon"
+      ],
+      "a": "**Carbon** (symbol C, atomic number 6) is the chemical basis of all known life, able to form more compounds than any other element due to its ability to bond with up to four other atoms, including other carbon atoms."
+    },
+    {
+      "k": [
+        "what is gold"
+      ],
+      "a": "**Gold** (symbol Au, atomic number 79) is a dense, soft, corrosion-resistant metal, prized throughout history for jewelry and currency, and valued today also for its use in electronics due to excellent conductivity."
+    },
+    {
+      "k": [
+        "what is iron"
+      ],
+      "a": "**Iron** (symbol Fe, atomic number 26) is a metal essential to modern industry, mainly used to make steel, and is also biologically essential — it's the core component of hemoglobin, which carries oxygen in blood."
+    },
+    {
+      "k": [
+        "what is an ip address"
+      ],
+      "a": "An **IP address** is a unique numerical label assigned to every device connected to a network, allowing it to be identified and located so data can be routed to and from it correctly."
+    },
+    {
+      "k": [
+        "what is a url"
+      ],
+      "a": "A **URL** (Uniform Resource Locator) is the address used to locate a resource on the internet, such as a webpage — for example, \"https://example.com/page\" specifies the protocol, domain, and path."
+    },
+    {
+      "k": [
+        "difference between the internet and the world wide web"
+      ],
+      "a": "The **internet** is the underlying global network of connected computers. The **World Wide Web** is a system of interlinked web pages and resources that runs on top of the internet, accessed through browsers using the HTTP protocol."
+    },
+    {
+      "k": [
+        "what is bandwidth"
+      ],
+      "a": "**Bandwidth** is the maximum amount of data that can be transmitted over a network connection in a given time, usually measured in bits per second — higher bandwidth generally means faster data transfer."
     }
   ]
 }

@@ -502,14 +502,53 @@ function renderDeckGrid(){
     const due = cardsDue(d.cards).length;
     const card = document.createElement('div'); card.className='deck-card';
     card.innerHTML = '<h3>'+escapeHtml(d.name)+'</h3><p>'+d.cards.length+' card'+(d.cards.length!==1?'s':'')+' · '+pct+'% known'+(due? ' · <strong style="color:var(--accent-strong);">'+due+' due</strong>':' · none due')+'</p><div class="deck-progress"><div class="deck-progress-fill" style="width:'+pct+'%"></div></div>'+
-      '<div class="deck-card-actions"><button class="deck-action-btn" data-action="study">Study</button><button class="deck-action-btn" data-action="quiz"'+(d.cards.length<2?' disabled title="Needs at least 2 cards"':'')+'>Quiz</button></div>';
+      '<div class="deck-card-actions"><button class="deck-action-btn" data-action="study">Study</button><button class="deck-action-btn" data-action="quiz"'+(d.cards.length<2?' disabled title="Needs at least 2 cards"':'')+'>Quiz</button><button class="deck-action-btn" data-action="export" title="Download as JSON">Export</button></div>';
     card.querySelector('[data-action="study"]').addEventListener('click', (e)=>{ e.stopPropagation(); openDeck(d.id); });
     const quizBtn = card.querySelector('[data-action="quiz"]');
     quizBtn.addEventListener('click', (e)=>{ e.stopPropagation(); if(!quizBtn.disabled) startQuiz(d.id); });
+    card.querySelector('[data-action="export"]').addEventListener('click', (e)=>{ e.stopPropagation(); exportDeck(d); });
     card.addEventListener('click', ()=>openDeck(d.id));
     grid.appendChild(card);
   });
 }
+// Deck export/import: lets a deck be backed up or shared as a plain JSON file,
+// independent of the account it was created under. Card progress (ease,
+// interval, due date) travels with it so imported decks resume where they left off.
+function exportDeck(deck){
+  const payload = { zariyaDeckExport: 1, name: deck.name, cards: deck.cards.map(c=>({
+    front: c.front, back: c.back, known: !!c.known, ease: c.ease, interval: c.interval, reps: c.reps, due: c.due
+  })) };
+  downloadFile(deck.name.replace(/[^\w\- ]/g, '').trim().replace(/\s+/g, '_') + '.json', JSON.stringify(payload, null, 2));
+}
+function importDeckFromJson(text){
+  let parsed;
+  try { parsed = JSON.parse(text); } catch(e){ alert('That file is not valid JSON.'); return; }
+  const cardsSource = Array.isArray(parsed) ? parsed : parsed.cards;
+  const name = Array.isArray(parsed) ? 'Imported deck' : (parsed.name || 'Imported deck');
+  if(!Array.isArray(cardsSource) || !cardsSource.length){ alert('No cards found in that file.'); return; }
+  const cards = [];
+  for(const c of cardsSource){
+    if(!c || typeof c.front !== 'string' || typeof c.back !== 'string') continue;
+    cards.push(migrateCardForSpacedRepetition({
+      id: uid(), front: c.front, back: c.back, known: !!c.known,
+      ease: typeof c.ease === 'number' ? c.ease : undefined,
+      interval: typeof c.interval === 'number' ? c.interval : undefined,
+      reps: typeof c.reps === 'number' ? c.reps : undefined,
+      due: typeof c.due === 'string' ? c.due : undefined
+    }));
+  }
+  if(!cards.length){ alert('No valid cards (each needs a front and back) found in that file.'); return; }
+  decks.unshift({ id: uid(), name, cards, createdAt: Date.now() });
+  saveServerState(); renderDeckGrid();
+}
+document.getElementById('importDeckBtn').addEventListener('click', ()=>document.getElementById('importDeckFile').click());
+document.getElementById('importDeckFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>importDeckFromJson(reader.result);
+  reader.readAsText(file);
+  e.target.value = '';
+});
 function openDeck(id){
   currentDeckId = id;
   const deck = decks.find(d=>d.id===id); if(!deck || !deck.cards.length) return;
