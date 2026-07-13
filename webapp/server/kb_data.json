@@ -4543,6 +4543,142 @@
         "what does offline-first mean"
       ],
       "a": "**Offline-first** software is designed to work fully without an internet connection, syncing with a server only when one is available, rather than depending on constant connectivity to function at all."
+    },
+    {
+      "k": [
+        "what is psychology"
+      ],
+      "a": "**Psychology** is the scientific study of the mind and behavior — how people think, feel, and act, and why."
+    },
+    {
+      "k": [
+        "what is sociology"
+      ],
+      "a": "**Sociology** is the study of human society, social relationships, institutions, and how groups and cultures shape individual behavior."
+    },
+    {
+      "k": [
+        "what is cognitive bias"
+      ],
+      "a": "A **cognitive bias** is a systematic pattern of deviation from rational judgment — a mental shortcut that can lead to consistently skewed thinking, such as confirmation bias (favoring information that confirms existing beliefs)."
+    },
+    {
+      "k": [
+        "what is islam"
+      ],
+      "a": "**Islam** is a monotheistic religion founded in the 7th century CE in Arabia, based on the teachings of the Prophet Muhammad as recorded in the Quran. It is the second-largest religion in the world and the majority religion in Pakistan."
+    },
+    {
+      "k": [
+        "what is christianity"
+      ],
+      "a": "**Christianity** is a monotheistic religion centered on the life and teachings of Jesus Christ, based on the Bible. It originated in the 1st century CE in the region of modern-day Israel/Palestine and is the world's largest religion by followers."
+    },
+    {
+      "k": [
+        "what is hinduism"
+      ],
+      "a": "**Hinduism** is one of the world's oldest religions, originating on the Indian subcontinent over 3,000 years ago. It encompasses a wide range of beliefs and practices, commonly including concepts like dharma, karma, and reincarnation, without a single founder or central text."
+    },
+    {
+      "k": [
+        "what is buddhism"
+      ],
+      "a": "**Buddhism** was founded by Siddhartha Gautama (the Buddha) in the 5th century BCE in present-day Nepal/India. It centers on teachings about suffering, its causes, and the path to liberation (nirvana) through practices like meditation and ethical conduct."
+    },
+    {
+      "k": [
+        "what is judaism"
+      ],
+      "a": "**Judaism** is one of the oldest monotheistic religions, tracing its origins to the ancient Israelites over 3,000 years ago, based on the Torah and centered on a covenant relationship between God and the Jewish people."
+    },
+    {
+      "k": [
+        "what is sikhism"
+      ],
+      "a": "**Sikhism** was founded by Guru Nanak in the 15th century CE in the Punjab region of South Asia. It teaches belief in one God, equality of all people, and service to others, and its scripture is the Guru Granth Sahib."
+    },
+    {
+      "k": [
+        "what are human rights"
+      ],
+      "a": "**Human rights** are basic rights and freedoms believed to belong to every person, regardless of nationality, ethnicity, or belief — such as the right to life, freedom of expression, and equality before the law. They're outlined internationally in the 1948 Universal Declaration of Human Rights."
+    },
+    {
+      "k": [
+        "what is the separation of powers"
+      ],
+      "a": "The **separation of powers** is a governance principle that divides state authority among separate branches — typically legislative (makes laws), executive (enforces laws), and judicial (interprets laws) — to prevent any one branch from holding too much power."
+    },
+    {
+      "k": [
+        "what is a referendum"
+      ],
+      "a": "A **referendum** is a direct vote in which the general public decides on a specific political question or proposed law, rather than having it decided solely by elected representatives."
+    },
+    {
+      "k": [
+        "what is federalism"
+      ],
+      "a": "**Federalism** is a system of government in which power is divided between a central (national) authority and constituent regional units, such as states or provinces, each with their own areas of authority."
+    },
+    {
+      "k": [
+        "how many members does the united nations have"
+      ],
+      "a": "The **United Nations** has **193 member states**, making it the world's largest intergovernmental organization, founded in 1945 to promote peace, security, and cooperation among nations."
+    },
+    {
+      "k": [
+        "what are vitamins"
+      ],
+      "a": "**Vitamins** are organic compounds the body needs in small amounts for normal growth and function, most of which can't be made by the body and must come from food — for example, vitamin C supports the immune system and vitamin D supports bone health."
+    },
+    {
+      "k": [
+        "what causes diabetes",
+        "what is diabetes"
+      ],
+      "a": "**Diabetes** is a condition where the body can't properly regulate blood sugar, either because the pancreas doesn't produce enough insulin (Type 1) or because the body doesn't respond to insulin effectively (Type 2, which is strongly linked to lifestyle factors)."
+    },
+    {
+      "k": [
+        "what causes high blood pressure",
+        "what is hypertension"
+      ],
+      "a": "**Hypertension** (high blood pressure) is a condition where the force of blood against artery walls is consistently too high, raising the risk of heart disease and stroke. Common contributing factors include diet, physical inactivity, obesity, and genetics."
+    },
+    {
+      "k": [
+        "what is antibiotic resistance"
+      ],
+      "a": "**Antibiotic resistance** occurs when bacteria evolve to survive drugs designed to kill them, often due to antibiotic overuse or misuse, making some infections increasingly difficult to treat."
+    },
+    {
+      "k": [
+        "what is the international space station",
+        "what is the iss"
+      ],
+      "a": "The **International Space Station (ISS)** is a habitable satellite in low Earth orbit, jointly operated by NASA, Roscosmos, ESA, JAXA, and CSA, used for scientific research in microgravity since 2000."
+    },
+    {
+      "k": [
+        "what is a satellite orbit",
+        "types of satellite orbits"
+      ],
+      "a": "Satellites commonly orbit Earth in **low Earth orbit** (a few hundred km up, used for imaging and the ISS), **geostationary orbit** (about 35,786 km up, matching Earth's rotation so the satellite stays over one spot — used for communications), or **medium Earth orbit** (used for GPS)."
+    },
+    {
+      "k": [
+        "what causes ocean currents"
+      ],
+      "a": "**Ocean currents** are driven mainly by wind, differences in water density (caused by temperature and salinity), and the Earth's rotation (the Coriolis effect), circulating heat around the planet and strongly influencing global climate."
+    },
+    {
+      "k": [
+        "what is the ozone layer"
+      ],
+      "a": "The **ozone layer** is a region of Earth's stratosphere with a high concentration of ozone (O₃) that absorbs most of the Sun's harmful ultraviolet radiation, protecting life on the surface."
     }
   ]
 }

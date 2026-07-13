@@ -62,6 +62,7 @@ async function loadServerState(){
   sessions = state.sessions || [];
   notes = state.notes || [];
   decks = state.decks || [];
+  decks.forEach(d=> d.cards.forEach(migrateCardForSpacedRepetition));
   currentSessionId = sessions.length ? sessions[0].id : null;
 }
 let saveTimer;
@@ -453,6 +454,40 @@ document.getElementById('noteToFlashBtn').addEventListener('click', ()=>{
 });
 
 let quizQueue = [], quizIndex = 0, quizScore = 0, quizAnswered = false;
+let reviewingAllCards = false;
+
+/* ============ SPACED REPETITION (SM-2) ============ */
+// A simplified version of the SM-2 algorithm used by tools like Anki and
+// SuperMemo: each review grades the card 0 (again) to 5 (easy), which adjusts
+// how many days until the card is due next and how "easy" it's tracked as.
+function migrateCardForSpacedRepetition(c){
+  if(c.due === undefined) c.due = new Date(0).toISOString(); // due immediately
+  if(c.ease === undefined) c.ease = 2.5;
+  if(c.interval === undefined) c.interval = 0;
+  if(c.reps === undefined) c.reps = 0;
+  return c;
+}
+function sm2Grade(card, quality){
+  card.reps = card.reps || 0;
+  card.ease = card.ease || 2.5;
+  card.interval = card.interval || 0;
+  if(quality < 3){
+    card.reps = 0;
+    card.interval = 1;
+  } else {
+    card.reps += 1;
+    if(card.reps === 1) card.interval = 1;
+    else if(card.reps === 2) card.interval = 6;
+    else card.interval = Math.round(card.interval * card.ease);
+    card.ease = Math.max(1.3, card.ease + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+  }
+  const due = new Date();
+  due.setDate(due.getDate() + card.interval);
+  card.due = due.toISOString();
+  card.known = quality >= 3;
+  return card;
+}
+function cardsDue(cards){ return cards.filter(c=> new Date(c.due||0) <= new Date()); }
 
 /* ============ FLASHCARDS ============ */
 function renderDeckGrid(){
@@ -461,10 +496,12 @@ function renderDeckGrid(){
   const grid = document.getElementById('deckGrid'); grid.style.display='grid'; grid.innerHTML='';
   if(!decks.length){ grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M6 2h16v12"/></svg><span>No decks yet — chat, then use "Make flashcards" above the message box</span></div>'; return; }
   decks.forEach(d=>{
+    d.cards.forEach(migrateCardForSpacedRepetition);
     const known = d.cards.filter(c=>c.known).length;
     const pct = d.cards.length? Math.round(known/d.cards.length*100):0;
+    const due = cardsDue(d.cards).length;
     const card = document.createElement('div'); card.className='deck-card';
-    card.innerHTML = '<h3>'+escapeHtml(d.name)+'</h3><p>'+d.cards.length+' card'+(d.cards.length!==1?'s':'')+' · '+pct+'% known</p><div class="deck-progress"><div class="deck-progress-fill" style="width:'+pct+'%"></div></div>'+
+    card.innerHTML = '<h3>'+escapeHtml(d.name)+'</h3><p>'+d.cards.length+' card'+(d.cards.length!==1?'s':'')+' · '+pct+'% known'+(due? ' · <strong style="color:var(--accent-strong);">'+due+' due</strong>':' · none due')+'</p><div class="deck-progress"><div class="deck-progress-fill" style="width:'+pct+'%"></div></div>'+
       '<div class="deck-card-actions"><button class="deck-action-btn" data-action="study">Study</button><button class="deck-action-btn" data-action="quiz"'+(d.cards.length<2?' disabled title="Needs at least 2 cards"':'')+'>Quiz</button></div>';
     card.querySelector('[data-action="study"]').addEventListener('click', (e)=>{ e.stopPropagation(); openDeck(d.id); });
     const quizBtn = card.querySelector('[data-action="quiz"]');
@@ -476,7 +513,9 @@ function renderDeckGrid(){
 function openDeck(id){
   currentDeckId = id;
   const deck = decks.find(d=>d.id===id); if(!deck || !deck.cards.length) return;
-  studyQueue = deck.cards.slice(); studyIndex=0; studyFlipped=false;
+  deck.cards.forEach(migrateCardForSpacedRepetition);
+  reviewingAllCards = false;
+  studyQueue = cardsDue(deck.cards); studyIndex=0; studyFlipped=false;
   document.getElementById('deckGrid').style.display='none';
   document.getElementById('studyArea').style.display='block';
   renderStudy();
@@ -484,6 +523,13 @@ function openDeck(id){
 function renderStudy(){
   const area = document.getElementById('studyArea');
   const deck = decks.find(d=>d.id===currentDeckId);
+  if(!reviewingAllCards && !studyQueue.length){
+    area.innerHTML = '<h2 style="font-weight:700;">All caught up</h2><p style="color:var(--text-muted);margin-bottom:18px;">No cards due for review in '+escapeHtml(deck.name)+' right now.</p>'+
+      '<div class="study-controls"><button class="sc-btn" id="reviewAllBtn">Review all cards anyway</button><button class="btn primary" id="backToDecks">Back to decks</button></div>';
+    document.getElementById('reviewAllBtn').addEventListener('click', ()=>{ reviewingAllCards=true; studyQueue=deck.cards.slice(); studyIndex=0; studyFlipped=false; renderStudy(); });
+    document.getElementById('backToDecks').addEventListener('click', renderDeckGrid);
+    return;
+  }
   if(studyIndex >= studyQueue.length){
     area.innerHTML = '<h2 style="font-weight:700;">Deck complete</h2><p style="color:var(--text-muted);margin-bottom:18px;">You reviewed '+studyQueue.length+' card'+(studyQueue.length!==1?'s':'')+'.</p><button class="btn primary" id="backToDecks">Back to decks</button>';
     document.getElementById('backToDecks').addEventListener('click', renderDeckGrid);
@@ -494,11 +540,24 @@ function renderStudy(){
     '<div class="card-flip-zone"><div class="flip-card '+(studyFlipped?'flipped':'')+'" id="flipCard">'+
     '<div class="flip-face front '+(isUrdu(c.front)?'is-urdu urdu':'')+'">'+escapeHtml(c.front)+'</div>'+
     '<div class="flip-face back '+(isUrdu(c.back)?'is-urdu urdu':'')+'">'+escapeHtml(c.back)+'</div></div></div>'+
-    '<div class="study-controls"><button class="sc-btn again" id="scAgain">Again</button><button class="sc-btn" id="scFlip">Flip</button><button class="sc-btn known" id="scKnown">Know it</button></div>';
+    (studyFlipped
+      ? '<div class="study-controls"><button class="sc-btn again" data-q="0">Again</button><button class="sc-btn" data-q="3">Hard</button><button class="sc-btn known" data-q="4">Good</button><button class="sc-btn known" data-q="5">Easy</button></div>'
+      : '<div class="study-controls"><button class="sc-btn" id="scFlip">Flip to grade</button></div>');
   document.getElementById('flipCard').addEventListener('click', ()=>{ studyFlipped=!studyFlipped; renderStudy(); });
-  document.getElementById('scFlip').addEventListener('click', (e)=>{ e.stopPropagation(); studyFlipped=!studyFlipped; renderStudy(); });
-  document.getElementById('scAgain').addEventListener('click', (e)=>{ e.stopPropagation(); const card=studyQueue[studyIndex]; card.known=false; studyQueue.push(card); studyIndex++; studyFlipped=false; renderStudy(); });
-  document.getElementById('scKnown').addEventListener('click', (e)=>{ e.stopPropagation(); const rc=deck.cards.find(x=>x.id===c.id); if(rc) rc.known=true; studyIndex++; studyFlipped=false; renderStudy(); });
+  if(!studyFlipped){
+    document.getElementById('scFlip').addEventListener('click', (e)=>{ e.stopPropagation(); studyFlipped=true; renderStudy(); });
+  } else {
+    area.querySelectorAll('[data-q]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const quality = parseInt(btn.dataset.q, 10);
+        const rc = deck.cards.find(x=>x.id===c.id) || c;
+        sm2Grade(rc, quality);
+        if(quality < 3) studyQueue.push(rc);
+        studyIndex++; studyFlipped=false; renderStudy();
+      });
+    });
+  }
 }
 document.getElementById('newDeckBtn').addEventListener('click', ()=>{
   const name = prompt('Deck name?'); if(!name) return;
@@ -506,7 +565,7 @@ document.getElementById('newDeckBtn').addEventListener('click', ()=>{
   while(addMore && cards.length<20){
     const front = prompt('Front of card #'+(cards.length+1)+' (Cancel to stop)'); if(front===null) break;
     const back = prompt('Back of card #'+(cards.length+1)); if(back===null) break;
-    cards.push({id:uid(), front, back, known:false});
+    cards.push(migrateCardForSpacedRepetition({id:uid(), front, back, known:false}));
     addMore = confirm('Add another card?');
   }
   if(cards.length){ decks.unshift({id:uid(), name, cards, createdAt:Date.now()}); saveServerState(); renderDeckGrid(); }
