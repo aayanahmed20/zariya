@@ -452,16 +452,23 @@ document.getElementById('noteToFlashBtn').addEventListener('click', ()=>{
   }
 });
 
+let quizQueue = [], quizIndex = 0, quizScore = 0, quizAnswered = false;
+
 /* ============ FLASHCARDS ============ */
 function renderDeckGrid(){
   document.getElementById('studyArea').style.display='none';
+  document.getElementById('quizArea').style.display='none';
   const grid = document.getElementById('deckGrid'); grid.style.display='grid'; grid.innerHTML='';
   if(!decks.length){ grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M6 2h16v12"/></svg><span>No decks yet — chat, then use "Make flashcards" above the message box</span></div>'; return; }
   decks.forEach(d=>{
     const known = d.cards.filter(c=>c.known).length;
     const pct = d.cards.length? Math.round(known/d.cards.length*100):0;
     const card = document.createElement('div'); card.className='deck-card';
-    card.innerHTML = '<h3>'+escapeHtml(d.name)+'</h3><p>'+d.cards.length+' card'+(d.cards.length!==1?'s':'')+' · '+pct+'% known</p><div class="deck-progress"><div class="deck-progress-fill" style="width:'+pct+'%"></div></div>';
+    card.innerHTML = '<h3>'+escapeHtml(d.name)+'</h3><p>'+d.cards.length+' card'+(d.cards.length!==1?'s':'')+' · '+pct+'% known</p><div class="deck-progress"><div class="deck-progress-fill" style="width:'+pct+'%"></div></div>'+
+      '<div class="deck-card-actions"><button class="deck-action-btn" data-action="study">Study</button><button class="deck-action-btn" data-action="quiz"'+(d.cards.length<2?' disabled title="Needs at least 2 cards"':'')+'>Quiz</button></div>';
+    card.querySelector('[data-action="study"]').addEventListener('click', (e)=>{ e.stopPropagation(); openDeck(d.id); });
+    const quizBtn = card.querySelector('[data-action="quiz"]');
+    quizBtn.addEventListener('click', (e)=>{ e.stopPropagation(); if(!quizBtn.disabled) startQuiz(d.id); });
     card.addEventListener('click', ()=>openDeck(d.id));
     grid.appendChild(card);
   });
@@ -504,6 +511,70 @@ document.getElementById('newDeckBtn').addEventListener('click', ()=>{
   }
   if(cards.length){ decks.unshift({id:uid(), name, cards, createdAt:Date.now()}); saveServerState(); renderDeckGrid(); }
 });
+
+/* ============ QUIZ MODE ============ */
+// Builds multiple-choice questions from a deck's cards: the card's front is the
+// question, its back is the correct answer, and wrong answers (distractors) are
+// pulled from other cards' backs -- first from the same deck, then from other
+// decks if the deck itself is too small to supply enough options on its own.
+function buildQuizQuestions(deck){
+  const allOtherBacks = decks.flatMap(d=>d.cards).filter(c=>c.id).map(c=>c.back);
+  const deckBacks = deck.cards.map(c=>c.back);
+  const shuffled = deck.cards.slice().sort(()=>Math.random()-0.5);
+  return shuffled.map(c=>{
+    const pool = new Set();
+    deckBacks.forEach(b=>{ if(b!==c.back) pool.add(b); });
+    if(pool.size < 3){ allOtherBacks.forEach(b=>{ if(b!==c.back) pool.add(b); }); }
+    const distractors = Array.from(pool).sort(()=>Math.random()-0.5).slice(0, 3);
+    const options = [c.back, ...distractors].sort(()=>Math.random()-0.5);
+    return { front: c.front, correct: c.back, options };
+  });
+}
+function startQuiz(deckId){
+  currentDeckId = deckId;
+  const deck = decks.find(d=>d.id===deckId); if(!deck || deck.cards.length<2) return;
+  quizQueue = buildQuizQuestions(deck); quizIndex=0; quizScore=0; quizAnswered=false;
+  document.getElementById('deckGrid').style.display='none';
+  document.getElementById('quizArea').style.display='block';
+  renderQuiz();
+}
+function renderQuiz(){
+  const area = document.getElementById('quizArea');
+  const deck = decks.find(d=>d.id===currentDeckId);
+  if(quizIndex >= quizQueue.length){
+    const pct = quizQueue.length? Math.round(quizScore/quizQueue.length*100):0;
+    area.innerHTML = '<h2 style="font-weight:700;">Quiz complete</h2>'+
+      '<p style="color:var(--text-muted);margin-bottom:18px;">You scored <strong>'+quizScore+' / '+quizQueue.length+'</strong> ('+pct+'%).</p>'+
+      '<div class="study-controls"><button class="sc-btn" id="quizRetry">Retry quiz</button><button class="btn primary" id="quizBackToDecks">Back to decks</button></div>';
+    document.getElementById('quizRetry').addEventListener('click', ()=>startQuiz(currentDeckId));
+    document.getElementById('quizBackToDecks').addEventListener('click', renderDeckGrid);
+    return;
+  }
+  const q = quizQueue[quizIndex];
+  let optionsHtml = q.options.map((opt,i)=>
+    '<button class="quiz-option'+(isUrdu(opt)?' is-urdu urdu':'')+'" data-i="'+i+'">'+escapeHtml(opt)+'</button>'
+  ).join('');
+  area.innerHTML = '<div class="study-progress-text">Question '+(quizIndex+1)+' of '+quizQueue.length+' — '+escapeHtml(deck.name)+' · Score: '+quizScore+'</div>'+
+    '<div class="quiz-question'+(isUrdu(q.front)?' is-urdu urdu':'')+'">'+escapeHtml(q.front)+'</div>'+
+    '<div class="quiz-options">'+optionsHtml+'</div>'+
+    '<div class="study-controls" id="quizNextRow" style="display:none;"><button class="btn primary" id="quizNext">Next question</button></div>';
+  quizAnswered = false;
+  area.querySelectorAll('.quiz-option').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(quizAnswered) return;
+      quizAnswered = true;
+      const chosen = q.options[parseInt(btn.dataset.i,10)];
+      area.querySelectorAll('.quiz-option').forEach(b=>{
+        const val = q.options[parseInt(b.dataset.i,10)];
+        if(val===q.correct) b.classList.add('correct');
+        else if(b===btn) b.classList.add('wrong');
+      });
+      if(chosen===q.correct) quizScore++;
+      document.getElementById('quizNextRow').style.display='flex';
+    });
+  });
+  document.getElementById('quizNext').addEventListener('click', ()=>{ quizIndex++; renderQuiz(); });
+}
 
 /* ============ SETTINGS WIRING ============ */
 document.querySelectorAll('[data-theme-opt]').forEach(el=> el.addEventListener('click', ()=>{ uiPrefs.theme=el.dataset.themeOpt; LS.set('zariya_ui_prefs',uiPrefs); applyUiPrefs(); }));
