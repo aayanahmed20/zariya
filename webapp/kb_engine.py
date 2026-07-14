@@ -360,17 +360,53 @@ def try_translate(text: str):
     return None
 
 
+def _clip(text: str, limit: int) -> str:
+    """Like _truncate_at_boundary, but only ever adds an ellipsis when text was
+    actually cut -- summarize_messages used to append '…' even to a two-word
+    message, which falsely implied something had been trimmed off."""
+    text = text.strip()
+    if len(text) <= limit:
+        return text
+    trimmed = _truncate_at_boundary(text, limit)
+    if trimmed.endswith(("…", ".", "?", "!")):
+        return trimmed
+    return trimmed + "…"
+
+
 def summarize_messages(messages: list[dict]) -> str:
-    user_msgs = [m["content"] for m in messages if m["role"] == "user"]
+    user_msgs = [m["content"].strip() for m in messages if m["role"] == "user" and m["content"].strip()]
     if not user_msgs:
         return "Nothing to summarize yet."
-    first, last = user_msgs[0][:60], user_msgs[-1][:60]
-    return f'This conversation covered {len(user_msgs)} request(s), starting with "{first}…" and most recently "{last}…"'
+    if len(user_msgs) == 1:
+        return f'This conversation covered one request: "{_clip(user_msgs[0], 80)}"'
+    first, last = _clip(user_msgs[0], 60), _clip(user_msgs[-1], 60)
+    return f'This conversation covered {len(user_msgs)} requests, starting with "{first}" and most recently "{last}".'
 
 
 def key_points(messages: list[dict]) -> str:
-    user_msgs = [m["content"] for m in messages if m["role"] == "user"][:6]
-    return "\n".join(f"• {m[:80]}" for m in user_msgs)
+    """Surfaces the substance of the conversation -- what was asked and the core
+    of what was answered -- rather than just echoing the questions back, which
+    isn't really a set of "key points" so much as a list of things already
+    visible in the chat above."""
+    points = []
+    seen = set()
+    for i in range(len(messages) - 1):
+        if messages[i]["role"] != "user" or messages[i + 1]["role"] != "assistant":
+            continue
+        q = messages[i]["content"].strip()
+        a = messages[i + 1]["content"].strip()
+        if not q or not a or a.startswith("I don't have that"):
+            continue
+        key = q.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        points.append(f"• {_clip(q, 70)} — {_clip(a, 110)}")
+        if len(points) >= 8:
+            break
+    if not points:
+        return "Not enough back-and-forth yet to pull out key points."
+    return "\n".join(points)
 
 
 def translate_words(text: str) -> str:
