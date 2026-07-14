@@ -440,16 +440,61 @@ document.getElementById('exportNoteBtn').addEventListener('click', ()=>{
   const n = notes.find(n=>n.id===currentNoteId); if(!n) return;
   downloadFile((n.title||'note')+'.md', '# '+n.title+'\n\n'+n.body);
 });
+// Builds flashcards from free-form note text. Tries progressively looser
+// patterns rather than blindly pairing every two lines, since notes are
+// usually prose, not neat alternating question/answer lines:
+//   1. Explicit "Q: ..." / "A: ..." pairs
+//   2. Glossary-style "Term: definition" or "Term — definition" lines
+//   3. A guarded fallback pairing of consecutive lines, only when the note
+//      actually looks like alternating short prompts and longer answers
+// Returns an empty array if nothing usable is found, rather than fabricating
+// meaningless cards from arbitrary line breaks.
+function buildCardsFromNoteText(text){
+  const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+
+  const qaCards = [];
+  for(let i=0;i<lines.length-1;i++){
+    const qm = lines[i].match(/^q(?:uestion)?\s*[:.\-]\s*(.+)$/i);
+    const am = lines[i+1].match(/^a(?:nswer)?\s*[:.\-]\s*(.+)$/i);
+    if(qm && am){ qaCards.push({front:qm[1].trim(), back:am[1].trim()}); i++; }
+  }
+  if(qaCards.length) return qaCards;
+
+  const glossaryCards = [];
+  const sepRe = /^(.{2,80}?)\s*[:—–]\s+(.{2,300})$/;
+  for(const raw of lines){
+    const line = raw.replace(/^[-*•\d.]+\s*/, '');
+    const m = line.match(sepRe);
+    if(m && !/^https?:\/\//i.test(m[2]) && !/^\/\//.test(m[1])){
+      glossaryCards.push({front:m[1].trim(), back:m[2].trim()});
+    }
+  }
+  if(glossaryCards.length) return glossaryCards;
+
+  if(lines.length >= 2 && lines.length % 2 === 0){
+    let looksAlternating = true;
+    for(let i=0;i<lines.length;i+=2){
+      const prompt = lines[i];
+      if(prompt.length > 120 && !/\?\s*$/.test(prompt)){ looksAlternating = false; break; }
+    }
+    if(looksAlternating){
+      const fallbackCards = [];
+      for(let i=0;i<lines.length-1;i+=2) fallbackCards.push({front:lines[i], back:lines[i+1]});
+      return fallbackCards;
+    }
+  }
+  return [];
+}
 document.getElementById('noteToFlashBtn').addEventListener('click', ()=>{
   const n = notes.find(n=>n.id===currentNoteId);
   if(!n || !n.body.trim()) return;
-  const lines = n.body.split('\n').map(l=>l.trim()).filter(Boolean);
-  const cards = [];
-  for(let i=0;i<lines.length-1;i+=2) cards.push({id:uid(), front:lines[i], back:lines[i+1]||'—', known:false});
+  const cards = buildCardsFromNoteText(n.body).map(c=>migrateCardForSpacedRepetition({id:uid(), front:c.front, back:c.back, known:false}));
   if(cards.length){
     const deck = {id:uid(), name:n.title+' — flashcards', cards, createdAt:Date.now()};
     decks.unshift(deck); saveServerState();
     switchView('flashcards'); renderDeckGrid(); openDeck(deck.id);
+  } else {
+    alert('Couldn\'t find clear question/answer or term/definition pairs in this note.\n\nTry formatting lines as "Q: ..." / "A: ..." pairs, or "Term: definition" lines, and try again.');
   }
 });
 

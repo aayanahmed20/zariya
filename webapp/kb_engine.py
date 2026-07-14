@@ -382,13 +382,33 @@ def translate_words(text: str) -> str:
     return " ".join(out)
 
 
+def _truncate_at_boundary(text: str, limit: int) -> str:
+    """Truncate to at most `limit` characters, preferring to cut at the end of a
+    sentence, then a word boundary, rather than slicing mid-word -- so generated
+    flashcards read as complete thoughts instead of chopped-off fragments."""
+    if len(text) <= limit:
+        return text
+    window = text[:limit]
+    for stop in (". ", "? ", "! "):
+        idx = window.rfind(stop)
+        if idx > limit * 0.4:
+            return window[: idx + 1].strip()
+    idx = window.rfind(" ")
+    if idx > limit * 0.4:
+        return window[:idx].strip() + "…"
+    return window.strip() + "…"
+
+
 def flashcards_from_messages(messages: list[dict]) -> list[dict]:
     cards = []
     for i in range(len(messages) - 1):
         if messages[i]["role"] == "user" and messages[i + 1]["role"] == "assistant":
             q, a = messages[i]["content"].strip(), messages[i + 1]["content"].strip()
             if len(q) > 2 and len(a) > 2 and not a.startswith("I don't have that"):
-                cards.append({"front": q[:140], "back": a[:220]})
+                cards.append({
+                    "front": _truncate_at_boundary(q, 140),
+                    "back": _truncate_at_boundary(a, 280),
+                })
     return cards
 
 
