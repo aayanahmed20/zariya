@@ -256,6 +256,10 @@ def try_convert(text: str):
     if m:
         v = float(m.group(1))
         return f"{v} cm is about **{v/2.54:.2f} inches**."
+    m = re.search(r"(-?\d+(\.\d+)?)\s*(inch|inches|in)\b.*\bcm\b", lower)
+    if m:
+        v = float(m.group(1))
+        return f"{v} inches is about **{v*2.54:.2f} cm**."
     m = re.search(r"(-?\d+(\.\d+)?)\s*(l|litres?|liters?)\b.*\bgallons?\b", lower)
     if m:
         v = float(m.group(1))
@@ -327,9 +331,9 @@ def try_number_ops(text: str):
     if m:
         n = int(m.group(1) or m.group(5))
         return f"{n} in hexadecimal is **{hex(n)[2:].upper()}**."
-    m = re.search(r"(binary|0b[01]+)\s+([01]+)\s*to\s*decimal", lower) or re.search(r"^0b([01]+)$", lower)
-    if m:
-        bits = next(g for g in reversed(m.groups()) if g and set(g) <= {"0", "1"})
+    m = re.search(r"0b([01]+)\b|\bbinary\s+([01]+)\b|\b([01]+)\s+(?:in\s+)?binary\b", lower)
+    if m and re.search(r"\bdecimal\b", lower):
+        bits = next(g for g in m.groups() if g)
         return f"Binary {bits} is **{int(bits, 2)}** in decimal."
 
     m = re.search(r"(?P<op>average|mean|median|min(?:imum)?|max(?:imum)?)\s*of\s*(?P<nums>[\d,.\s]+)", lower)
