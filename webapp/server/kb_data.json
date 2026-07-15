@@ -2194,7 +2194,8 @@
     },
     {
       "k": [
-        "what is big o notation"
+        "what is big o notation",
+        "what is time complexity"
       ],
       "a": "Big O notation describes how an algorithm's run time or memory use grows as the input size grows — e.g. O(n) means time grows linearly with input size, O(n²) means it grows quadratically (like nested loops over the same list)."
     },

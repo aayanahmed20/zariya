@@ -452,6 +452,29 @@ def knowledge_base_stats() -> dict:
     return {"dictWords": len(DICT), "kbEntries": len(KB)}
 _GREETING_RE = re.compile(r"^(hi|hello|hey|salam|assalam)", re.I)
 _BYE_RE = re.compile(r"^(bye|goodbye|see you|khuda hafiz)", re.I)
+# Deliberately an exact-phrase allowlist, not a substring or loose regex match:
+# earlier versions matched the bare substrings "time" and "date" anywhere in the
+# message (so "what is time complexity" and "what is a candidate" were hijacked
+# into the clock/calendar response), and a follow-up regex attempt still matched
+# "what is time complexity" as a prefix. Checking against a closed set of full
+# phrasings, after stripping trailing punctuation, has no such collision risk.
+_TIME_QUERY_PHRASES = {
+    "what time is it", "what's the time", "whats the time", "what is the time",
+    "current time", "tell me the time", "do you know the time",
+}
+_DATE_QUERY_PHRASES = {
+    "what is the date", "what's the date", "whats the date", "current date",
+    "what day is it", "what is today", "what's today", "today's date",
+    "todays date", "what is today's date", "what date is it",
+}
+
+
+def _is_time_query(lower: str) -> bool:
+    return lower.strip().rstrip("?!.") in _TIME_QUERY_PHRASES
+
+
+def _is_date_query(lower: str) -> bool:
+    return lower.strip().rstrip("?!.") in _DATE_QUERY_PHRASES
 
 
 def offline_reply(messages: list[dict]) -> str:
@@ -481,17 +504,19 @@ def offline_reply(messages: list[dict]) -> str:
     if tr:
         return tr
 
-    if "time" in lower and "management" not in lower and "pomodoro" not in lower:
-        return "It's currently " + time.strftime("%I:%M %p") + " on the server."
-    if "date" in lower or ("today" in lower and "is" in lower):
-        return "Today is " + time.strftime("%A, %B %d, %Y") + "."
-
     learned = learned_lookup(last)
     if learned:
         return learned
     kb_hit = knowledge_base_lookup(last)
     if kb_hit:
         return kb_hit
+
+    # Time/date intent is checked last, after the knowledge base has had a
+    # chance to answer, so a curated fact always takes priority over a guess.
+    if _is_time_query(lower):
+        return "It's currently " + time.strftime("%I:%M %p") + " on the server."
+    if _is_date_query(lower):
+        return "Today is " + time.strftime("%A, %B %d, %Y") + "."
 
     generic_en = [
         "I don't have that in my offline knowledge base yet — I can handle arithmetic, unit conversions, "
