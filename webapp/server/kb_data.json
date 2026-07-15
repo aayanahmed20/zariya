@@ -4810,6 +4810,176 @@
         "what is bandwidth"
       ],
       "a": "**Bandwidth** is the maximum amount of data that can be transmitted over a network connection in a given time, usually measured in bits per second — higher bandwidth generally means faster data transfer."
+    },
+    {
+      "k": [
+        "what is algebra"
+      ],
+      "a": "**Algebra** is the branch of mathematics that uses letters and symbols to represent numbers and quantities in equations and formulas, allowing general relationships to be expressed and solved — for example, solving for x in 2x + 3 = 11."
+    },
+    {
+      "k": [
+        "what is geometry"
+      ],
+      "a": "**Geometry** is the branch of mathematics concerned with the properties and relationships of points, lines, shapes, angles, and surfaces in space."
+    },
+    {
+      "k": [
+        "what is calculus"
+      ],
+      "a": "**Calculus** is the branch of mathematics that studies continuous change, built on two core ideas: differentiation (finding rates of change, like speed from distance) and integration (finding totals accumulated over time, like distance from speed)."
+    },
+    {
+      "k": [
+        "what is trigonometry"
+      ],
+      "a": "**Trigonometry** is the branch of mathematics that studies the relationships between the angles and sides of triangles, built around the sine, cosine, and tangent functions."
+    },
+    {
+      "k": [
+        "what is probability"
+      ],
+      "a": "**Probability** measures how likely an event is to occur, expressed as a number between 0 (impossible) and 1 (certain) — for example, the probability of flipping a fair coin and getting heads is 0.5."
+    },
+    {
+      "k": [
+        "what is a matrix in mathematics",
+        "what is a matrix math"
+      ],
+      "a": "In mathematics, a **matrix** is a rectangular array of numbers arranged in rows and columns, used to represent and solve systems of linear equations, transformations, and data in fields from computer graphics to machine learning."
+    },
+    {
+      "k": [
+        "what is a vector in mathematics",
+        "what is a vector math"
+      ],
+      "a": "In mathematics and physics, a **vector** is a quantity that has both magnitude (size) and direction — such as velocity or force — as opposed to a scalar, which has only magnitude, like temperature or mass."
+    },
+    {
+      "k": [
+        "what is a prime number"
+      ],
+      "a": "A **prime number** is a whole number greater than 1 that has exactly two divisors: 1 and itself. The first few primes are 2, 3, 5, 7, 11, and 13; 2 is the only even prime number."
+    },
+    {
+      "k": [
+        "what is standard deviation"
+      ],
+      "a": "**Standard deviation** measures how spread out a set of numbers is from its average (mean) — a low standard deviation means values cluster close to the mean, while a high one means they're more spread out."
+    },
+    {
+      "k": [
+        "what is mars known for",
+        "planet mars"
+      ],
+      "a": "**Mars**, the fourth planet from the Sun, is known as the \"Red Planet\" due to iron oxide (rust) on its surface. It has the largest volcano in the solar system, Olympus Mons, and is a major target for future human exploration."
+    },
+    {
+      "k": [
+        "what is venus known for",
+        "planet venus"
+      ],
+      "a": "**Venus**, the second planet from the Sun, is the hottest planet in the solar system, with surface temperatures around 465°C due to a thick, carbon-dioxide-rich atmosphere causing an extreme greenhouse effect. It's also the brightest planet as seen from Earth."
+    },
+    {
+      "k": [
+        "what is saturn known for",
+        "planet saturn"
+      ],
+      "a": "**Saturn**, the sixth planet from the Sun, is famous for its extensive ring system, made mostly of ice particles and rock. It's the second-largest planet in the solar system after Jupiter."
+    },
+    {
+      "k": [
+        "what is jupiter known for",
+        "planet jupiter"
+      ],
+      "a": "**Jupiter** is the largest planet in the solar system, a gas giant more massive than all other planets combined. Its Great Red Spot is a giant storm that has raged for at least 150 years."
+    },
+    {
+      "k": [
+        "what are moon phases",
+        "phases of the moon"
+      ],
+      "a": "The **phases of the Moon** — new moon, waxing crescent, first quarter, waxing gibbous, full moon, waning gibbous, last quarter, and waning crescent — result from changing angles between the Sun, Earth, and Moon as the Moon orbits Earth roughly every 29.5 days."
+    },
+    {
+      "k": [
+        "what causes tides"
+      ],
+      "a": "**Tides** are caused mainly by the gravitational pull of the Moon (and to a lesser extent the Sun) on Earth's oceans, creating bulges of water that produce the rise and fall of sea levels roughly twice a day in most places."
+    },
+    {
+      "k": [
+        "what is nasa"
+      ],
+      "a": "**NASA** (National Aeronautics and Space Administration) is the United States' space agency, founded in 1958, responsible for the country's civilian space program, including the Apollo Moon landings and the Mars rover missions."
+    },
+    {
+      "k": [
+        "what is the richter scale"
+      ],
+      "a": "The **Richter scale** measures the magnitude of earthquakes based on the amplitude of seismic waves. It's logarithmic, so each whole-number increase represents roughly 10 times more ground shaking and about 32 times more energy released. Modern seismology mostly uses the related moment magnitude scale."
+    },
+    {
+      "k": [
+        "what is a fault line"
+      ],
+      "a": "A **fault line** is a fracture in Earth's crust along which blocks of rock have moved relative to each other, and where movement is most likely to cause earthquakes."
+    },
+    {
+      "k": [
+        "what is a programming language"
+      ],
+      "a": "A **programming language** is a formal set of instructions and rules used to write software, telling a computer what operations to perform — examples include Python, JavaScript, C++, and Java, each suited to different kinds of tasks."
+    },
+    {
+      "k": [
+        "what is python used for"
+      ],
+      "a": "**Python** is a general-purpose programming language known for its readable syntax, widely used in data science, web development, automation, and artificial intelligence."
+    },
+    {
+      "k": [
+        "what is javascript used for"
+      ],
+      "a": "**JavaScript** is the primary programming language for making web pages interactive, running in nearly every web browser, and is also used on servers via environments like Node.js."
+    },
+    {
+      "k": [
+        "what is a variable in programming"
+      ],
+      "a": "In programming, a **variable** is a named storage location that holds a value, which can change while a program runs — like a labeled box you can put different things into over time."
+    },
+    {
+      "k": [
+        "what is a function in programming"
+      ],
+      "a": "In programming, a **function** is a named, reusable block of code that performs a specific task, optionally taking inputs and returning an output, letting the same logic be used repeatedly without rewriting it."
+    },
+    {
+      "k": [
+        "how many continents are there and what are they",
+        "list of continents"
+      ],
+      "a": "There are seven commonly recognized **continents**: Asia, Africa, North America, South America, Antarctica, Europe, and Australia (Oceania)."
+    },
+    {
+      "k": [
+        "what is an archipelago"
+      ],
+      "a": "An **archipelago** is a group or chain of islands clustered together in a body of water — Indonesia and the Philippines are among the world's largest archipelagos."
+    },
+    {
+      "k": [
+        "what is the largest lake in the world"
+      ],
+      "a": "The **Caspian Sea**, bordered by five countries in Central Asia, is the largest lake in the world by area, at about 371,000 square kilometres — larger than Germany."
+    },
+    {
+      "k": [
+        "what is the longest river in the world"
+      ],
+      "a": "The **Nile River** is generally considered the longest river in the world at about 6,650 kilometres, flowing through northeastern Africa, though some measurements place the Amazon River slightly longer depending on how its source is defined."
     }
   ]
 }
