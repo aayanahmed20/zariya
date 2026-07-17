@@ -75,7 +75,7 @@ def remember_answer(question: str, answer: str, max_entries: int = 500):
         return
     entries = _load_learned()
     entries = [e for e in entries if e["q"].lower() != q.lower()]
-    entries.insert(0, {"q": q, "a": answer, "ts": time.time()})
+    entries.insert(0, {"q": q, "a": answer, "ts": time.time(), "score": 0})
     entries = entries[:max_entries]
     _save_learned(entries)
 
@@ -100,10 +100,31 @@ def learned_lookup(text: str):
                 ratio = overlap / len(entry_words)
                 if ratio >= 0.7:
                     score = overlap
+        score += entry.get("score", 0) * 0.5
         if score > best_score:
             best, best_score = entry, score
-    return best["a"] if best_score > 0 else None
-
+        return best["a"] if best_score > 0 else None
+ def rate_learned_answer(question: str, rating: str) -> bool:
+    """Apply user feedback to a cached learned answer. An "up" rating nudges
+    that answer to be preferred over other loosely-matching cached answers in
+    future lookups; a "down" rating removes it entirely, so a bad cached
+    answer never gets served again. Returns True if a matching cached entry
+    was found and updated, False otherwise (e.g. the reply came straight from
+    the offline knowledge base rather than a real model, so there's nothing
+    cached to rate)."""
+    q = (question or "").strip().lower()
+    if not q or rating not in ("up", "down"):
+        return False
+    entries = _load_learned()
+    match = next((e for e in entries if e["q"].lower() == q), None)
+    if not match:
+        return False
+    if rating == "down":
+        entries = [e for e in entries if e is not match]
+    else:
+        match["score"] = match.get("score", 0) + 1
+    _save_learned(entries)
+    return True
 
 def _significant_words(text: str):
     return {w for w in re.findall(r"[\w']+", text.lower()) if len(w) > 2 and w not in KB_STOPWORDS}
@@ -453,7 +474,7 @@ def flashcards_from_messages(messages: list[dict]) -> list[dict]:
 
 
 def knowledge_base_stats() -> dict:
-    return {"dictWords": len(DICT), "kbEntries": len(KB)}
+    return {"dictWords": len(DICT), "kbEntries": len(KB), "learnedEntries": len(_load_learned())}
 _GREETING_RE = re.compile(r"^(hi|hello|hey|salam|assalam)", re.I)
 _BYE_RE = re.compile(r"^(bye|goodbye|see you|khuda hafiz)", re.I)
 # Deliberately an exact-phrase allowlist, not a substring or loose regex match:
