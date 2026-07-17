@@ -222,12 +222,16 @@ function renderBubble(m, idx, isLast){
   } else {
     row.innerHTML = '<img class="avatar-logo" src="/static/logo.png" alt=""><div class="bubble-col assistant-col"><div class="bubble assistant '+urduClass+'">'+renderMarkdown(m.content)+'</div>'+
       (uiPrefs.showTimestamps ? '<div class="msg-meta">'+(m.ts||'')+'</div>' : '')+
-      '<div class="msg-actions"><button class="ghost-btn" data-act="copy">Copy</button><button class="ghost-btn" data-act="speak">Read aloud</button>'+
+            '<div class="msg-actions"><button class="ghost-btn" data-act="copy">Copy</button><button class="ghost-btn" data-act="speak">Read aloud</button><button class="ghost-btn" data-act="up" title="Good answer">Helpful</button><button class="ghost-btn" data-act="down" title="Not helpful">Not helpful</button>'+
       (isLast?'<button class="ghost-btn" data-act="regen">Regenerate</button>':'')+'</div></div>';
     row.querySelector('[data-act="copy"]').addEventListener('click', ()=>{ navigator.clipboard && navigator.clipboard.writeText(m.content); });
     row.querySelector('[data-act="speak"]').addEventListener('click', ()=>speak(m.content));
     const regen = row.querySelector('[data-act="regen"]');
     if(regen) regen.addEventListener('click', regenerateLast);
+          const upBtn = row.querySelector('[data-act="up"]');
+          if(upBtn) upBtn.addEventListener('click', ()=>sendFeedback(idx, 'up', upBtn));
+          const downBtn = row.querySelector('[data-act="down"]');
+          if(downBtn) downBtn.addEventListener('click', ()=>sendFeedback(idx, 'down', downBtn));
     row.querySelectorAll('.code-copy-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const codeEl = document.getElementById(btn.dataset.codeId);
@@ -237,6 +241,16 @@ function renderBubble(m, idx, isLast){
   }
   inner.appendChild(row);
 }
+  function sendFeedback(idx, rating, btn){
+      const session = currentSession(); if(!session) return;
+      const userMsg = session.messages[idx-1];
+      if(!userMsg || userMsg.role!=='user') return;
+      apiPost('/api/feedback', { question: userMsg.content, rating });
+      const row = btn.closest('.msg-actions');
+      if(row){ row.querySelectorAll('[data-act="up"],[data-act="down"]').forEach(b=>b.disabled=true); }
+      btn.classList.add('active');
+      btn.textContent = rating==='up' ? 'Thanks!' : 'Noted';
+  }
 function saveEdit(idx){
   const ta = document.getElementById('editTa');
   const newText = ta.value.trim(); if(!newText) return;
