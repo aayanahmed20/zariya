@@ -209,7 +209,15 @@ def chat():
 
     return jsonify({"reply": reply, "usedRealModel": used_real_model})
 
-
+@app.route("/api/feedback", methods=["POST"])
+def feedback():
+  body = request.get_json(force=True) or {}
+  question = body.get("question", "")
+  rating = body.get("rating", "")
+  if rating not in ("up", "down"):
+    return jsonify({"error": "rating must be 'up' or 'down'"}), 400
+  updated = kb_engine.rate_learned_answer(question, rating)
+  return jsonify({"ok": True, "updated": updated})
 # ---------------------------------------------------------------------------
 # Web search: Google Custom Search (server-side key)
 # ---------------------------------------------------------------------------
