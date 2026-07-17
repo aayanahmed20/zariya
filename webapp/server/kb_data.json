@@ -4980,6 +4980,459 @@
         "what is the longest river in the world"
       ],
       "a": "The **Nile River** is generally considered the longest river in the world at about 6,650 kilometres, flowing through northeastern Africa, though some measurements place the Amazon River slightly longer depending on how its source is defined."
-    }
+    },
+    {
+            "k": [
+                      "capital of fiji"
+            ],
+            "a": "**Suva** is the capital of Fiji."
+    },
+        {
+                "k": [
+                          "capital of cameroon"
+                ],
+                "a": "**Yaounde** is the capital of Cameroon."
+        },
+        {
+                "k": [
+                          "capital of senegal"
+                ],
+                "a": "**Dakar** is the capital of Senegal."
+        },
+        {
+                "k": [
+                          "capital of zimbabwe"
+                ],
+                "a": "**Harare** is the capital of Zimbabwe."
+        },
+        {
+                "k": [
+                          "capital of zambia"
+                ],
+                "a": "**Lusaka** is the capital of Zambia."
+        },
+        {
+                "k": [
+                          "capital of somalia"
+                ],
+                "a": "**Mogadishu** is the capital of Somalia."
+        },
+        {
+                "k": [
+                          "capital of sudan"
+                ],
+                "a": "**Khartoum** is the capital of Sudan."
+        },
+        {
+                "k": [
+                          "capital of uganda"
+                ],
+                "a": "**Kampala** is the capital of Uganda."
+        },
+        {
+                "k": [
+                          "capital of dr congo",
+                          "capital of democratic republic of congo"
+                ],
+                "a": "**Kinshasa** is the capital of the Democratic Republic of the Congo."
+        },
+        {
+                "k": [
+                          "capital of angola"
+                ],
+                "a": "**Luanda** is the capital of Angola."
+        },
+        {
+                "k": [
+                          "capital of mozambique"
+                ],
+                "a": "**Maputo** is the capital of Mozambique."
+        },
+        {
+                "k": [
+                          "capital of madagascar"
+                ],
+                "a": "**Antananarivo** is the capital of Madagascar."
+        },
+        {
+                "k": [
+                          "capital of estonia"
+                ],
+                "a": "**Tallinn** is the capital of Estonia."
+        },
+        {
+                "k": [
+                          "capital of latvia"
+                ],
+                "a": "**Riga** is the capital of Latvia."
+        },
+        {
+                "k": [
+                          "capital of lithuania"
+                ],
+                "a": "**Vilnius** is the capital of Lithuania."
+        },
+        {
+                "k": [
+                          "capital of belarus"
+                ],
+                "a": "**Minsk** is the capital of Belarus."
+        },
+        {
+                "k": [
+                          "capital of armenia"
+                ],
+                "a": "**Yerevan** is the capital of Armenia."
+        },
+        {
+                "k": [
+                          "capital of slovenia"
+                ],
+                "a": "**Ljubljana** is the capital of Slovenia."
+        },
+        {
+                "k": [
+                          "capital of cyprus"
+                ],
+                "a": "**Nicosia** is the capital of Cyprus."
+        },
+        {
+                "k": [
+                          "capital of malta"
+                ],
+                "a": "**Valletta** is the capital of Malta."
+        },
+        {
+                "k": [
+                          "capital of luxembourg"
+                ],
+                "a": "**Luxembourg City** is the capital of Luxembourg."
+        },
+        {
+                "k": [
+                          "capital of ivory coast",
+                          "capital of cote d'ivoire"
+                ],
+                "a": "**Yamoussoukro** is the official capital of Ivory Coast (Cote d'Ivoire), though Abidjan remains its largest city and main economic centre."
+        },
+        {
+                "k": [
+                          "capital of rwanda"
+                ],
+                "a": "**Kigali** is the capital of Rwanda."
+        },
+        {
+                "k": [
+                          "hello world go",
+                          "hello world golang"
+                ],
+                "a": "```go\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello, world!\")\n}\n```"
+        },
+        {
+                "k": [
+                          "hello world rust"
+                ],
+                "a": "```rust\nfn main() {\n    println!(\"Hello, world!\");\n}\n```"
+        },
+        {
+                "k": [
+                          "hello world swift"
+                ],
+                "a": "```swift\nprint(\"Hello, world!\")\n```"
+        },
+        {
+                "k": [
+                          "hello world kotlin"
+                ],
+                "a": "```kotlin\nfun main() {\n    println(\"Hello, world!\")\n}\n```"
+        },
+        {
+                "k": [
+                          "hello world php"
+                ],
+                "a": "```php\n<?php\necho \"Hello, world!\";\n```"
+        },
+        {
+                "k": [
+                          "hello world ruby"
+                ],
+                "a": "```ruby\nputs \"Hello, world!\"\n```"
+        },
+        {
+                "k": [
+                          "hello world typescript"
+                ],
+                "a": "```typescript\nconsole.log(\"Hello, world!\");\n```"
+        },
+        {
+                "k": [
+                          "quicksort python"
+                ],
+                "a": "```python\ndef quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    mid = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quicksort(left) + mid + quicksort(right)\n```"
+        },
+        {
+                "k": [
+                          "merge sort python"
+                ],
+                "a": "```python\ndef merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    result, i, j = [], 0, 0\n    while i < len(left) and j < len(right):\n        if left[i] <= right[j]:\n            result.append(left[i]); i += 1\n        else:\n            result.append(right[j]); j += 1\n    return result + left[i:] + right[j:]\n```"
+        },
+        {
+                "k": [
+                          "insertion sort python"
+                ],
+                "a": "```python\ndef insertion_sort(arr):\n    for i in range(1, len(arr)):\n        key = arr[i]\n        j = i - 1\n        while j >= 0 and arr[j] > key:\n            arr[j + 1] = arr[j]\n            j -= 1\n        arr[j + 1] = key\n    return arr\n```"
+        },
+        {
+                "k": [
+                          "linked list python example",
+                          "implement linked list python"
+                ],
+                "a": "```python\nclass Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def append(self, data):\n        node = Node(data)\n        if not self.head:\n            self.head = node\n            return\n        curr = self.head\n        while curr.next:\n            curr = curr.next\n        curr.next = node\n```"
+        },
+        {
+                "k": [
+                          "what is a binary tree"
+                ],
+                "a": "A binary tree is a data structure where each node has at most two children, usually called the left and right child - commonly used for fast searching (binary search trees), sorting, and representing hierarchical data."
+        },
+        {
+                "k": [
+                          "what is a graph data structure"
+                ],
+                "a": "A graph is a data structure made up of nodes (vertices) connected by edges, used to model networks like maps, social connections, or web links. Graphs can be directed or undirected, and weighted or unweighted."
+        },
+        {
+                "k": [
+                          "what is dynamic programming"
+                ],
+                "a": "Dynamic programming is a technique for solving complex problems by breaking them into simpler overlapping subproblems, solving each just once, and storing (caching) the results to avoid redundant work - commonly used for problems like the Fibonacci sequence or shortest-path routing."
+        },
+        {
+                "k": [
+                          "what is an exponent"
+                ],
+                "a": "An exponent shows how many times a number (the base) is multiplied by itself - for example, in 2³, the base is 2 and the exponent is 3, meaning 2 × 2 × 2 = 8."
+        },
+        {
+                "k": [
+                          "what is a logarithm"
+                ],
+                "a": "A logarithm answers the question \"to what power must this base be raised to get this number?\" - for example, log₂(8) = 3, because 2³ = 8. Logarithms are the inverse of exponentiation."
+        },
+        {
+                "k": [
+                          "what is a fraction"
+                ],
+                "a": "A fraction represents a part of a whole, written as one number (the numerator) over another (the denominator) - for example, 3/4 means 3 parts out of 4 equal parts."
+        },
+        {
+                "k": [
+                          "what is a percentage"
+                ],
+                "a": "A percentage expresses a number as a fraction of 100 - for example, 25% means 25 out of every 100, or 0.25 as a decimal."
+        },
+        {
+                "k": [
+                          "what is a set in math",
+                          "what is a set mathematics"
+                ],
+                "a": "In mathematics, a set is a well-defined collection of distinct objects (called elements or members) - for example, {2, 4, 6, 8} is a set of even numbers, and sets can be combined using operations like union and intersection."
+        },
+        {
+                "k": [
+                          "who was stephen hawking"
+                ],
+                "a": "**Stephen Hawking** (1942-2018) was a British theoretical physicist known for his work on black holes and cosmology, including Hawking radiation, and for his bestselling book *A Brief History of Time*, written despite living with a motor neurone disease for most of his adult life."
+        },
+        {
+                "k": [
+                          "who was galileo galilei",
+                          "who was galileo"
+                ],
+                "a": "**Galileo Galilei** (1564-1642) was an Italian astronomer and physicist often called the \"father of modern science,\" known for improving the telescope, discovering Jupiter's largest moons, and supporting the theory that Earth orbits the Sun."
+        },
+        {
+                "k": [
+                          "what is an exoplanet"
+                ],
+                "a": "An exoplanet is a planet that orbits a star outside our own solar system. Thousands have been confirmed so far, mostly discovered by detecting the tiny dip in starlight as a planet passes in front of its star."
+        },
+        {
+                "k": [
+                          "what is the hubble space telescope"
+                ],
+                "a": "The Hubble Space Telescope is a large telescope launched into orbit by NASA in 1990, positioned above Earth's atmosphere to capture exceptionally clear images of distant galaxies, nebulae, and planets."
+        },
+        {
+                "k": [
+                          "what is dark matter"
+                ],
+                "a": "Dark matter is an invisible form of matter that doesn't emit or reflect light, but whose gravitational effects on galaxies and stars reveal its presence. It's estimated to make up about 27% of the universe, though it has never been directly observed."
+        },
+        {
+                "k": [
+                          "what is dark energy"
+                ],
+                "a": "Dark energy is a mysterious force thought to make up about 68% of the universe, believed to be responsible for the accelerating expansion of the universe - its exact nature remains one of the biggest open questions in physics."
+        },
+        {
+                "k": [
+                          "who is malala yousafzai",
+                          "malala yousafzai"
+                ],
+                "a": "**Malala Yousafzai** is a Pakistani education activist who survived being shot by the Taliban in 2012 for advocating girls' right to education, and became the youngest-ever Nobel Peace Prize laureate in 2014."
+        },
+        {
+                "k": [
+                          "who was nelson mandela"
+                ],
+                "a": "**Nelson Mandela** (1918-2013) was a South African anti-apartheid activist who spent 27 years in prison before becoming South Africa's first Black president in 1994, and later received the Nobel Peace Prize for his work ending apartheid."
+        },
+        {
+                "k": [
+                          "who was mahatma gandhi"
+  ],
+                "a": "**Mahatma Gandhi** (1869-1948) led India's independence movement against British rule through nonviolent civil disobedience, inspiring later movements for civil rights and freedom around the world."
+        },
+        {
+                "k": [
+                          "who was martin luther king jr"
+                ],
+                "a": "**Martin Luther King Jr.** (1929-1968) was an American Baptist minister and civil rights leader who led nonviolent campaigns against racial segregation in the US, famous for his 1963 \"I Have a Dream\" speech."
+        },
+        {
+                "k": [
+                          "who was winston churchill"
+          ],
+                "a": "**Winston Churchill** (1874-1965) was the British prime minister who led the United Kingdom through most of World War II, known for his wartime speeches and leadership during the Blitz."
+        },
+        {
+                "k": [
+                          "who wrote the great gatsby"
+                ],
+                "a": "F. Scott Fitzgerald wrote *The Great Gatsby*, published in 1925, set in the Jazz Age on Long Island, New York."
+        },
+        {
+                "k": [
+                          "who wrote crime and punishment"
+                ],
+                "a": "Fyodor Dostoevsky wrote *Crime and Punishment*, published in 1866, exploring the psychology of a young man who commits murder."
+        },
+        {
+                "k": [
+                          "who wrote one hundred years of solitude"
+                ],
+                "a": "Gabriel Garcia Marquez wrote *One Hundred Years of Solitude*, published in 1967, a landmark work of magical realism following the Buendia family."
+        },
+        {
+                "k": [
+                          "who wrote the alchemist"
+                ],
+                "a": "Paulo Coelho wrote *The Alchemist*, published in 1988, a widely translated novel about a shepherd boy's journey to find his personal legend."
+        },
+        {
+                "k": [
+                          "butterflies in stomach",
+                          "butterflies in my stomach"
+                ],
+                "a": "**\"Butterflies In Stomach\"** - a fluttery, nervous feeling, often before something important like a performance or a first date."
+        },
+        {
+                "k": [
+                          "speak of the devil"
+                ],
+                "a": "**\"Speak Of The Devil\"** - said when a person being talked about unexpectedly appears or contacts you."
+        },
+        {
+                "k": [
+                          "when pigs fly"
+                ],
+                "a": "**\"When Pigs Fly\"** - used to say something will never happen."
+        },
+        {
+                "k": [
+                          "the elephant in the room"
+                ],
+                "a": "**\"The Elephant In The Room\"** - an obvious problem or sensitive topic that everyone notices but avoids discussing."
+        },
+        {
+                "k": [
+                          "jump on the bandwagon"
+                ],
+                "a": "**\"Jump On The Bandwagon\"** - to join in doing something because it has suddenly become popular or successful."
+        },
+        {
+                "k": [
+                          "what is marketing"
+                ],
+                "a": "Marketing is the set of activities a business uses to promote and sell its products or services, including advertising, market research, branding, and understanding customer needs."
+        },
+        {
+                "k": [
+                          "what is supply chain"
+                ],
+                "a": "A supply chain is the full network of people, organizations, and processes involved in producing and delivering a product - from raw materials, through manufacturing, to shipping and finally reaching the customer."
+        },
+        {
+                "k": [
+                          "what is a startup"
+                ],
+                "a": "A startup is a newly founded company, typically built around an untested or innovative idea, often aiming to grow quickly and scale a product or service in an uncertain market."
+        },
+        {
+                "k": [
+                          "what is venture capital"
+                ],
+                "a": "Venture capital is funding provided by investors to early-stage, high-growth-potential startups in exchange for equity (partial ownership), accepting high risk in hopes of a large future return."
+        },
+        {
+                "k": [
+                          "what is cryptocurrency"
+                ],
+                "a": "Cryptocurrency is a digital form of currency secured by cryptography and typically built on a decentralized network called a blockchain, meaning no single central authority (like a bank) controls it. Bitcoin, launched in 2009, was the first cryptocurrency."
+        },
+        {
+                "k": [
+                          "what is blockchain"
+                ],
+                "a": "A blockchain is a distributed digital ledger that records transactions across many computers in linked \"blocks,\" making the records very difficult to alter after the fact without agreement across the network."
+        },
+        {
+                "k": [
+                          "what is bmi",
+                          "what does bmi stand for"
+                ],
+                "a": "BMI (Body Mass Index) is a simple calculation - weight in kilograms divided by height in metres squared - used as a rough screening tool for whether someone's weight may be in a healthy range, though it doesn't account for muscle mass, so it isn't a complete health measure on its own."
+        },
+        {
+                "k": [
+                          "what is cholesterol"
+                ],
+                "a": "Cholesterol is a waxy, fat-like substance in blood that the body needs to build cells and hormones. \"LDL\" is often called \"bad\" cholesterol because too much can build up in artery walls, while \"HDL\" is called \"good\" cholesterol because it helps remove excess cholesterol from the blood."
+        },
+        {
+                "k": [
+                          "what are calories"
+                ],
+                "a": "A calorie is a unit that measures the energy food provides, or the energy the body uses. Consuming more calories than the body uses leads to weight gain over time, while using more than consumed leads to weight loss."
+        },
+        {
+                "k": [
+                          "what is bluetooth"
+                ],
+                "a": "Bluetooth is a short-range wireless technology used to connect devices - like headphones, speakers, and keyboards - to each other without cables, typically working over distances of about 10 metres."
+        },
+        {
+                "k": [
+                          "what is wifi"
+                ],
+                "a": "Wi-Fi is a wireless networking technology that lets devices connect to the internet or a local network using radio waves, typically through a router, over ranges of tens of metres."
+        },
+        {
+                "k": [
+                          "difference between wifi and bluetooth"
+                ],
+                "a": "**Wi-Fi** is designed for higher-speed, longer-range connections, typically linking devices to the internet through a router. **Bluetooth** is designed for short-range, lower-power connections directly between two nearby devices, like a phone and a pair of headphones."
+        }
   ]
 }
