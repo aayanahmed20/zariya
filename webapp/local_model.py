@@ -27,6 +27,7 @@ trying to use a local model entirely.
 """
 import os
 import threading
+import time
 
 import requests
 
@@ -86,15 +87,23 @@ def _init_in_background():
     if _DISABLED:
         _status = "not configured (DISABLE_LOCAL_MODEL is set)"
         return
-    if not _ollama_running():
-        _status = "Ollama isn't running -- install it from https://ollama.com/download and start it"
-        return
-    if not _model_present(DEFAULT_MODEL):
-        if not _pull_model(DEFAULT_MODEL):
+    delay = 3
+    while True:
+        if not _ollama_running():
+            _status = ("Ollama isn't running yet -- install it from https://ollama.com/download and start it "
+                        "(this will retry automatically once it's up)")
+        elif not _model_present(DEFAULT_MODEL):
+            if _pull_model(DEFAULT_MODEL):
+                _status = "loaded"
+                _ready = True
+                return
+            # pull failed -- _pull_model already set a status message; retry after a delay
+        else:
+            _status = "loaded"
+            _ready = True
             return
-    _status = "loaded"
-    _ready = True
-
+        time.sleep(delay)
+        delay = min(delay * 2, 60)
 
 threading.Thread(target=_init_in_background, daemon=True).start()
 

@@ -544,16 +544,20 @@ def offline_reply(messages: list[dict]) -> str:
         return "Today is " + time.strftime("%A, %B %d, %Y") + "."
 
     generic_en = [
-        "I don't have that in my offline knowledge base yet — I can handle arithmetic, unit conversions, "
-        "common English⇄Urdu words, a range of general-knowledge questions, small code snippets, and study tips. "
-        "For truly open-ended answers, add a Claude API key in Settings.",
+        "I don't have that in my offline knowledge base yet -- I can handle arithmetic, unit conversions, "
+        "common English/Urdu words, a range of general-knowledge questions, small code snippets, and study tips. "
+        "Open-ended questions like this are handled by the local AI model once it's finished loading -- check "
+        "Settings to see its status.",
         "That one's outside my offline knowledge base. Try a math expression, a conversion (like '10 km to miles'), "
-        "a common word to translate, or connect an API key in Settings for full answers.",
+        "a common word to translate, or check Settings -- the local AI model handles open-ended questions like "
+        "this automatically once it's ready.",
     ]
     generic_ur = [
-        "یہ سوال میرے آف لائن ڈیٹا بیس میں شامل نہیں ہے — میں حساب کتاب، پیمائش کی تبدیلی، عام الفاظ کا ترجمہ، "
-        "اور کچھ عمومی معلومات دے سکتا ہوں۔ مکمل جوابات کے لیے سیٹنگز میں API key شامل کریں۔",
-        "معذرت، یہ میری معلومات میں شامل نہیں۔ کوئی حساب، پیمائش، یا لفظ آزمائیں، یا سیٹنگز سے Claude API key جوڑیں۔",
+        "یہ سوال میرے آف لائن ڈیٹا بیس میں شامل نہیں ہے -- میں حساب کتاب، پیمائش کی تبدیلی، عام الفاظ کا ترجمہ، "
+        "اور کچھ عمومی معلومات دے سکتا ہوں۔ اس طرح کے کھلے سوالات مقامی AI ماڈل کے تیار ہوتے ہی خودکار طور پر "
+        "جواب دیے جاتے ہیں -- سیٹنگز میں اس کی صورتحال دیکھیں۔",
+        "معذرت، یہ میری معلومات میں شامل نہیں۔ کوئی حساب، پیمائش، یا لفظ آزمائیں، یا سیٹنگز میں دیکھیں کہ مقامی "
+        "AI ماڈل تیار ہے یا نہیں -- تیار ہوتے ہی یہ خود بخود ایسے سوالات کے جواب دے سکتا ہے۔",
     ]
     import random
     return random.choice(generic_ur if urdu else generic_en)
