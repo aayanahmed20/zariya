@@ -87,6 +87,7 @@ function updateStatusPill(){
   const dot = document.getElementById('statusDot'); const txt = document.getElementById('statusText');
   if(serverConfig.claudeConfigured){ dot.classList.remove('off'); txt.textContent = 'Claude connected'; }
   else if(serverConfig.localModelAvailable){ dot.classList.remove('off'); txt.textContent = 'Local model ready'; }
+  else if(serverConfig.localModelStatus && /download|loading/i.test(serverConfig.localModelStatus)){ dot.classList.add('off'); txt.textContent = 'Local model starting…'; }
   else { dot.classList.add('off'); txt.textContent = 'Offline mode'; }
 }
 function renderAccountUI(){
@@ -115,9 +116,9 @@ function renderAccountUI(){
     : 'GitHub sign-in isn\'t set up on this server yet.';
   document.getElementById('githubSignInBtn').disabled = !serverConfig.githubConfigured;
 
-  document.getElementById('claudeStatusText').textContent = serverConfig.claudeConfigured ? 'Connected' : 'Not configured';
-  document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded' : 'Not configured';
-  document.getElementById('searchStatusText').textContent = serverConfig.searchConfigured ? 'Connected' : 'Not configured';
+  document.getElementById('claudeStatusText').textContent = serverConfig.claudeConfigured ? 'Connected' : 'Not configured (optional)';
+  document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded — answering your chats' : (serverConfig.localModelStatus || 'Not configured');
+  document.getElementById('searchStatusText').textContent = serverConfig.searchConfigured ? 'Connected' : 'Not configured (optional)';
 }
 document.getElementById('sbProfileRow').addEventListener('click', ()=>switchView('settings'));
 document.getElementById('githubSignInBtn').addEventListener('click', ()=>{ window.location.href = '/auth/github/login'; });
