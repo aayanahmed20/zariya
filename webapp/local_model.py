@@ -25,6 +25,7 @@ https://ollama.com/library). Override the Ollama address with OLLAMA_URL if
 it's running on a different host/port. Set DISABLE_LOCAL_MODEL=1 to skip
 trying to use a local model entirely.
 """
+import json
 import os
 import threading
 import time
@@ -37,6 +38,9 @@ _DISABLED = os.environ.get("DISABLE_LOCAL_MODEL", "").lower() in ("1", "true", "
 
 _status = "starting"
 _ready = False
+_pulling = False
+_progress = {"completed": 0, "total": 0}
+_wake_event = threading.Event()
 
 
 def is_available() -> bool:
@@ -45,6 +49,23 @@ def is_available() -> bool:
 
 def load_status() -> str:
     return _status
+
+
+def load_progress() -> dict:
+    """Bytes downloaded so far for the current/most recent pull, if known."""
+    return dict(_progress)
+
+
+def retry_now() -> dict:
+    """Wakes the background loop up immediately instead of waiting out the
+    current backoff delay. Safe to call any time -- a no-op if a pull is
+    already in flight or the model is already loaded."""
+    if _ready:
+        return {"ok": True, "status": _status}
+    if _pulling:
+        return {"ok": False, "status": _status}
+    _wake_event.set()
+    return {"ok": True, "status": "Retrying now..."}
 
 
 def _ollama_running() -> bool:
@@ -67,19 +88,64 @@ def _model_present(model: str) -> bool:
 
 
 def _pull_model(model: str) -> bool:
-    global _status
+    """Streams a model pull from Ollama, actually reading each progress line
+    instead of discarding it, so a failure reported mid-stream (bad model
+    name, disk full, network drop) is caught instead of being silently
+    treated as success. Always re-checks with Ollama's own model list
+    afterwards before declaring victory, since a pull can end without an
+    exception and still not have produced a usable model.
+    """
+    global _status, _pulling, _progress
+    _pulling = True
+    _progress = {"completed": 0, "total": 0}
     try:
-        _status = f"downloading '{model}' via Ollama (one-time)"
+        _status = f"Downloading '{model}' via Ollama (one-time, may take a few minutes)..."
         with requests.post(
             f"{OLLAMA_URL}/api/pull", json={"name": model}, stream=True, timeout=None
         ) as r:
             r.raise_for_status()
-            for _ in r.iter_lines():
-                pass  # drain streamed progress; nothing to show server-side
+            for line in r.iter_lines():
+                if not line:
+                    continue
+                try:
+                    payload = json.loads(line)
+                except (ValueError, TypeError):
+                    continue
+
+                if payload.get("error"):
+                    _status = f"Failed to pull model '{model}' from Ollama: {payload['error']}"
+                    return False
+
+                total = payload.get("total")
+                completed = payload.get("completed")
+                if isinstance(total, int):
+                    _progress["total"] = total
+                if isinstance(completed, int):
+                    _progress["completed"] = completed
+                status_line = payload.get("status")
+                if status_line:
+                    if _progress["total"]:
+                        pct = round(_progress["completed"] / _progress["total"] * 100)
+                        _status = f"{status_line} ({pct}%)"
+                    else:
+                        _status = status_line
+
+        # A 200 response with no explicit "error" line still isn't proof the
+        # model is actually usable -- confirm it shows up in Ollama's own
+        # model list before telling the rest of the app it's ready.
+        if not _model_present(model):
+            _status = (
+                f"Ollama finished responding but '{model}' still isn't in its model "
+                "list -- the pull may have been interrupted. Will retry."
+            )
+            return False
+
         return True
     except Exception as e:
         _status = f"Failed to pull model '{model}' from Ollama: {e}"
         return False
+    finally:
+        _pulling = False
 
 
 def _init_in_background():
@@ -102,8 +168,10 @@ def _init_in_background():
             _status = "loaded"
             _ready = True
             return
-        time.sleep(delay)
+        _wake_event.wait(delay)
+        _wake_event.clear()
         delay = min(delay * 2, 60)
+
 
 threading.Thread(target=_init_in_background, daemon=True).start()
 
