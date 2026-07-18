@@ -747,6 +747,27 @@ function downloadFile(filename, content){
   URL.revokeObjectURL(a.href);
 }
 
+/* ============ LIVE STATUS POLLING ============ */
+// The local model can still be downloading/starting when the page first loads.
+// Without this, the status pill and Settings page would only ever reflect
+// whatever serverConfig looked like at that one initial fetch, even after the
+// model finishes loading in the background -- so poll /api/config until ready.
+let statusPollTimer = null;
+function pollLocalModelStatus(){
+  if(serverConfig.localModelAvailable) return;
+  let elapsed = 0;
+  const intervalMs = 4000, maxMs = 15*60*1000;
+  statusPollTimer = setInterval(async ()=>{
+    elapsed += intervalMs;
+    let cfg;
+    try{ cfg = await apiGet('/api/config'); }catch(e){ return; }
+    const changed = cfg.localModelAvailable !== serverConfig.localModelAvailable || cfg.localModelStatus !== serverConfig.localModelStatus;
+    serverConfig = cfg;
+    if(changed){ updateStatusPill(); renderAccountUI(); }
+    if(cfg.localModelAvailable || elapsed >= maxMs) clearInterval(statusPollTimer);
+  }, intervalMs);
+}
+
 /* ============ INIT ============ */
 (async function init(){
   await loadServerState();
@@ -755,5 +776,6 @@ function downloadFile(filename, content){
   renderAccountUI();
   renderSessionList();
   renderChat();
+  pollLocalModelStatus();
 })();
 })();
