@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 
-/* ============ LOCAL UI PREFERENCES (theme/font/etc — not API keys, those are server-side) ============ */
+/* ============ LOCAL UI PREFERENCES (theme/font/etc -- not API keys, those are server-side) ============ */
 const LS = {
   get(k, d){ try{ const v = localStorage.getItem(k); return v===null? d : JSON.parse(v); }catch(e){ return d; } },
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
@@ -117,7 +117,7 @@ function renderAccountUI(){
   document.getElementById('githubSignInBtn').disabled = !serverConfig.githubConfigured;
 
   document.getElementById('claudeStatusText').textContent = serverConfig.claudeConfigured ? 'Connected' : 'Not configured (optional)';
-  document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded — answering your chats' : (serverConfig.localModelStatus || 'Not configured');
+  document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded -- answering your chats' : (serverConfig.localModelStatus || 'Not configured');
   document.getElementById('searchStatusText').textContent = serverConfig.searchConfigured ? 'Connected' : 'Not configured (optional)';
 }
 document.getElementById('sbProfileRow').addEventListener('click', ()=>switchView('settings'));
@@ -342,7 +342,7 @@ async function runQuickTool(tool){
   } else if(tool==='flashcards'){
     const {cards} = await apiPost('/api/tools/flashcards', payload);
     if(cards && cards.length){
-      const deck = {id:uid(), name:session.title+' — flashcards', cards: cards.map(c=>({id:uid(), front:c.front, back:c.back, known:false})), createdAt:Date.now()};
+      const deck = {id:uid(), name:session.title+' - flashcards', cards: cards.map(c=>({id:uid(), front:c.front, back:c.back, known:false})), createdAt:Date.now()};
       decks.unshift(deck); saveServerState();
       switchView('flashcards'); renderDeckGrid(); openDeck(deck.id);
       return;
@@ -459,7 +459,7 @@ document.getElementById('exportNoteBtn').addEventListener('click', ()=>{
 // patterns rather than blindly pairing every two lines, since notes are
 // usually prose, not neat alternating question/answer lines:
 //   1. Explicit "Q: ..." / "A: ..." pairs
-//   2. Glossary-style "Term: definition" or "Term — definition" lines
+//   2. Glossary-style "Term: definition" or "Term - definition" lines
 //   3. A guarded fallback pairing of consecutive lines, only when the note
 //      actually looks like alternating short prompts and longer answers
 // Returns an empty array if nothing usable is found, rather than fabricating
@@ -505,7 +505,7 @@ document.getElementById('noteToFlashBtn').addEventListener('click', ()=>{
   if(!n || !n.body.trim()) return;
   const cards = buildCardsFromNoteText(n.body).map(c=>migrateCardForSpacedRepetition({id:uid(), front:c.front, back:c.back, known:false}));
   if(cards.length){
-    const deck = {id:uid(), name:n.title+' — flashcards', cards, createdAt:Date.now()};
+    const deck = {id:uid(), name:n.title+' - flashcards', cards, createdAt:Date.now()};
     decks.unshift(deck); saveServerState();
     switchView('flashcards'); renderDeckGrid(); openDeck(deck.id);
   } else {
@@ -554,7 +554,7 @@ function renderDeckGrid(){
   document.getElementById('studyArea').style.display='none';
   document.getElementById('quizArea').style.display='none';
   const grid = document.getElementById('deckGrid'); grid.style.display='grid'; grid.innerHTML='';
-  if(!decks.length){ grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M6 2h16v12"/></svg><span>No decks yet — chat, then use "Make flashcards" above the message box</span></div>'; return; }
+  if(!decks.length){ grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M6 2h16v12"/></svg><span>No decks yet -- chat, then use "Make flashcards" above the message box</span></div>'; return; }
   decks.forEach(d=>{
     d.cards.forEach(migrateCardForSpacedRepetition);
     const known = d.cards.filter(c=>c.known).length;
@@ -635,7 +635,7 @@ function renderStudy(){
     saveServerState(); return;
   }
   const c = studyQueue[studyIndex];
-  area.innerHTML = '<div class="study-progress-text">Card '+(studyIndex+1)+' of '+studyQueue.length+' — '+escapeHtml(deck.name)+'</div>'+
+  area.innerHTML = '<div class="study-progress-text">Card '+(studyIndex+1)+' of '+studyQueue.length+' -- '+escapeHtml(deck.name)+'</div>'+
     '<div class="card-flip-zone"><div class="flip-card '+(studyFlipped?'flipped':'')+'" id="flipCard">'+
     '<div class="flip-face front '+(isUrdu(c.front)?'is-urdu urdu':'')+'">'+escapeHtml(c.front)+'</div>'+
     '<div class="flip-face back '+(isUrdu(c.back)?'is-urdu urdu':'')+'">'+escapeHtml(c.back)+'</div></div></div>'+
@@ -712,7 +712,7 @@ function renderQuiz(){
   let optionsHtml = q.options.map((opt,i)=>
     '<button class="quiz-option'+(isUrdu(opt)?' is-urdu urdu':'')+'" data-i="'+i+'">'+escapeHtml(opt)+'</button>'
   ).join('');
-  area.innerHTML = '<div class="study-progress-text">Question '+(quizIndex+1)+' of '+quizQueue.length+' — '+escapeHtml(deck.name)+' · Score: '+quizScore+'</div>'+
+  area.innerHTML = '<div class="study-progress-text">Question '+(quizIndex+1)+' of '+quizQueue.length+' -- '+escapeHtml(deck.name)+' · Score: '+quizScore+'</div>'+
     '<div class="quiz-question'+(isUrdu(q.front)?' is-urdu urdu':'')+'">'+escapeHtml(q.front)+'</div>'+
     '<div class="quiz-options">'+optionsHtml+'</div>'+
     '<div class="study-controls" id="quizNextRow" style="display:none;"><button class="btn primary" id="quizNext">Next question</button></div>';
