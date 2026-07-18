@@ -1,124 +1,117 @@
 """
-Optional real local-model inference, server-side.
+Local-model inference via Ollama, server-side.
 
-Zariya is designed to run as a fully standalone app with zero API keys. If no
-model file is present in server/models/, this module downloads a small
-instruction-tuned GGUF model (Qwen2.5-1.5B-Instruct, ~1GB, a public file with
-no account or key required) the first time the server starts, in a background
-thread so Flask itself is never blocked waiting on it. Until the download and
-load finish, app.py falls through to the offline knowledge engine, so the app
-always responds to something -- it just gets noticeably better once the local
-model is ready.
+Why Ollama instead of embedding llama-cpp-python directly: llama-cpp-python
+needs a working C++ build toolchain to install on many machines, which fails
+silently or loudly depending on the platform. Ollama (https://ollama.com) is
+a free, single-installer application -- prebuilt for Windows/Mac/Linux, no
+compiler, no account, no API key -- that runs open-source models locally and
+exposes them over a small local HTTP API. This module just talks to that API.
 
-To use a different model instead of the default, put a GGUF file in
-server/models/ yourself and set LOCAL_MODEL_PATH in .env to its filename --
-this module will use that file and will not attempt to download anything.
+Setup, once, on the machine that runs this server:
+1. Install Ollama from https://ollama.com/download (a normal app installer).
+2. Make sure it's running (it starts automatically after install on most
+   platforms; otherwise run the `ollama` app / `ollama serve`).
+3. That's it. On first request, this module asks Ollama to pull a small
+   default model automatically if it isn't already present -- no need to run
+   any command yourself.
 
-Set DISABLE_LOCAL_MODEL_DOWNLOAD=1 in .env to turn off auto-download entirely
-(e.g. for an offline-only deployment) and stay on the offline knowledge engine.
+If Ollama isn't installed or isn't running, this module simply reports
+itself as unavailable and app.py falls through to the offline knowledge
+engine, so the app is never broken by this being absent.
+
+Override the model with LOCAL_MODEL_NAME in .env (any name from
+https://ollama.com/library). Override the Ollama address with OLLAMA_URL if
+it's running on a different host/port. Set DISABLE_LOCAL_MODEL=1 to skip
+trying to use a local model entirely.
 """
 import os
 import threading
-from pathlib import Path
 
 import requests
 
-MODELS_DIR = Path(__file__).parent / "server" / "models"
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+DEFAULT_MODEL = os.environ.get("LOCAL_MODEL_NAME", "qwen2.5:1.5b")
+_DISABLED = os.environ.get("DISABLE_LOCAL_MODEL", "").lower() in ("1", "true", "yes")
 
-DEFAULT_MODEL_FILENAME = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
-DEFAULT_MODEL_URL = (
-    "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/"
-    + DEFAULT_MODEL_FILENAME
-)
-
-MODEL_PATH = os.environ.get("LOCAL_MODEL_PATH", "") or DEFAULT_MODEL_FILENAME
-_AUTO_DOWNLOAD_DISABLED = os.environ.get("DISABLE_LOCAL_MODEL_DOWNLOAD", "").lower() in ("1", "true", "yes")
-
-_llama = None
-_load_error = None
 _status = "starting"
+_ready = False
 
 
 def is_available() -> bool:
-    return _llama is not None
+    return _ready
 
 
 def load_status() -> str:
     return _status
 
 
+def _ollama_running() -> bool:
+    try:
+        r = requests.get(f"{OLLAMA_URL}/api/tags", timeout=3)
+        return r.status_code == 200
+    except Exception:
+        return False
+
+
+def _model_present(model: str) -> bool:
+    try:
+        r = requests.get(f"{OLLAMA_URL}/api/tags", timeout=5)
+        r.raise_for_status()
+        names = [m.get("name", "") for m in r.json().get("models", [])]
+        base = model.split(":")[0]
+        return any(n == model or n.startswith(base + ":") for n in names)
+    except Exception:
+        return False
+
+
+def _pull_model(model: str) -> bool:
+    global _status
+    try:
+        _status = f"downloading '{model}' via Ollama (one-time)"
+        with requests.post(
+            f"{OLLAMA_URL}/api/pull", json={"name": model}, stream=True, timeout=None
+        ) as r:
+            r.raise_for_status()
+            for _ in r.iter_lines():
+                pass  # drain streamed progress; nothing to show server-side
+        return True
+    except Exception as e:
+        _status = f"Failed to pull model '{model}' from Ollama: {e}"
+        return False
+
+
+def _init_in_background():
+    global _ready, _status
+    if _DISABLED:
+        _status = "not configured (DISABLE_LOCAL_MODEL is set)"
+        return
+    if not _ollama_running():
+        _status = "Ollama isn't running -- install it from https://ollama.com/download and start it"
+        return
+    if not _model_present(DEFAULT_MODEL):
+        if not _pull_model(DEFAULT_MODEL):
+            return
+    _status = "loaded"
+    _ready = True
+
+
+threading.Thread(target=_init_in_background, daemon=True).start()
+
+
 def generate_reply(messages: list[dict], system_prompt: str) -> str | None:
-    if _llama is None:
+    if not _ready:
         return None
     chat_messages = [{"role": "system", "content": system_prompt}]
     chat_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-12:]]
     try:
-        result = _llama.create_chat_completion(messages=chat_messages, max_tokens=500, temperature=0.7)
-        return result["choices"][0]["message"]["content"]
+        res = requests.post(
+            f"{OLLAMA_URL}/api/chat",
+            json={"model": DEFAULT_MODEL, "messages": chat_messages, "stream": False},
+            timeout=60,
+        )
+        res.raise_for_status()
+        data = res.json()
+        return data.get("message", {}).get("content")
     except Exception:
         return None
-
-
-def _download_default_model(model_file: Path) -> bool:
-    """Stream the default model to a temp file first, then rename it into
-    place once complete -- so an interrupted download never leaves behind a
-    truncated file that looks valid on the next run."""
-    global _load_error, _status
-    tmp_file = model_file.with_suffix(model_file.suffix + ".part")
-    try:
-        _status = "downloading default model (~1GB, one-time)"
-        MODELS_DIR.mkdir(parents=True, exist_ok=True)
-        with requests.get(DEFAULT_MODEL_URL, stream=True, timeout=60) as r:
-            r.raise_for_status()
-            with open(tmp_file, "wb") as f:
-                for chunk in r.iter_content(chunk_size=1024 * 1024):
-                    if chunk:
-                        f.write(chunk)
-        tmp_file.rename(model_file)
-        return True
-    except Exception as e:
-        _load_error = f"Auto-download of default model failed: {e}"
-        _status = _load_error
-        if tmp_file.exists():
-            try:
-                tmp_file.unlink()
-            except OSError:
-                pass
-        return False
-
-
-def _load_model(model_file: Path):
-    global _llama, _load_error, _status
-    try:
-        from llama_cpp import Llama
-    except ImportError:
-        _load_error = "llama-cpp-python isn't installed (pip install -r requirements.txt)"
-        _status = _load_error
-        return
-    try:
-        _status = "loading model into memory"
-        _llama = Llama(model_path=str(model_file), n_ctx=2048, verbose=False)
-        _status = "loaded"
-    except Exception as e:
-        _load_error = f"Failed to load model: {e}"
-        _status = _load_error
-
-
-def _init_in_background():
-    global _load_error, _status
-    model_file = MODELS_DIR / MODEL_PATH
-    if model_file.exists():
-        _load_model(model_file)
-        return
-    if MODEL_PATH != DEFAULT_MODEL_FILENAME:
-        _load_error = f"Model file not found at {model_file}"
-        _status = _load_error
-        return
-    if _AUTO_DOWNLOAD_DISABLED:
-        _status = "not configured (auto-download disabled)"
-        return
-    if _download_default_model(model_file):
-        _load_model(model_file)
-
-
-threading.Thread(target=_init_in_background, daemon=True).start()
