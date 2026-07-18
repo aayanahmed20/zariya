@@ -2,17 +2,17 @@
 Zariya -- offline-first, privacy-focused AI platform for Urdu and low-resource languages.
 
 Architecture, and why it's built this way:
-  - All API keys (Anthropic, Google, GitHub OAuth) live server-side in environment
-    variables. The browser never sees them, never stores them, and never has to
-    ask the person using the app for anything -- that's configured once by whoever
-    deploys it, not per visitor.
-  - The offline knowledge engine (kb_engine.py) has zero dependencies and zero
-    network calls. It's the guaranteed fallback if no keys are configured, and it's
-    what makes this genuinely offline-capable, not just "offline until the API key
-    runs out."
-  - GitHub sign-in is real OAuth (authorization-code flow), not a public-profile
-    lookup -- the client secret is exchanged server-side, exactly the way GitHub's
-    own docs require, and is never exposed to the browser.
+- All API keys (Anthropic, Google, GitHub OAuth) live server-side in environment
+  variables. The browser never sees them, never stores them, and never has to
+  ask the person using the app for anything -- that's configured once by whoever
+  deploys it, not per visitor.
+- The offline knowledge engine (kb_engine.py) has zero dependencies and zero
+  network calls. It's the guaranteed fallback if no keys are configured, and it's
+  what makes this genuinely offline-capable, not just "offline until the API key
+  runs out."
+- GitHub sign-in is real OAuth (authorization-code flow), not a public-profile
+  lookup -- the client secret is exchanged server-side, exactly the way GitHub's
+  own docs require, and is never exposed to the browser.
 """
 import os
 import secrets
@@ -48,7 +48,6 @@ SYSTEM_PROMPT = (
     "Reply in whichever language the user writes in, mixing naturally if they mix."
 )
 
-
 # ---------------------------------------------------------------------------
 # Tiny JSON-file store for notes/flashcards/sessions (per logged-in GitHub user
 # if signed in, otherwise a shared local/anonymous bucket -- this is a uni-scale
@@ -60,21 +59,17 @@ def _load_store():
         return json.loads(STORE_PATH.read_text(encoding="utf-8"))
     return {"users": {}}
 
-
 def _save_store(store):
     import json
     STORE_PATH.write_text(json.dumps(store, ensure_ascii=False, indent=2), encoding="utf-8")
 
-
 def _current_user_key():
     return session.get("github_login", "anonymous")
-
 
 def _user_bucket(store):
     key = _current_user_key()
     store["users"].setdefault(key, {"sessions": [], "notes": [], "decks": []})
     return store["users"][key]
-
 
 # ---------------------------------------------------------------------------
 # Auth: real GitHub OAuth (authorization-code flow), client secret stays server-side
@@ -93,7 +88,6 @@ def github_login():
         f"&scope=read:user&state={state}"
     )
     return redirect(authorize_url)
-
 
 @app.route("/auth/github/callback")
 def github_callback():
@@ -132,12 +126,10 @@ def github_callback():
     session["github_bio"] = profile.get("bio") or ""
     return redirect("/")
 
-
 @app.route("/auth/logout", methods=["POST"])
 def logout():
     session.clear()
     return jsonify({"ok": True})
-
 
 @app.route("/api/me")
 def me():
@@ -151,7 +143,6 @@ def me():
             "githubConfigured": bool(GITHUB_CLIENT_ID),
         })
     return jsonify({"signedIn": False, "githubConfigured": bool(GITHUB_CLIENT_ID)})
-
 
 # ---------------------------------------------------------------------------
 # Chat: Claude API (server-side key) -> offline knowledge engine.
@@ -211,13 +202,13 @@ def chat():
 
 @app.route("/api/feedback", methods=["POST"])
 def feedback():
-  body = request.get_json(force=True) or {}
-  question = body.get("question", "")
-  rating = body.get("rating", "")
-  if rating not in ("up", "down"):
-    return jsonify({"error": "rating must be 'up' or 'down'"}), 400
-  updated = kb_engine.rate_learned_answer(question, rating)
-  return jsonify({"ok": True, "updated": updated})
+    body = request.get_json(force=True) or {}
+    question = body.get("question", "")
+    rating = body.get("rating", "")
+    if rating not in ("up", "down"):
+        return jsonify({"error": "rating must be 'up' or 'down'"}), 400
+    updated = kb_engine.rate_learned_answer(question, rating)
+    return jsonify({"ok": True, "updated": updated})
 # ---------------------------------------------------------------------------
 # Web search: Google Custom Search (server-side key)
 # ---------------------------------------------------------------------------
@@ -248,7 +239,6 @@ def web_search():
     except Exception as e:
         return jsonify({"error": f"Web search failed: {e}"}), 502
 
-
 # ---------------------------------------------------------------------------
 # Notes / Flashcards / Sessions -- simple per-user JSON storage
 # ---------------------------------------------------------------------------
@@ -258,7 +248,6 @@ def get_state():
     bucket = _user_bucket(store)
     _save_store(store)
     return jsonify(bucket)
-
 
 @app.route("/api/state", methods=["POST"])
 def save_state():
@@ -272,7 +261,6 @@ def save_state():
     }
     _save_store(store)
     return jsonify({"ok": True})
-
 
 @app.route("/api/tools/<name>", methods=["POST"])
 def run_tool(name):
@@ -291,11 +279,9 @@ def run_tool(name):
         return jsonify({"cards": kb_engine.flashcards_from_messages(messages)})
     return jsonify({"error": f"Unknown tool '{name}'"}), 404
 
-
 @app.route("/api/kb-stats")
 def kb_stats():
     return jsonify(kb_engine.knowledge_base_stats())
-
 
 @app.route("/api/config")
 def config():
@@ -306,13 +292,20 @@ def config():
         "githubConfigured": bool(GITHUB_CLIENT_ID),
         "localModelAvailable": local_model.is_available(),
         "localModelStatus": local_model.load_status(),
+        "localModelProgress": local_model.load_progress(),
     })
 
+@app.route("/api/local-model/retry", methods=["POST"])
+def local_model_retry():
+    """Manually wakes up the background model-download loop instead of waiting
+    out its backoff delay -- surfaced as a "Retry download" button in Settings
+    for when a pull has failed and the automatic wait would otherwise take up
+    to a minute."""
+    return jsonify(local_model.retry_now())
 
 @app.route("/")
 def index():
     return render_template("index.html")
-
 
 if __name__ == "__main__":
     DATA_DIR.mkdir(exist_ok=True)
