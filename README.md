@@ -20,11 +20,10 @@
 
 ## Web App (recommended)
 
-The actively developed version of Zariya now lives in [`webapp/`](webapp/) — a
+The actively developed version of Zariya now lives in [`webapp/`](webapp/): a
 Flask backend plus browser frontend, with a genuinely offline knowledge engine,
 optional Claude API / web search / real GitHub OAuth sign-in (all server-side,
-so no one using the app ever has to enter a key), and an optional local
-llama.cpp-based model in the same spirit as the original design below.
+so no one using the app ever has to enter a key), and an optional local model (via Ollama) in the same spirit as the original design below.
 
 ```bash
 cd webapp
