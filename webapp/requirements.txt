@@ -1,5 +1,5 @@
 Flask>=3.0
 requests>=2.31
 python-dotenv>=1.0
-# Optional, only needed if you want a real local GGUF model (see local_model.py):
-# llama-cpp-python
+# Needed for the local model (auto-downloaded by default, see local_model.py):
+llama-cpp-python
