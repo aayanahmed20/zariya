@@ -1,5 +1,5 @@
 """
-Zariya — offline-first, privacy-focused AI platform for Urdu and low-resource languages.
+Zariya -- offline-first, privacy-focused AI platform for Urdu and low-resource languages.
 
 Architecture, and why it's built this way:
   - All API keys (Anthropic, Google, GitHub OAuth) live server-side in environment
@@ -98,7 +98,7 @@ def github_login():
 @app.route("/auth/github/callback")
 def github_callback():
     if request.args.get("state") != session.get("oauth_state"):
-        return jsonify({"error": "State mismatch — possible CSRF, or your session expired. Try signing in again."}), 400
+        return jsonify({"error": "State mismatch -- possible CSRF, or your session expired. Try signing in again."}), 400
     code = request.args.get("code")
     if not code:
         return jsonify({"error": "GitHub didn't return an authorization code."}), 400

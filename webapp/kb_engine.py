@@ -426,7 +426,7 @@ def key_points(messages: list[dict]) -> str:
         if key in seen:
             continue
         seen.add(key)
-        points.append(f"• {_clip(q, 70)} — {_clip(a, 110)}")
+        points.append(f"• {_clip(q, 70)} - {_clip(a, 110)}")
         if len(points) >= 8:
             break
     if not points:
