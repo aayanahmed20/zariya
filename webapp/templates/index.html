@@ -211,8 +211,12 @@ Settings
 
 <div class="setting-group">
 <h3><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v10l7 4"/></svg>AI status</h3>
-<p class="desc">Local AI model is the default and needs no key -- it downloads and runs entirely on this server. Claude API and web search below are both entirely optional, for whoever deploys this server to add if they want.</p>
-<div class="setting-row"><label>Local AI model (default)</label><span id="localModelStatusText" class="sub"></span></div>
+<p class="desc">The standalone in-browser AI needs no key, no account, and nothing installed -- it runs right in this tab. The local Ollama model and Claude API below are both entirely optional alternatives, for whoever deploys this server to add if they want.</p>
+      <div class="setting-row"><label>Standalone AI (runs in your browser)</label><span id="webllmStatusText" class="sub"></span></div>
+      <div class="setting-row" id="webllmProgressRow" style="display:none;">
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="webllmProgressFill"></div></div>
+      </div>
+<div class="setting-row"><label>Local AI model (Ollama, optional)</label><span id="localModelStatusText" class="sub"></span></div>
 <div class="setting-row" id="localModelRetryRow" style="display:none;">
 <div class="progress-bar-track"><div class="progress-bar-fill" id="localModelProgressFill"></div></div>
 <button class="btn" id="localModelRetryBtn">Retry download</button>
