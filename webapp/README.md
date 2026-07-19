@@ -16,15 +16,19 @@ This is a real Flask backend + a browser frontend, not a single static file. Tha
 
 ## Setup
 
-1. Install Ollama once: https://ollama.com/download (a normal app installer for Windows/Mac/Linux: no C++ compiler, no account, nothing to configure). Make sure it's running.
-2. ```
+1. ```
    pip install -r requirements.txt
    cp .env.example .env
    python app.py
    ```
-3. Open http://localhost:5000. On first chat request, Zariya asks Ollama to pull a small model (`qwen2.5:1.5b` by default, ~1GB, free, one-time) automatically: no command needed from you. The offline knowledge engine answers immediately in the meantime, then the app switches over to the real local model once it's ready.
+2. Open http://localhost:5000 and start chatting -- that's it, nothing else to install or configure.
 
-This previously used `llama-cpp-python` to load model files directly in-process, which required a working C++ build toolchain and failed to install on a number of machines. Talking to Ollama over plain HTTP instead avoids that entirely: Ollama ships its own prebuilt binaries.
+A real language model answers your chats out of the box, with no setup, in one of two ways depending on your browser:
+
+- **Standalone in-browser AI (default, zero setup):** if your browser supports WebGPU (recent Chrome or Edge), Zariya downloads a small open-source model (`Qwen2.5-1.5B-Instruct`, a few hundred MB) straight from a public CDN the first time you open the app, and runs it entirely inside the tab from then on -- no API key, no account, nothing installed on your machine, and it's cached by the browser so it only downloads once. You can watch its progress in Settings under "Standalone AI".
+- **Local Ollama model (optional alternative):** if your browser doesn't support WebGPU, or you'd rather run a model as a proper desktop app instead of in the browser, install Ollama once (https://ollama.com/download -- a normal installer, no compiler, no account) and make sure it's running. On your first chat request Zariya asks it to pull a small model (`qwen2.5:1.5b` by default, ~1GB, free, one-time) automatically.
+
+Either way, the offline knowledge engine answers instantly in the meantime (and always handles the guaranteed-correct stuff -- arithmetic, conversions, translations, curated facts -- itself), so the app is never just sitting there waiting on a model download before it's useful.
 
 ### Using a different local model
 
