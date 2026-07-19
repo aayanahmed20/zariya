@@ -26,6 +26,20 @@ with open(DATA_PATH, "r", encoding="utf-8") as f:
 DICT = _data["dict"]
 KB = _data["kb"]
 
+# Optional supplementary knowledge base file, kept separate from kb_data.json
+# (the large generated dataset) so new dictionary words / KB entries can be
+# added in small, easy-to-review batches without touching that file at all.
+# This is purely additive and never a hard dependency: if the file is missing,
+# empty, or malformed, the app must still start up fine on kb_data.json alone.
+EXTRA_DATA_PATH = Path(__file__).parent / "server" / "kb_data_extra.json"
+if EXTRA_DATA_PATH.exists():
+    try:
+        _extra = json.loads(EXTRA_DATA_PATH.read_text(encoding="utf-8"))
+        DICT = {**DICT, **_extra.get("dict", {})}
+        KB = KB + _extra.get("kb", [])
+    except Exception as _e:
+        print(f"kb_engine: ignoring invalid kb_data_extra.json ({_e})")
+
 # Build a reverse-safe stopword-filtered index once at import time for speed.
 KB_STOPWORDS = {
     "who", "what", "the", "is", "are", "was", "were", "a", "an", "of", "in", "on",
@@ -41,10 +55,8 @@ KB_FILLERS = [
 
 URDU_RE = re.compile(r"[\u0600-\u06FF]")
 
-
 def is_urdu(text: str) -> bool:
     return bool(URDU_RE.search(text or ""))
-
 
 def _normalize_query(text: str) -> str:
     s = text.lower().strip()
@@ -52,7 +64,6 @@ def _normalize_query(text: str) -> str:
     for filler in KB_FILLERS:
         s = re.sub(r"^" + re.escape(filler) + r"\s+", "", s)
     return s.strip()
-
 
 def _load_learned():
     if LEARNED_PATH.exists():
@@ -62,10 +73,8 @@ def _load_learned():
             return []
     return []
 
-
 def _save_learned(entries):
     LEARNED_PATH.write_text(json.dumps(entries, ensure_ascii=False, indent=2), encoding="utf-8")
-
 
 def remember_answer(question: str, answer: str, max_entries: int = 500):
     """Cache a real model answer locally so offline mode can reuse it later.
@@ -78,7 +87,6 @@ def remember_answer(question: str, answer: str, max_entries: int = 500):
     entries.insert(0, {"q": q, "a": answer, "ts": time.time(), "score": 0})
     entries = entries[:max_entries]
     _save_learned(entries)
-
 
 def learned_lookup(text: str):
     entries = _load_learned()
@@ -103,8 +111,10 @@ def learned_lookup(text: str):
         score += entry.get("score", 0) * 0.5
         if score > best_score:
             best, best_score = entry, score
-        return best["a"] if best_score > 0 else None
- def rate_learned_answer(question: str, rating: str) -> bool:
+    return best["a"] if best_score > 0 else None
+
+
+def rate_learned_answer(question: str, rating: str) -> bool:
     """Apply user feedback to a cached learned answer. An "up" rating nudges
     that answer to be preferred over other loosely-matching cached answers in
     future lookups; a "down" rating removes it entirely, so a bad cached
@@ -129,7 +139,6 @@ def learned_lookup(text: str):
 def _significant_words(text: str):
     return {w for w in re.findall(r"[\w']+", text.lower()) if len(w) > 2 and w not in KB_STOPWORDS}
 
-
 def _edit_distance(a: str, b: str) -> int:
     """Standard Levenshtein distance, used to tolerate small typos in queries.
     Kept dependency-free since the offline engine can't rely on external packages."""
@@ -147,7 +156,6 @@ def _edit_distance(a: str, b: str) -> int:
             curr[j] = min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost)
         prev = curr
     return prev[-1]
-
 
 # Inverted index: significant word -> set of KB entry indices whose keyword phrases contain it.
 # Built once at import time so lookups only ever score a small candidate set instead of
@@ -167,7 +175,6 @@ _KB_WORDS_BY_LEN: dict[int, list[str]] = {}
 for _w in _KB_INDEX_WORDS:
     _KB_WORDS_BY_LEN.setdefault(len(_w), []).append(_w)
 
-
 def _fuzzy_correct(word: str):
     """Find the closest known index word for a possibly-misspelled query word.
     Only tries words within 1 character of length, and only accepts a match within
@@ -185,7 +192,6 @@ def _fuzzy_correct(word: str):
             if d < best_dist:
                 best, best_dist = candidate, d
     return best if best_dist <= max_dist else None
-
 
 def knowledge_base_lookup(text: str):
     lower = text.lower()
@@ -235,9 +241,32 @@ def try_math(text: str):
         pct, of = float(m.group(1)), float(m.group(3))
         return f"{m.group(1)}% of {m.group(3)} is **{(pct/100)*of}**."
 
+    # The generic evaluator below used to fire whenever the message contained
+    # *any* digits plus *any* operator-like character, anywhere in the text.
+    # That misfired on plenty of non-math messages that merely happen to
+    # contain a run of digits and a hyphen/plus/etc -- phone numbers ("call me
+    # at 555-1234"), dates, addresses, and scores ("we won 3-2") were all
+    # silently "solved" as arithmetic and given a nonsense numeric answer.
+    # Guard it: only treat the message as an inline calculation if every word
+    # in it (aside from digits/operators) is one of a small set of normal
+    # math-phrasing words, so a real expression like "what's 12*4" still
+    # works but a sentence built around unrelated words is left alone for the
+    # knowledge base / fallback reply to handle instead.
+    _MATH_PHRASE_WORDS = {
+        "what", "whats", "is", "the", "calculate", "compute", "solve", "equals",
+        "equal", "to", "of", "answer", "result", "please", "and", "plus", "minus",
+        "times", "divided", "by", "sum", "value", "it",
+    }
+    other_words = [w for w in re.findall(r"[a-zA-Z]{2,}", text.lower()) if w not in _MATH_PHRASE_WORDS]
+
     cleaned = text.replace("^", "**")
     cleaned = re.sub(r"[^0-9+\-*/().\s]", "", cleaned)
-    if cleaned.strip() and re.search(r"[0-9]", cleaned) and re.search(r"[+\-*/]", cleaned):
+    if (
+        not other_words
+        and cleaned.strip()
+        and re.search(r"[0-9]", cleaned)
+        and re.search(r"[+\-*/]", cleaned)
+    ):
         try:
             val = eval(cleaned, {"__builtins__": {}}, {})  # noqa: S307 (sanitized input, digits/operators only)
             if isinstance(val, (int, float)):
@@ -245,7 +274,6 @@ def try_math(text: str):
         except Exception:
             pass
     return None
-
 
 def try_convert(text: str):
     lower = text.lower()
@@ -268,11 +296,11 @@ def try_convert(text: str):
     m = re.search(r"(-?\d+(\.\d+)?)\s*(c|celsius)\b.*\b(f|fahrenheit)\b", lower)
     if m:
         v = float(m.group(1))
-        return f"{v}°C is **{(v*9/5)+32:.1f}°F**."
+        return f"{v}\u00b0C is **{(v*9/5)+32:.1f}\u00b0F**."
     m = re.search(r"(-?\d+(\.\d+)?)\s*(f|fahrenheit)\b.*\b(c|celsius)\b", lower)
     if m:
         v = float(m.group(1))
-        return f"{v}°F is **{(v-32)*5/9:.1f}°C**."
+        return f"{v}\u00b0F is **{(v-32)*5/9:.1f}\u00b0C**."
     m = re.search(r"(-?\d+(\.\d+)?)\s*cm\b.*\b(inch|inches|in)\b", lower)
     if m:
         v = float(m.group(1))
@@ -376,27 +404,24 @@ def try_number_ops(text: str):
                 return f"The maximum of [{display}] is **{max(nums):g}**."
     return None
 
-
 def try_translate(text: str):
     lower = text.lower().strip()
     for k, v in DICT.items():
         if lower == k.lower():
-            return f"**{k}** → {v}"
+            return f"**{k}** \u2192 {v}"
     return None
-
 
 def _clip(text: str, limit: int) -> str:
     """Like _truncate_at_boundary, but only ever adds an ellipsis when text was
-    actually cut -- summarize_messages used to append '…' even to a two-word
+    actually cut -- summarize_messages used to append '\u2026' even to a two-word
     message, which falsely implied something had been trimmed off."""
     text = text.strip()
     if len(text) <= limit:
         return text
     trimmed = _truncate_at_boundary(text, limit)
-    if trimmed.endswith(("…", ".", "?", "!")):
+    if trimmed.endswith(("\u2026", ".", "?", "!")):
         return trimmed
-    return trimmed + "…"
-
+    return trimmed + "\u2026"
 
 def summarize_messages(messages: list[dict]) -> str:
     user_msgs = [m["content"].strip() for m in messages if m["role"] == "user" and m["content"].strip()]
@@ -406,7 +431,6 @@ def summarize_messages(messages: list[dict]) -> str:
         return f'This conversation covered one request: "{_clip(user_msgs[0], 80)}"'
     first, last = _clip(user_msgs[0], 60), _clip(user_msgs[-1], 60)
     return f'This conversation covered {len(user_msgs)} requests, starting with "{first}" and most recently "{last}".'
-
 
 def key_points(messages: list[dict]) -> str:
     """Surfaces the substance of the conversation -- what was asked and the core
@@ -426,13 +450,12 @@ def key_points(messages: list[dict]) -> str:
         if key in seen:
             continue
         seen.add(key)
-        points.append(f"• {_clip(q, 70)} - {_clip(a, 110)}")
+        points.append(f"\u2022 {_clip(q, 70)} - {_clip(a, 110)}")
         if len(points) >= 8:
             break
     if not points:
         return "Not enough back-and-forth yet to pull out key points."
     return "\n".join(points)
-
 
 def translate_words(text: str) -> str:
     words = text.split()
@@ -441,7 +464,6 @@ def translate_words(text: str) -> str:
         clean = "".join(ch for ch in w if ch.isalnum() or ("\u0600" <= ch <= "\u06FF"))
         out.append(DICT.get(clean.lower(), DICT.get(clean, w)))
     return " ".join(out)
-
 
 def _truncate_at_boundary(text: str, limit: int) -> str:
     """Truncate to at most `limit` characters, preferring to cut at the end of a
@@ -456,9 +478,8 @@ def _truncate_at_boundary(text: str, limit: int) -> str:
             return window[: idx + 1].strip()
     idx = window.rfind(" ")
     if idx > limit * 0.4:
-        return window[:idx].strip() + "…"
-    return window.strip() + "…"
-
+        return window[:idx].strip() + "\u2026"
+    return window.strip() + "\u2026"
 
 def flashcards_from_messages(messages: list[dict]) -> list[dict]:
     cards = []
@@ -472,9 +493,9 @@ def flashcards_from_messages(messages: list[dict]) -> list[dict]:
                 })
     return cards
 
-
 def knowledge_base_stats() -> dict:
     return {"dictWords": len(DICT), "kbEntries": len(KB), "learnedEntries": len(_load_learned())}
+
 _GREETING_RE = re.compile(r"^(hi|hello|hey|salam|assalam)", re.I)
 _BYE_RE = re.compile(r"^(bye|goodbye|see you|khuda hafiz)", re.I)
 # Deliberately an exact-phrase allowlist, not a substring or loose regex match:
@@ -493,14 +514,11 @@ _DATE_QUERY_PHRASES = {
     "todays date", "what is today's date", "what date is it",
 }
 
-
 def _is_time_query(lower: str) -> bool:
     return lower.strip().rstrip("?!.") in _TIME_QUERY_PHRASES
 
-
 def _is_date_query(lower: str) -> bool:
     return lower.strip().rstrip("?!.") in _DATE_QUERY_PHRASES
-
 
 def offline_reply(messages: list[dict]) -> str:
     last_msg = messages[-1]
