@@ -336,6 +336,8 @@ color:var(--text-dim); cursor:pointer; font-size:11.5px; font-weight:600; transi
 .deck-action-btn:hover{ border-color:var(--accent); color:var(--accent-strong); }
 .deck-action-btn:disabled{ opacity:.4; cursor:not-allowed; }
 .deck-action-btn:disabled:hover{ border-color:var(--border); color:var(--text-dim); }
+.deck-action-btn.danger{ color:var(--danger); border-color:var(--danger); }
+.deck-action-btn.danger:hover{ background:var(--danger); color:#fff; border-color:var(--danger); }
 
 .quiz-question{
 font-family:var(--font-serif); font-size:19px; font-weight:700; text-align:center;
