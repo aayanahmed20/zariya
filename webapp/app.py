@@ -229,6 +229,28 @@ def chat():
 
     return jsonify({"reply": reply, "usedRealModel": used_real_model})
 
+@app.route("/api/offline-check", methods=["POST"])
+def offline_check():
+    """Fast, deterministic-only check used by the frontend before it hands a
+    message to a generative model (server-side, or running client-side in the
+    browser). Only ever returns an answer for the guaranteed-correct handlers
+    (arithmetic, conversions, translation, greetings, exact/fuzzy knowledge-base
+    hits, time/date); returns {"reply": None} for anything open-ended, so a real
+    AI model -- not a guess from the rule-based engine -- handles those instead."""
+    body = request.get_json(silent=True) or {}
+    messages, err = _normalize_messages(body.get("messages"))
+    if err:
+        return jsonify({"error": err}), 400
+    last_user = next((m for m in reversed(messages) if m["role"] == "user"), None)
+    if not last_user:
+        return jsonify({"reply": None})
+    try:
+        reply = kb_engine.try_confident_reply(last_user["content"])
+    except Exception:
+        app.logger.exception("try_confident_reply crashed")
+        reply = None
+    return jsonify({"reply": reply})
+
 @app.route("/api/feedback", methods=["POST"])
 def feedback():
     body = request.get_json(silent=True) or {}
