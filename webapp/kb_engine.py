@@ -520,9 +520,20 @@ def _is_time_query(lower: str) -> bool:
 def _is_date_query(lower: str) -> bool:
     return lower.strip().rstrip("?!.") in _DATE_QUERY_PHRASES
 
-def offline_reply(messages: list[dict]) -> str:
-    last_msg = messages[-1]
-    last = last_msg.get("content", "").strip()
+def try_confident_reply(text: str):
+    """Runs only the deterministic, guaranteed-correct handlers -- arithmetic,
+    unit conversions, number utilities, translation, greetings/farewells/thanks,
+    exact or fuzzy knowledge-base hits, and time/date -- and returns an answer
+    only when one of them actually matched. Returns None otherwise, without ever
+    generating the generic "I don't have that" filler.
+
+    This lets a caller that has a real language model available (whether a
+    server-side one in app.py, or one running entirely client-side in the
+    browser) use that instead of the rule-based fallback for genuinely
+    open-ended questions, while still always trusting this deterministic path
+    for the categories it's actually built to get right every time.
+    """
+    last = (text or "").strip()
     lower = last.lower()
     urdu = is_urdu(last)
 
@@ -554,27 +565,40 @@ def offline_reply(messages: list[dict]) -> str:
     if kb_hit:
         return kb_hit
 
-    # Time/date intent is checked last, after the knowledge base has had a
-    # chance to answer, so a curated fact always takes priority over a guess.
     if _is_time_query(lower):
         return "It's currently " + time.strftime("%I:%M %p") + " on the server."
     if _is_date_query(lower):
         return "Today is " + time.strftime("%A, %B %d, %Y") + "."
+    return None
+
+
+def offline_reply(messages: list[dict]) -> str:
+    """Guaranteed-to-answer offline entry point: tries every deterministic
+    handler via try_confident_reply first, and only ever falls back to a
+    generic "I don't know" message -- honest about the offline engine's
+    limits and pointing at Settings -- when truly nothing matched."""
+    last_msg = messages[-1]
+    last = last_msg.get("content", "").strip()
+    urdu = is_urdu(last)
+
+    confident = try_confident_reply(last)
+    if confident:
+        return confident
 
     generic_en = [
         "I don't have that in my offline knowledge base yet -- I can handle arithmetic, unit conversions, "
         "common English/Urdu words, a range of general-knowledge questions, small code snippets, and study tips. "
-        "Open-ended questions like this are handled by the local AI model once it's finished loading -- check "
-        "Settings to see its status.",
+        "Open-ended questions like this are handled automatically by a real AI model once one is ready -- either "
+        "the standalone in-browser model (no install needed) or a local/Ollama model -- check Settings to see status.",
         "That one's outside my offline knowledge base. Try a math expression, a conversion (like '10 km to miles'), "
-        "a common word to translate, or check Settings -- the local AI model handles open-ended questions like "
-        "this automatically once it's ready.",
+        "a common word to translate, or check Settings -- a real AI model (in-browser, or local via Ollama) handles "
+        "open-ended questions like this automatically once it's ready.",
     ]
     generic_ur = [
         "یہ سوال میرے آف لائن ڈیٹا بیس میں شامل نہیں ہے -- میں حساب کتاب، پیمائش کی تبدیلی، عام الفاظ کا ترجمہ، "
-        "اور کچھ عمومی معلومات دے سکتا ہوں۔ اس طرح کے کھلے سوالات مقامی AI ماڈل کے تیار ہوتے ہی خودکار طور پر "
+        "اور کچھ عمومی معلومات دے سکتا ہوں۔ اس طرح کے کھلے سوالات ایک حقیقی AI ماڈل کے تیار ہوتے ہی خودکار طور پر "
         "جواب دیے جاتے ہیں -- سیٹنگز میں اس کی صورتحال دیکھیں۔",
-        "معذرت، یہ میری معلومات میں شامل نہیں۔ کوئی حساب، پیمائش، یا لفظ آزمائیں، یا سیٹنگز میں دیکھیں کہ مقامی "
+        "معذرت، یہ میری معلومات میں شامل نہیں۔ کوئی حساب، پیمائش، یا لفظ آزمائیں، یا سیٹنگز میں دیکھیں کہ کوئی حقیقی "
         "AI ماڈل تیار ہے یا نہیں -- تیار ہوتے ہی یہ خود بخود ایسے سوالات کے جواب دے سکتا ہے۔",
     ]
     import random
