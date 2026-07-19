@@ -22,6 +22,65 @@ let currentAbort = null;
 let serverConfig = { claudeConfigured:false, searchConfigured:false, githubConfigured:false, localModelAvailable:false, localModelStatus:'' };
 let me = { signedIn:false };
 
+/* :::::::::::: STANDALONE IN-BROWSER AI (WebLLM, no key/account/install needed) :::::::::::: */
+// Runs a small open-source language model entirely inside this tab via WebGPU.
+// The model downloads once from a public CDN and is cached by the browser afterward,
+// so there's no API key, no account, and nothing to install -- it's a genuine fallback-free
+// "standalone LLM" path. If the browser doesn't support WebGPU (or the download/init fails
+// for any reason), webllmState just stays 'unsupported'/'error' and the app transparently
+// keeps using the existing server-side chain (Claude / Ollama / offline knowledge base)
+// in app.py instead -- nothing here can break the rest of the chat flow.
+const WEBLLM_MODEL_ID = "Qwen2.5-1.5B-Instruct-q4f16_1-MLC";
+const WEBLLM_SYSTEM_PROMPT = "You are Zariya, a warm, concise bilingual Urdu/English assistant "
+  + "running as a standalone model entirely inside the user's browser. Reply in whichever "
+  + "language the user writes in, mixing naturally if they mix.";
+let webllmEngine = null;
+let webllmState = 'idle'; // idle | unsupported | loading | ready | error
+let webllmProgressText = '';
+let webllmProgressPct = 0;
+
+async function initWebLLM(){
+  if(!('gpu' in navigator)){
+    webllmState = 'unsupported';
+    renderAccountUI();
+    return;
+  }
+  webllmState = 'loading';
+  renderAccountUI();
+  try{
+    const webllm = await import("https://esm.run/@mlc-ai/web-llm");
+    webllmEngine = await webllm.CreateMLCEngine(WEBLLM_MODEL_ID, {
+      initProgressCallback: (p) => {
+        webllmProgressText = p.text || '';
+        webllmProgressPct = typeof p.progress === 'number' ? Math.round(p.progress * 100) : webllmProgressPct;
+        renderAccountUI();
+      }
+    });
+    webllmState = 'ready';
+  }catch(e){
+    webllmState = 'error';
+    webllmProgressText = (e && e.message) ? e.message : 'Failed to load the in-browser model.';
+  }
+  renderAccountUI();
+}
+
+async function generateWithWebLLM(session){
+  const chatMessages = [
+    { role: 'system', content: WEBLLM_SYSTEM_PROMPT },
+    ...session.messages.slice(-12).map(m => ({ role: m.role, content: m.content })),
+  ];
+  const completion = await webllmEngine.chat.completions.create({
+    messages: chatMessages,
+    temperature: 0.7,
+    max_tokens: 512,
+  });
+  const text = completion.choices && completion.choices[0] && completion.choices[0].message
+    ? completion.choices[0].message.content
+    : null;
+  return (text || '').trim() || null;
+}
+
+
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 function nowISO(){ return new Date().toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}); }
 function isUrdu(text){ return /[\u0600-\u06FF]/.test(text||''); }
@@ -107,6 +166,23 @@ function updateLocalModelRetryUI(){
     fill.style.width = pct + '%';
   }
 }
+
+function updateWebLLMStatusUI(){
+  const textEl = document.getElementById('webllmStatusText');
+  const row = document.getElementById('webllmProgressRow');
+  const fill = document.getElementById('webllmProgressFill');
+  if(!textEl) return;
+  const labels = {
+    idle: 'Starting...',
+    unsupported: 'Not supported in this browser (needs WebGPU -- try a recent Chrome or Edge)',
+    loading: webllmProgressText || 'Loading...',
+    ready: 'Loaded -- answering your chats in this browser',
+    error: 'Could not load: ' + (webllmProgressText || 'unknown error'),
+  };
+  textEl.textContent = labels[webllmState] || labels.idle;
+  if(row) row.style.display = (webllmState === 'loading') ? 'flex' : 'none';
+  if(fill) fill.style.width = webllmProgressPct + '%';
+}
 function renderAccountUI(){
   const sbAvatar = document.getElementById('sbProfileAvatar');
   const sbName = document.getElementById('sbProfileName');
@@ -137,6 +213,7 @@ function renderAccountUI(){
   document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded -- answering your chats' : (serverConfig.localModelStatus || 'Not configured');
   document.getElementById('searchStatusText').textContent = serverConfig.searchConfigured ? 'Connected' : 'Not configured (optional)';
   updateLocalModelRetryUI();
+  updateWebLLMStatusUI();
 }
 document.getElementById('sbProfileRow').addEventListener('click', ()=>switchView('settings'));
 document.getElementById('githubSignInBtn').addEventListener('click', ()=>{ window.location.href = '/auth/github/login'; });
@@ -326,8 +403,34 @@ async function respondTo(session){
   currentAbort = new AbortController();
   let reply = '';
   try{
-    const data = await apiPost('/api/chat', { messages: session.messages.map(m=>({role:m.role, content:m.content})) }, currentAbort.signal);
-    reply = data.reply || data.error || 'Something went wrong.';
+    // 1. Deterministic-only check (math, conversions, translation, greetings,
+    //    curated knowledge-base hits, time/date) -- always trusted first, whether
+    //    or not a generative model is available, so these stay exact.
+    let confident = null;
+    const lastUser = [...session.messages].reverse().find(m => m.role === 'user');
+    if(lastUser){
+      try{
+        const check = await apiPost('/api/offline-check', { messages: [{ role: 'user', content: lastUser.content }] }, currentAbort.signal);
+        confident = check.reply || null;
+      }catch(e){ /* offline-check itself failing just means we fall through below */ }
+    }
+
+    if(confident){
+      reply = confident;
+    } else if(webllmState === 'ready' && webllmEngine){
+      // 2. Standalone in-browser AI -- no key, no account, nothing installed.
+      try{
+        reply = await generateWithWebLLM(session);
+      }catch(e){ reply = null; }
+      if(!reply){
+        const data = await apiPost('/api/chat', { messages: session.messages.map(m=>({role:m.role, content:m.content})) }, currentAbort.signal);
+        reply = data.reply || data.error || 'Something went wrong.';
+      }
+    } else {
+      // 3. Existing server-side chain: Claude API -> local Ollama model -> offline knowledge base.
+      const data = await apiPost('/api/chat', { messages: session.messages.map(m=>({role:m.role, content:m.content})) }, currentAbort.signal);
+      reply = data.reply || data.error || 'Something went wrong.';
+    }
   }catch(err){
     if(err.name==='AbortError'){ removeThinking(); setGenerating(false); return; }
     reply = 'Could not reach the server: ' + (err.message||'unknown error');
@@ -823,5 +926,6 @@ function pollLocalModelStatus(){
   renderSessionList();
   renderChat();
   pollLocalModelStatus();
+  initWebLLM();
 })();
 })();
