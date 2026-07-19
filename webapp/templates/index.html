@@ -62,7 +62,7 @@ Settings
 </button>
 <div class="sb-footer-bottom">
 <div class="status-pill"><span class="status-dot off" id="statusDot"></span><span id="statusText">Offline mode</span></div>
-<button class="icon-btn" id="themeToggleBtn" title="Toggle theme">
+<button class="icon-btn" id="themeToggleBtn" title="Toggle theme" aria-label="Toggle theme">
 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
 </button>
 </div>
@@ -75,7 +75,7 @@ Settings
 <button class="ob-dismiss" id="onboardingDismissBtn" aria-label="Dismiss">&times;</button>
 </div>
 <div class="topbar">
-<button class="hamburger" id="hamburgerBtn">
+<button class="hamburger" id="hamburgerBtn" aria-label="Open sidebar">
 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
 </button>
 <div class="sb-name" style="font-size:15px;">Zariya</div>
@@ -93,16 +93,17 @@ Settings
 <button class="qt-btn" data-tool="translate">Translate last</button>
 <button class="qt-btn" data-tool="websearch">Search web</button>
 <button class="qt-btn" data-tool="title">Auto-title</button>
+            <button class="qt-btn" data-tool="exportchat">Export chat</button>
 </div>
 <div id="composer">
 <div class="composer-inner">
 <div class="attach-preview" id="attachPreview"></div>
 <div class="composer-box" id="composerBox">
-<button class="composer-btn mic" id="micBtn" title="Voice input">
+<button class="composer-btn mic" id="micBtn" title="Voice input" aria-label="Voice input">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4"/></svg>
 </button>
 <textarea id="chat-input" rows="1" placeholder="Reply to Zariya… کछو بھی پوछیں"></textarea>
-<button class="composer-btn send" id="sendBtn" data-mode="send" disabled>
+<button class="composer-btn send" id="sendBtn" data-mode="send" disabled aria-label="Send message">
 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
 </div>

@@ -72,13 +72,36 @@ def _user_bucket(store):
     return store["users"][key]
 
 # ---------------------------------------------------------------------------
+# Input validation helpers -- keep malformed client input from ever crashing a
+# route with an unhandled 500. A misbehaving or future frontend change should
+# get a clear 400 error back, not a blank server error page.
+# ---------------------------------------------------------------------------
+def _normalize_messages(raw):
+    """Validates the 'messages' list coming from the client.
+    Returns (messages, error) where error is None on success, or a short
+    user-facing string describing what's wrong."""
+    if not isinstance(raw, list) or not raw:
+        return None, "No messages provided"
+    cleaned = []
+    for m in raw:
+        if not isinstance(m, dict):
+            return None, "Each message must be an object with 'role' and 'content'"
+        role = m.get("role")
+        content = m.get("content")
+        if role not in ("user", "assistant", "system") or not isinstance(content, str):
+            return None, "Each message needs a valid 'role' (user/assistant/system) and a string 'content'"
+        cleaned.append({"role": role, "content": content})
+    return cleaned, None
+
+
+# ---------------------------------------------------------------------------
 # Auth: real GitHub OAuth (authorization-code flow), client secret stays server-side
 # ---------------------------------------------------------------------------
 @app.route("/auth/github/login")
 def github_login():
     if not GITHUB_CLIENT_ID:
         return jsonify({"error": "GitHub OAuth isn't configured on this server yet. "
-                                  "Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env."}), 400
+                                 "Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env."}), 400
     state = secrets.token_urlsafe(16)
     session["oauth_state"] = state
     redirect_uri = f"{APP_BASE_URL}/auth/github/callback"
@@ -144,17 +167,18 @@ def me():
         })
     return jsonify({"signedIn": False, "githubConfigured": bool(GITHUB_CLIENT_ID)})
 
+
 # ---------------------------------------------------------------------------
-# Chat: Claude API (server-side key) -> offline knowledge engine.
+# Chat: Claude API (server-side key) -> local model -> offline knowledge engine.
 # The person using the app is never asked for a key -- whoever deploys the
 # server configures it once in .env.
 # ---------------------------------------------------------------------------
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    body = request.get_json(force=True) or {}
-    messages = body.get("messages", [])
-    if not messages:
-        return jsonify({"error": "No messages provided"}), 400
+    body = request.get_json(silent=True) or {}
+    messages, err = _normalize_messages(body.get("messages"))
+    if err:
+        return jsonify({"error": err}), 400
 
     used_real_model = False
     reply = None
@@ -191,7 +215,12 @@ def chat():
             used_real_model = True
 
     if reply is None:
-        reply = kb_engine.offline_reply(messages)
+        try:
+            reply = kb_engine.offline_reply(messages)
+        except Exception:
+            app.logger.exception("offline_reply crashed")
+            reply = ("Something went wrong answering that offline. Try rephrasing your "
+                      "message, or a simpler one like a math expression or a greeting.")
 
     if used_real_model:
         last_user = next((m for m in reversed(messages) if m["role"] == "user"), None)
@@ -202,7 +231,7 @@ def chat():
 
 @app.route("/api/feedback", methods=["POST"])
 def feedback():
-    body = request.get_json(force=True) or {}
+    body = request.get_json(silent=True) or {}
     question = body.get("question", "")
     rating = body.get("rating", "")
     if rating not in ("up", "down"):
@@ -214,13 +243,13 @@ def feedback():
 # ---------------------------------------------------------------------------
 @app.route("/api/search", methods=["POST"])
 def web_search():
-    body = request.get_json(force=True) or {}
+    body = request.get_json(silent=True) or {}
     query = body.get("query", "").strip()
     if not query:
         return jsonify({"error": "No query provided"}), 400
     if not (GOOGLE_API_KEY and GOOGLE_CX):
         return jsonify({"error": "Web search isn't configured on this server. "
-                                  "Set GOOGLE_API_KEY and GOOGLE_CX in .env."}), 400
+                                 "Set GOOGLE_API_KEY and GOOGLE_CX in .env."}), 400
     try:
         res = requests.get(
             "https://www.googleapis.com/customsearch/v1",
@@ -239,6 +268,7 @@ def web_search():
     except Exception as e:
         return jsonify({"error": f"Web search failed: {e}"}), 502
 
+
 # ---------------------------------------------------------------------------
 # Notes / Flashcards / Sessions -- simple per-user JSON storage
 # ---------------------------------------------------------------------------
@@ -251,7 +281,7 @@ def get_state():
 
 @app.route("/api/state", methods=["POST"])
 def save_state():
-    body = request.get_json(force=True) or {}
+    body = request.get_json(silent=True) or {}
     store = _load_store()
     key = _current_user_key()
     store["users"][key] = {
@@ -264,8 +294,11 @@ def save_state():
 
 @app.route("/api/tools/<name>", methods=["POST"])
 def run_tool(name):
-    body = request.get_json(force=True) or {}
-    messages = body.get("messages", [])
+    body = request.get_json(silent=True) or {}
+    raw_messages = body.get("messages", [])
+    messages, err = _normalize_messages(raw_messages) if raw_messages else ([], None)
+    if err:
+        return jsonify({"error": err}), 400
     if name == "summarize":
         return jsonify({"result": kb_engine.summarize_messages(messages)})
     if name == "keypoints":

@@ -1,0 +1,136 @@
+{
+  "dict": {
+    "university": "جامعہ",
+    "semester": "سمسٹر",
+    "lecture": "لیکچر",
+    "assignment": "اسائنمنٹ",
+    "scholarship": "وظیفہ",
+    "library": "لائبریری",
+    "attendance": "حاضری",
+    "result": "نتیجہ",
+    "degree": "ڈگری",
+    "thesis": "مقالہ",
+    "research": "تحقیق",
+    "internship": "انٹرن شپ",
+    "campus": "کیمپس",
+    "hostel": "ہاسٹل",
+    "syllabus": "نصاب",
+    "deadline": "آخری تاریخ",
+    "classmate": "ہم جماعت",
+    "teacher": "استاد",
+    "student": "طالب علم",
+    "exam": "امتحان",
+    "notes": "نوٹس",
+    "timetable": "ٹائم ٹیبل",
+    "holiday": "چھٹی",
+    "project": "منصوبہ"
+  },
+  "kb": [
+    {
+      "k": [
+        "what is a semester",
+        "what does semester mean"
+      ],
+      "a": "A **semester** is one of the two (sometimes three) main teaching terms a university's academic year is split into, usually 15-18 weeks long, ending in exams."
+    },
+    {
+      "k": [
+        "what is gpa",
+        "what does gpa mean",
+        "what is cgpa",
+        "difference between gpa and cgpa"
+      ],
+      "a": "**GPA** (Grade Point Average) measures your performance in a single semester. **CGPA** (Cumulative GPA) is the running average across every semester completed so far, so it changes more slowly than a single term's GPA."
+    },
+    {
+      "k": [
+        "what is plagiarism",
+        "what does plagiarism mean"
+      ],
+      "a": "**Plagiarism** is presenting someone else's words, ideas, or work as your own without proper credit. Universities take it seriously -- always cite sources and use quotation marks for direct text, or paraphrase and still cite the origin."
+    },
+    {
+      "k": [
+        "what is a thesis",
+        "what does thesis mean"
+      ],
+      "a": "A **thesis** is a long-form research document, usually required near the end of a degree, where a student investigates a specific question in depth and defends their findings, often followed by a viva voce (oral defence)."
+    },
+    {
+      "k": [
+        "what is an internship",
+        "what does internship mean"
+      ],
+      "a": "An **internship** is a short-term, supervised work placement -- often during or right after a degree -- that gives students real workplace experience in their field, sometimes paid and sometimes unpaid."
+    },
+    {
+      "k": [
+        "how to study effectively",
+        "tips for exam preparation",
+        "how to prepare for exams"
+      ],
+      "a": "A few things that reliably help: space out revision instead of cramming (spaced repetition), test yourself with practice questions rather than just re-reading notes, study in short focused blocks with real breaks, and teach the material to someone else -- if you can explain it simply, you actually understand it."
+    },
+    {
+      "k": [
+        "what is a scholarship",
+        "what does scholarship mean"
+      ],
+      "a": "A **scholarship** is financial support awarded to a student -- based on merit, need, or both -- that reduces or covers tuition and sometimes living costs, and unlike a loan, it does not need to be paid back."
+    },
+    {
+      "k": [
+        "what is hec",
+        "what does hec stand for"
+      ],
+      "a": "**HEC** stands for the **Higher Education Commission** of Pakistan, the government body that funds, regulates, and accredits universities and degree programs across the country."
+    },
+    {
+      "k": [
+        "what is a credit hour",
+        "what does credit hour mean"
+      ],
+      "a": "A **credit hour** roughly represents one hour of class time per week over a semester, used to measure course workload -- a typical 3-credit-hour course usually meets for about 3 hours of lectures a week."
+    },
+    {
+      "k": [
+        "what is time management",
+        "how to manage time better"
+      ],
+      "a": "Time management is planning and prioritising how you spend your hours so important tasks (like assignments and exam prep) get done before deadlines. Simple tools that help: a weekly planner, breaking big tasks into smaller ones, and tackling the hardest task first when your energy is highest."
+    },
+    {
+      "k": [
+        "what is procrastination",
+        "how to stop procrastinating"
+      ],
+      "a": "**Procrastination** is delaying tasks you know you should be doing, often in favour of easier or more enjoyable ones. It usually helps to break the task into a tiny first step (open the document, write one sentence), remove distractions, and set a short timer to just get started."
+    },
+    {
+      "k": [
+        "what is a viva",
+        "what is viva voce"
+      ],
+      "a": "A **viva voce** (often just called a \"viva\") is an oral exam where a student defends their thesis or project in person, answering questions from examiners about their work, methodology, and conclusions."
+    },
+    {
+      "k": [
+        "what is a literature review"
+      ],
+      "a": "A **literature review** is a structured summary and analysis of existing research on a topic, used to show what's already known, spot gaps, and justify why new research (like a thesis) is needed."
+    },
+    {
+      "k": [
+        "what is peer review"
+      ],
+      "a": "**Peer review** is the process where other experts in a field evaluate a research paper's quality and validity before it is published, checking the methodology, evidence, and conclusions."
+    },
+    {
+      "k": [
+        "how to write a good assignment",
+        "tips for writing assignments"
+      ],
+      "a": "Strong assignments usually: answer the actual question asked (re-read the prompt before submitting), have a clear structure (intro, body, conclusion), back up claims with evidence or citations, and get proofread at least once before submission."
+    }
+  ]
+}
