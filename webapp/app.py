@@ -13,6 +13,11 @@ Architecture, and why it's built this way:
 - GitHub sign-in is real OAuth (authorization-code flow), not a public-profile
   lookup -- the client secret is exchanged server-side, exactly the way GitHub's
   own docs require, and is never exposed to the browser.
+- Two generation knobs (a custom system prompt / persona, and a temperature /
+  creativity value) can be sent per-request from the client and are applied to
+  whichever backend (Claude or the local model) ends up answering. Both are
+  optional and fall back to sane defaults, so older requests without them still
+  work unchanged.
 """
 import os
 import secrets
@@ -94,6 +99,23 @@ def _normalize_messages(raw):
         cleaned.append({"role": role, "content": content})
     return cleaned, None
 
+def _generation_params(body):
+    """Optional per-request generation overrides from the client: a custom
+    persona / system prompt, and a creativity (temperature) value. Both are
+    optional -- a missing or invalid value just falls back to the server
+    default, so older frontend code (or a stray request) keeps working
+    exactly as before."""
+    system_prompt = SYSTEM_PROMPT
+    custom = body.get("systemPrompt")
+    if isinstance(custom, str) and custom.strip():
+        system_prompt = custom.strip()[:2000]  # generous cap, just to stop abuse
+
+    temperature = None
+    raw_temp = body.get("temperature")
+    if isinstance(raw_temp, (int, float)) and not isinstance(raw_temp, bool):
+        temperature = max(0.0, min(1.0, float(raw_temp)))
+
+    return system_prompt, temperature
 
 # ---------------------------------------------------------------------------
 # Auth: real GitHub OAuth (authorization-code flow), client secret stays server-side
@@ -102,7 +124,7 @@ def _normalize_messages(raw):
 def github_login():
     if not GITHUB_CLIENT_ID:
         return jsonify({"error": "GitHub OAuth isn't configured on this server yet. "
-                                 "Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env."}), 400
+                                  "Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env."}), 400
     state = secrets.token_urlsafe(16)
     session["oauth_state"] = state
     redirect_uri = f"{APP_BASE_URL}/auth/github/callback"
@@ -168,7 +190,6 @@ def me():
         })
     return jsonify({"signedIn": False, "githubConfigured": bool(GITHUB_CLIENT_ID)})
 
-
 # ---------------------------------------------------------------------------
 # Chat: Claude API (server-side key) -> local model -> offline knowledge engine.
 # The person using the app is never asked for a key -- whoever deploys the
@@ -180,12 +201,21 @@ def chat():
     messages, err = _normalize_messages(body.get("messages"))
     if err:
         return jsonify({"error": err}), 400
+    system_prompt, temperature = _generation_params(body)
 
     used_real_model = False
     reply = None
 
     if ANTHROPIC_API_KEY:
         try:
+            claude_body = {
+                "model": ANTHROPIC_MODEL,
+                "max_tokens": 1000,
+                "system": system_prompt,
+                "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
+            }
+            if temperature is not None:
+                claude_body["temperature"] = temperature
             res = requests.post(
                 "https://api.anthropic.com/v1/messages",
                 headers={
@@ -193,12 +223,7 @@ def chat():
                     "x-api-key": ANTHROPIC_API_KEY,
                     "anthropic-version": "2023-06-01",
                 },
-                json={
-                    "model": ANTHROPIC_MODEL,
-                    "max_tokens": 1000,
-                    "system": SYSTEM_PROMPT,
-                    "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
-                },
+                json=claude_body,
                 timeout=30,
             )
             res.raise_for_status()
@@ -210,7 +235,7 @@ def chat():
             app.logger.warning("Claude API call failed, falling back to offline: %s", e)
 
     if reply is None and local_model.is_available():
-        local_reply = local_model.generate_reply(messages, SYSTEM_PROMPT)
+        local_reply = local_model.generate_reply(messages, system_prompt, temperature)
         if local_reply:
             reply = local_reply
             used_real_model = True
@@ -233,7 +258,6 @@ def chat():
 def _sse(data):
     return f"data: {json.dumps(data)}\n\n"
 
-
 @app.route("/api/chat/stream", methods=["POST"])
 def chat_stream():
     """Same fallback chain as /api/chat (Claude -> local model -> offline
@@ -247,6 +271,7 @@ def chat_stream():
     messages, err = _normalize_messages(body.get("messages"))
     if err:
         return jsonify({"error": err}), 400
+    system_prompt, temperature = _generation_params(body)
 
     def generate():
         used_real_model = False
@@ -254,6 +279,14 @@ def chat_stream():
 
         if ANTHROPIC_API_KEY:
             try:
+                claude_body = {
+                    "model": ANTHROPIC_MODEL,
+                    "max_tokens": 1000,
+                    "system": system_prompt,
+                    "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
+                }
+                if temperature is not None:
+                    claude_body["temperature"] = temperature
                 res = requests.post(
                     "https://api.anthropic.com/v1/messages",
                     headers={
@@ -261,12 +294,7 @@ def chat_stream():
                         "x-api-key": ANTHROPIC_API_KEY,
                         "anthropic-version": "2023-06-01",
                     },
-                    json={
-                        "model": ANTHROPIC_MODEL,
-                        "max_tokens": 1000,
-                        "system": SYSTEM_PROMPT,
-                        "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
-                    },
+                    json=claude_body,
                     timeout=30,
                 )
                 res.raise_for_status()
@@ -281,7 +309,7 @@ def chat_stream():
 
         if full_reply is None and local_model.is_available():
             collected = []
-            for token in local_model.stream_reply(messages, SYSTEM_PROMPT):
+            for token in local_model.stream_reply(messages, system_prompt, temperature):
                 collected.append(token)
                 yield _sse({"delta": token})
             if collected:
@@ -294,7 +322,7 @@ def chat_stream():
             except Exception:
                 app.logger.exception("offline_reply crashed")
                 full_reply = ("Something went wrong answering that offline. Try rephrasing your "
-                              "message, or a simpler one like a math expression or a greeting.")
+                               "message, or a simpler one like a math expression or a greeting.")
             yield _sse({"delta": full_reply})
 
         if used_real_model and full_reply:
@@ -309,7 +337,6 @@ def chat_stream():
         mimetype="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
-
 
 @app.route("/api/feedback", methods=["POST"])
 def feedback():
@@ -331,7 +358,7 @@ def web_search():
         return jsonify({"error": "No query provided"}), 400
     if not (GOOGLE_API_KEY and GOOGLE_CX):
         return jsonify({"error": "Web search isn't configured on this server. "
-                                 "Set GOOGLE_API_KEY and GOOGLE_CX in .env."}), 400
+                                  "Set GOOGLE_API_KEY and GOOGLE_CX in .env."}), 400
     try:
         res = requests.get(
             "https://www.googleapis.com/customsearch/v1",
@@ -349,7 +376,6 @@ def web_search():
         return jsonify({"error": f"Google Search API error: {e}"}), 502
     except Exception as e:
         return jsonify({"error": f"Web search failed: {e}"}), 502
-
 
 # ---------------------------------------------------------------------------
 # Notes / Flashcards / Sessions -- simple per-user JSON storage
@@ -408,6 +434,7 @@ def config():
         "localModelAvailable": local_model.is_available(),
         "localModelStatus": local_model.load_status(),
         "localModelProgress": local_model.load_progress(),
+        "localModelName": local_model.current_model(),
     })
 
 @app.route("/api/local-model/retry", methods=["POST"])
@@ -417,6 +444,25 @@ def local_model_retry():
     for when a pull has failed and the automatic wait would otherwise take up
     to a minute."""
     return jsonify(local_model.retry_now())
+
+@app.route("/api/local-model/models")
+def local_model_models():
+    """Lists every model Ollama already has pulled on this machine, plus which
+    one is currently active, so Settings can offer a model switcher without
+    ever needing to touch .env."""
+    return jsonify({"models": local_model.list_models(), "active": local_model.current_model()})
+
+@app.route("/api/local-model/select", methods=["POST"])
+def local_model_select():
+    """Switches the active local model at runtime. If the requested model
+    isn't pulled yet, this starts a background download exactly like the
+    first-run setup does, and the frontend polls /api/config for progress."""
+    body = request.get_json(silent=True) or {}
+    name = body.get("model", "")
+    if not isinstance(name, str):
+        return jsonify({"ok": False, "error": "model must be a string"}), 400
+    result = local_model.set_active_model(name)
+    return jsonify(result)
 
 @app.route("/")
 def index():
