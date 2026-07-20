@@ -7,6 +7,7 @@ const LS = {
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 };
 let uiPrefs = LS.get('zariya_ui_prefs', { theme:'light', fontSize:15, showTimestamps:true, ttsEnabled:false });
+let genPrefs = LS.get('zariya_gen_prefs', { persona:'', temperature:0.5 });
 
 let sessions = [];
 let notes = [];
@@ -89,6 +90,23 @@ function applyUiPrefs(){
   document.getElementById('toggleTimestamps').classList.toggle('on', uiPrefs.showTimestamps);
   document.getElementById('toggleTTS').classList.toggle('on', uiPrefs.ttsEnabled);
 }
+function applyGenPrefs(){
+  document.getElementById('personaInput').value = genPrefs.persona || '';
+  const pct = Math.round((typeof genPrefs.temperature==='number'? genPrefs.temperature : 0.5) * 100);
+  document.getElementById('creativitySlider').value = pct;
+  updateCreativityLabel(pct);
+}
+function updateCreativityLabel(pct){
+  const label = document.getElementById('creativityLabel');
+  const t = pct/100;
+  let desc = 'Balanced';
+  if(t <= 0.2) desc = 'Focused';
+  else if(t <= 0.4) desc = 'Steady';
+  else if(t <= 0.6) desc = 'Balanced';
+  else if(t <= 0.8) desc = 'Creative';
+  else desc = 'Very creative';
+  label.textContent = desc+' ('+t.toFixed(2)+')';
+}
 function updateStatusPill(){
   const dot = document.getElementById('statusDot'); const txt = document.getElementById('statusText');
   if(serverConfig.claudeConfigured){ dot.classList.remove('off'); txt.textContent = 'Claude connected'; }
@@ -134,7 +152,7 @@ function renderAccountUI(){
   document.getElementById('githubSignInBtn').disabled = !serverConfig.githubConfigured;
 
   document.getElementById('claudeStatusText').textContent = serverConfig.claudeConfigured ? 'Connected' : 'Not configured (optional)';
-  document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded -- answering your chats' : (serverConfig.localModelStatus || 'Not configured');
+document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded -- answering your chats' + (serverConfig.localModelName ? ' (' + serverConfig.localModelName + ')' : '') : (serverConfig.localModelStatus || 'Not configured');
   document.getElementById('searchStatusText').textContent = serverConfig.searchConfigured ? 'Connected' : 'Not configured (optional)';
   updateLocalModelRetryUI();
 }
@@ -157,6 +175,7 @@ function switchView(name){
   closeSidebarMobile();
   if(name==='notepad') renderNotesList();
   if(name==='flashcards') renderDeckGrid();
+if(name==='settings') loadModelList();
 }
 document.querySelectorAll('.nav-item').forEach(n=> n.addEventListener('click', ()=>switchView(n.dataset.view)));
 
@@ -330,7 +349,7 @@ async function respondTo(session){
     const res = await fetch('/api/chat/stream', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ messages: session.messages.map(m=>({role:m.role, content:m.content})) }),
+body: JSON.stringify({ messages: session.messages.map(m=>({role:m.role, content:m.content})), systemPrompt: genPrefs.persona || undefined, temperature: typeof genPrefs.temperature==='number' ? genPrefs.temperature : undefined }),
       signal: currentAbort.signal
     });
     if(!res.ok || !res.body){
@@ -819,6 +838,64 @@ document.getElementById('themeToggleBtn').addEventListener('click', ()=>{ uiPref
 document.getElementById('fontSizeSlider').addEventListener('input', (e)=>{ uiPrefs.fontSize=parseInt(e.target.value,10); LS.set('zariya_ui_prefs',uiPrefs); applyUiPrefs(); });
 document.getElementById('toggleTimestamps').addEventListener('click', ()=>{ uiPrefs.showTimestamps=!uiPrefs.showTimestamps; LS.set('zariya_ui_prefs',uiPrefs); applyUiPrefs(); renderChat(); });
 document.getElementById('toggleTTS').addEventListener('click', ()=>{ uiPrefs.ttsEnabled=!uiPrefs.ttsEnabled; LS.set('zariya_ui_prefs',uiPrefs); applyUiPrefs(); });
+document.getElementById('personaInput').addEventListener('input', (e)=>{ genPrefs.persona=e.target.value; LS.set('zariya_gen_prefs',genPrefs); });
+document.getElementById('creativitySlider').addEventListener('input', (e)=>{ const pct=parseInt(e.target.value,10); genPrefs.temperature=pct/100; LS.set('zariya_gen_prefs',genPrefs); updateCreativityLabel(pct); });
+document.getElementById('resetPersonaBtn').addEventListener('click', ()=>{ genPrefs={persona:'', temperature:0.5}; LS.set('zariya_gen_prefs',genPrefs); applyGenPrefs(); });
+
+async function loadModelList(){
+  const sel = document.getElementById('modelSelect');
+  if(!sel) return;
+  try{
+    const data = await apiGet('/api/local-model/models');
+    const models = data.models || [];
+    const active = data.active || '';
+    if(!models.length){
+      sel.innerHTML = '<option value="">No models pulled yet (Ollama may not be running)</option>';
+      return;
+    }
+    sel.innerHTML = models.map(m=> '<option value="'+escapeHtml(m.name)+'"'+(m.name===active?' selected':'')+'>'+escapeHtml(m.name)+(m.name===active?' (active)':'')+'</option>').join('');
+  }catch(e){
+    sel.innerHTML = '<option value="">Could not load models</option>';
+  }
+}
+const modelSelect = document.getElementById('modelSelect');
+if(modelSelect){
+  modelSelect.addEventListener('change', async (e)=>{
+    const name = e.target.value; if(!name) return;
+    const note = document.getElementById('modelSwitchNote');
+    note.textContent = 'Switching to '+name+'…';
+    try{
+      const res = await apiPost('/api/local-model/select', { model:name });
+      if(res.ok){
+        note.textContent = res.pulling ? ('Downloading '+name+'… this can take a few minutes.') : ('Now using '+name+'.');
+        pollLocalModelStatus();
+        const cfg = await apiGet('/api/config'); serverConfig = cfg; updateStatusPill(); renderAccountUI();
+      } else {
+        note.textContent = res.error || 'Could not switch model.';
+      }
+    }catch(err){ note.textContent = 'Could not reach the server.'; }
+  });
+}
+const pullModelBtn = document.getElementById('pullModelBtn');
+if(pullModelBtn){
+  pullModelBtn.addEventListener('click', async ()=>{
+    const inputEl = document.getElementById('newModelInput');
+    const name = inputEl.value.trim(); if(!name) return;
+    const note = document.getElementById('modelSwitchNote');
+    note.textContent = 'Requesting '+name+'…';
+    try{
+      const res = await apiPost('/api/local-model/select', { model:name });
+      if(res.ok){
+        note.textContent = res.pulling ? ('Downloading '+name+'… this can take a few minutes.') : ('Now using '+name+'.');
+        inputEl.value='';
+        pollLocalModelStatus();
+        loadModelList();
+      } else {
+        note.textContent = res.error || 'Could not pull that model.';
+      }
+    }catch(err){ note.textContent = 'Could not reach the server.'; }
+  });
+}
 
 const localModelRetryBtn = document.getElementById('localModelRetryBtn');
 if(localModelRetryBtn){
@@ -866,6 +943,8 @@ function pollLocalModelStatus(){
 (async function init(){
   await loadServerState();
   applyUiPrefs();
+  applyGenPrefs();
+  loadModelList();
   updateStatusPill();
   renderAccountUI();
   renderSessionList();
