@@ -192,3 +192,37 @@ def generate_reply(messages: list[dict], system_prompt: str) -> str | None:
         return data.get("message", {}).get("content")
     except Exception:
         return None
+
+
+def stream_reply(messages: list[dict], system_prompt: str):
+    """Yields reply tokens as they arrive from Ollama's streaming chat API,
+    for a real-time typing effect in the UI. Yields nothing (an empty
+    generator) if the local model isn't ready or the request fails partway --
+    callers should treat "no tokens yielded" the same as generate_reply()
+    returning None."""
+    if not _ready:
+        return
+    chat_messages = [{"role": "system", "content": system_prompt}]
+    chat_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-12:]]
+    try:
+        with requests.post(
+            f"{OLLAMA_URL}/api/chat",
+            json={"model": DEFAULT_MODEL, "messages": chat_messages, "stream": True},
+            timeout=120,
+            stream=True,
+        ) as res:
+            res.raise_for_status()
+            for line in res.iter_lines():
+                if not line:
+                    continue
+                try:
+                    payload = json.loads(line)
+                except (ValueError, TypeError):
+                    continue
+                token = payload.get("message", {}).get("content")
+                if token:
+                    yield token
+                if payload.get("done"):
+                    return
+    except Exception:
+        return
