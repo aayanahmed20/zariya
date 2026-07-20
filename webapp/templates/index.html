@@ -93,7 +93,7 @@ Settings
 <button class="qt-btn" data-tool="translate">Translate last</button>
 <button class="qt-btn" data-tool="websearch">Search web</button>
 <button class="qt-btn" data-tool="title">Auto-title</button>
-            <button class="qt-btn" data-tool="exportchat">Export chat</button>
+<button class="qt-btn" data-tool="exportchat">Export chat</button>
 </div>
 <div id="composer">
 <div class="composer-inner">
@@ -210,6 +210,22 @@ Settings
 </div>
 
 <div class="setting-group">
+<h3><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Persona &amp; creativity</h3>
+<p class="desc">Tune how Zariya replies to you specifically -- these are saved in this browser and sent with each message, applied to whichever model answers (Claude or the local model).</p>
+<div class="setting-row" style="align-items:flex-start;flex-direction:column;gap:8px;">
+<label for="personaInput">Custom persona / system prompt</label>
+<textarea id="personaInput" placeholder="Leave blank to use Zariya's default personality" style="width:100%;min-height:70px;font-family:inherit;font-size:13px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text);resize:vertical;"></textarea>
+</div>
+<div class="setting-row">
+<div><label>Creativity</label><div class="sub" id="creativityLabel">Balanced (0.5)</div></div>
+<input type="range" min="0" max="100" value="50" class="slider" id="creativitySlider" style="width:140px;">
+</div>
+<div class="setting-row">
+<button class="btn" id="resetPersonaBtn">Reset to defaults</button>
+</div>
+</div>
+
+<div class="setting-group">
 <h3><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v10l7 4"/></svg>AI status</h3>
 <p class="desc">Local AI model is the default and needs no key -- it downloads and runs entirely on this server. Claude API and web search below are both entirely optional, for whoever deploys this server to add if they want.</p>
 <div class="setting-row"><label>Local AI model (default)</label><span id="localModelStatusText" class="sub"></span></div>
@@ -217,6 +233,17 @@ Settings
 <div class="progress-bar-track"><div class="progress-bar-fill" id="localModelProgressFill"></div></div>
 <button class="btn" id="localModelRetryBtn">Retry download</button>
 </div>
+<div class="setting-row" style="align-items:flex-start;flex-direction:column;gap:8px;">
+<label for="modelSelect">Switch local model</label>
+<select id="modelSelect" style="width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text);font-size:13px;">
+<option value="">Loading models…</option>
+</select>
+</div>
+<div class="setting-row" style="gap:8px;">
+<input id="newModelInput" placeholder="Or pull a new model, e.g. llama3.2:1b" style="flex:1;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text);font-size:13px;">
+<button class="btn" id="pullModelBtn">Pull &amp; use</button>
+</div>
+<div class="small-note" id="modelSwitchNote"></div>
 <div class="setting-row"><label>Claude API (optional)</label><span id="claudeStatusText" class="sub"></span></div>
 <div class="setting-row"><label>Web search (optional)</label><span id="searchStatusText" class="sub"></span></div>
 </div>
