@@ -1,38 +1,35 @@
-# Zariya
+# Zariya - Web App
 
-Offline-first AI platform for Urdu and other low-resource languages.
+This is the actively developed version of Zariya: a Flask backend with a browser front end, built around privacy-first, offline-first AI for Urdu and other low-resource languages.
 
-Built around four things: privacy-first AI, offline/local systems, accessibility, and being a culturally aware communication tool for Urdu speakers.
+## How it's built
 
-## How it's actually built
+This is a real Flask backend plus a browser front end, not a single static page, and that matters for a few reasons.
 
-This is a real Flask backend + a browser frontend, not a single static file. That matters for a few reasons:
+By default, Zariya talks to a free local model runner called Ollama, which runs open-source models entirely on your own machine, so there's no API key to sign up for and nothing to paste into a settings screen. If you do choose to add optional Claude, Google Search, or GitHub OAuth credentials, they live in a server-side `.env` file - whoever deploys this configures them once, and the person using the app never has to enter a key themselves. GitHub sign-in uses a real OAuth authorization-code flow with the client secret exchanged server-side, the way GitHub's own docs describe, not a public-profile lookup dressed up as a login.
 
-- **No API key required, ever.** By default Zariya talks to a free local model runner called Ollama, which runs open-source models entirely on your own machine. There's nothing to sign up for and nothing to paste into a settings screen.
-- **API keys never touch the browser, if you choose to add any.** Claude, Google Search, and GitHub OAuth credentials (all optional) live in a server-side `.env` file. Whoever deploys this configures them once; the person using the app is never asked to enter a key.
-- **Real GitHub sign-in.** This uses the actual OAuth authorization-code flow: the client secret is exchanged server-side, exactly as GitHub's own docs require. It is not a public-profile lookup pretending to be a login.
-- **A genuine offline core.** `kb_engine.py` has zero dependencies and zero network calls: arithmetic, unit conversion, a ~340-word bilingual Urdu/English dictionary, and a ~395-entry curated knowledge base matched with a fuzzy scorer. This is the guaranteed fallback if Ollama isn't installed/running, or while a model is still downloading: the app never goes blank.
-- **Answers get remembered.** When the local model (or Claude, if configured) gives a real answer, it's cached server-side and reused for similarly-worded questions later: a growing local memory, not model retraining.
+Underneath all of that sits `kb_engine.py`, a genuinely offline core with no dependencies and no network calls: arithmetic, unit conversion, a roughly 340-word bilingual Urdu/English dictionary, and a roughly 395-entry curated knowledge base matched with a fuzzy scorer. It's the guaranteed fallback if Ollama isn't installed or running, or while a model is still downloading, so the app never goes blank. When the local model (or Claude, if configured) gives a real answer, it gets cached server-side and reused for similarly worded questions later - a growing local memory, not model retraining.
 
 ## Setup
 
-1. Install Ollama once: https://ollama.com/download (a normal app installer for Windows/Mac/Linux: no C++ compiler, no account, nothing to configure). Make sure it's running.
-2. ```
+1. Install Ollama once: https://ollama.com/download (a normal installer for Windows/Mac/Linux - no C++ compiler, no account, nothing to configure). Make sure it's running.
+2.
+   ```bash
    pip install -r requirements.txt
    cp .env.example .env
    python app.py
    ```
-3. Open http://localhost:5000. On first chat request, Zariya asks Ollama to pull a small model (`qwen2.5:1.5b` by default, ~1GB, free, one-time) automatically: no command needed from you. The offline knowledge engine answers immediately in the meantime, then the app switches over to the real local model once it's ready.
+3. Open `http://localhost:5000`. On the first chat request, Zariya asks Ollama to pull a small model (`qwen2.5:1.5b` by default, about 1GB, free, one-time) automatically - no command needed from you. The offline knowledge engine answers immediately in the meantime, then the app switches over to the real local model once it's ready.
 
-This previously used `llama-cpp-python` to load model files directly in-process, which required a working C++ build toolchain and failed to install on a number of machines. Talking to Ollama over plain HTTP instead avoids that entirely: Ollama ships its own prebuilt binaries.
+This used to load model files directly in-process with `llama-cpp-python`, which needed a working C++ build toolchain and failed to install on a number of machines. Talking to Ollama over plain HTTP instead avoids that entirely - Ollama ships its own prebuilt binaries.
 
 ### Using a different local model
 
-Set `LOCAL_MODEL_NAME` in `.env` to any model name from https://ollama.com/library (e.g. `llama3.2:1b`, `qwen2.5:3b`).
+Set `LOCAL_MODEL_NAME` in `.env` to any model name from https://ollama.com/library (for example `llama3.2:1b` or `qwen2.5:3b`).
 
 ### Running Ollama elsewhere
 
-Set `OLLAMA_URL` in `.env` if Ollama is running on a different host/port than the default `http://localhost:11434`.
+Set `OLLAMA_URL` in `.env` if Ollama is running on a different host or port than the default `http://localhost:11434`.
 
 ### Disabling the local model entirely
 
@@ -40,7 +37,7 @@ Set `DISABLE_LOCAL_MODEL=1` in `.env` for a purely offline, lookup-table-only de
 
 ### Optional: Claude API
 
-Get a key from the Anthropic Console and set `ANTHROPIC_API_KEY` in `.env`. When set, Claude is tried first (highest quality), then the local model, then the offline knowledge engine.
+Get a key from the Anthropic Console and set `ANTHROPIC_API_KEY` in `.env`. When it's set, Claude is tried first, then the local model, then the offline knowledge engine.
 
 ### Optional: Web search
 
@@ -55,18 +52,18 @@ Create an OAuth App at github.com/settings/developers:
 
 Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in `.env`.
 
-## An honest limit, stated plainly
+## An honest limit
 
-The default local model is small (1.5B parameters) so it downloads quickly and runs on ordinary laptop CPUs: it will be noticeably less capable and slower than a large hosted model. The offline knowledge engine below it is a curated lookup table with a fuzzy matcher, not a language model, and will always have gaps outside its ~395 entries. For higher-quality or faster answers, connect the Claude API or point `LOCAL_MODEL_NAME` at a larger Ollama model: there's no way around that trade-off, and this README won't pretend otherwise.
+The default local model is small (1.5B parameters) so it downloads quickly and runs on ordinary laptop CPUs, but it's noticeably less capable and slower than a large hosted model. The offline knowledge engine below it is a curated lookup table with a fuzzy matcher, not a language model, and will always have gaps outside its ~395 entries. For higher-quality or faster answers, connect the Claude API or point `LOCAL_MODEL_NAME` at a larger Ollama model - there's no way around that trade-off, and I'd rather say so here than pretend otherwise.
 
 ## Project layout
 
 - `app.py` - Flask app: routes, OAuth, Claude/Search proxying, model fallback chain
-- `kb_engine.py`: Offline knowledge engine (no dependencies, no network)
-- `local_model.py`: Local-model inference via Ollama's local HTTP API
-- `templates/index.html`: Frontend markup
-- `static/app.js`: Frontend logic (talks only to this server's own API)
-- `static/style.css`: Styling
-- `server/kb_data.json`: Dictionary + knowledge base data
-- `server/store.json`: Per-user notes/sessions/decks (created at runtime)
-- `server/learned.json`: Cached AI answers (created at runtime)
+- `kb_engine.py` - offline knowledge engine (no dependencies, no network)
+- `local_model.py` - local-model inference via Ollama's HTTP API
+- `templates/index.html` - frontend markup
+- `static/app.js` - frontend logic (talks only to this server's own API)
+- `static/style.css` - styling
+- `server/kb_data.json` - dictionary + knowledge base data
+- `server/store.json` - per-user notes/sessions/decks (created at runtime)
+- `server/learned.json` - cached AI answers (created at runtime)
