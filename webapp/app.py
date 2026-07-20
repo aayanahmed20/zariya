@@ -17,11 +17,12 @@ Architecture, and why it's built this way:
 import os
 import secrets
 import time
+import json
 from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, jsonify, redirect, request, session, url_for, render_template
+from flask import Flask, jsonify, redirect, request, session, url_for, render_template, Response, stream_with_context
 
 import kb_engine
 import local_model
@@ -228,6 +229,87 @@ def chat():
             kb_engine.remember_answer(last_user["content"], reply)
 
     return jsonify({"reply": reply, "usedRealModel": used_real_model})
+
+def _sse(data):
+    return f"data: {json.dumps(data)}\n\n"
+
+
+@app.route("/api/chat/stream", methods=["POST"])
+def chat_stream():
+    """Same fallback chain as /api/chat (Claude -> local model -> offline
+    knowledge engine), but streams the reply back as Server-Sent Events so
+    the local model can show up token-by-token like a real LLM chat instead
+    of the browser waiting on one big blocking response. Claude and the
+    offline knowledge engine don't support token streaming here, so their
+    replies are sent as a single event -- only the local model path streams
+    incrementally."""
+    body = request.get_json(silent=True) or {}
+    messages, err = _normalize_messages(body.get("messages"))
+    if err:
+        return jsonify({"error": err}), 400
+
+    def generate():
+        used_real_model = False
+        full_reply = None
+
+        if ANTHROPIC_API_KEY:
+            try:
+                res = requests.post(
+                    "https://api.anthropic.com/v1/messages",
+                    headers={
+                        "Content-Type": "application/json",
+                        "x-api-key": ANTHROPIC_API_KEY,
+                        "anthropic-version": "2023-06-01",
+                    },
+                    json={
+                        "model": ANTHROPIC_MODEL,
+                        "max_tokens": 1000,
+                        "system": SYSTEM_PROMPT,
+                        "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
+                    },
+                    timeout=30,
+                )
+                res.raise_for_status()
+                data = res.json()
+                text_block = next((b for b in data.get("content", []) if b.get("type") == "text"), None)
+                if text_block:
+                    full_reply = text_block["text"]
+                    used_real_model = True
+                    yield _sse({"delta": full_reply})
+            except Exception as e:
+                app.logger.warning("Claude API call failed, falling back to offline: %s", e)
+
+        if full_reply is None and local_model.is_available():
+            collected = []
+            for token in local_model.stream_reply(messages, SYSTEM_PROMPT):
+                collected.append(token)
+                yield _sse({"delta": token})
+            if collected:
+                full_reply = "".join(collected)
+                used_real_model = True
+
+        if full_reply is None:
+            try:
+                full_reply = kb_engine.offline_reply(messages)
+            except Exception:
+                app.logger.exception("offline_reply crashed")
+                full_reply = ("Something went wrong answering that offline. Try rephrasing your "
+                              "message, or a simpler one like a math expression or a greeting.")
+            yield _sse({"delta": full_reply})
+
+        if used_real_model and full_reply:
+            last_user = next((m for m in reversed(messages) if m["role"] == "user"), None)
+            if last_user and last_user.get("content", "").strip():
+                kb_engine.remember_answer(last_user["content"], full_reply)
+
+        yield _sse({"done": True, "usedRealModel": used_real_model})
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
 
 @app.route("/api/feedback", methods=["POST"])
 def feedback():
