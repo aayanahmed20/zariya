@@ -79,5 +79,27 @@ User → Streamlit UI → Inference Engine (llama.cpp) → Local LLM → Respons
 
 ## Model Setup
 
-Zariya requires a local language model to run.
+Zariya requires a local language model to run. It runs the same fallback-free, no-internet-required design either way:
 
+1. **Easiest -- download a model from inside the app.** Launch Zariya (see below), open **Settings > Model**, and pick one of the built-in presets (Phi-3 Mini, ~2.2 GB; Mistral 7B Instruct, ~4.4 GB; Llama 3 8B Instruct, ~4.9 GB), or paste any direct `.gguf` URL. The app streams it straight into `models/model.gguf`.
+2. **Manual.** Download any GGUF-format model yourself (for example from [Hugging Face](https://huggingface.co/models?search=gguf)), and place it at `models/model.gguf`.
+
+Either way, once a model file is in place, Zariya loads it locally via `llama.cpp` and never calls out to the network to answer a chat message.
+
+---
+
+## Running Zariya (Streamlit app)
+
+```bash
+pip install -r requirements.txt
+python run.py
+```
+
+`run.py` creates the `models/` and `data/` folders if they don't exist, checks whether `streamlit` and `llama-cpp-python` are installed and whether a model is already in place, then launches the Streamlit UI. If no model has been downloaded yet, the app still starts -- it just won't be able to generate real replies until you add one from **Settings > Model**, as described above.
+
+---
+
+## Which version should I use?
+
+- Want the simplest possible standalone LLM chat, with everything (UI, inference, storage) in one Python process and no server concepts to think about? Use the **Streamlit app** (`run.py`) above.
+- Want a browser-based UI with notes/flashcards/spaced-repetition study tools, and don't mind running a small Flask server? Use **[`webapp/`](webapp/)**. It talks to a local model through [Ollama](https://ollama.com) instead of `llama.cpp` directly (no C++ build tools required), answers with streaming, token-by-token responses, and only ever reaches out to the network if you explicitly configure an optional Claude API key or web search -- with neither configured, it is just as standalone as the Streamlit app.
