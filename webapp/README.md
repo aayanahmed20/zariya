@@ -52,6 +52,17 @@ Create an OAuth App at github.com/settings/developers:
 
 Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in `.env`.
 
+## Persona, creativity, and switching models
+
+A few things are tunable from Settings, per browser, without touching `.env`:
+
+- **Persona / system prompt.** Replace Zariya's default personality with your own instructions for this browser only. Leave it blank to use the default.
+- **Creativity.** A temperature slider (0 to 1) sent with every chat request, applied to whichever backend answers -- lower for more predictable replies, higher for more varied ones.
+- **Local model switching.** Settings lists every model Ollama has already pulled and lets you switch the active one instantly, or type in any model name from https://ollama.com/library to pull and switch to a new one in the background.
+
+None of this requires a restart -- changes take effect on the next message.
+
+
 ## An honest limit
 
 The default local model is small (1.5B parameters) so it downloads quickly and runs on ordinary laptop CPUs, but it's noticeably less capable and slower than a large hosted model. The offline knowledge engine below it is a curated lookup table with a fuzzy matcher, not a language model, and will always have gaps outside its ~395 entries. For higher-quality or faster answers, connect the Claude API or point `LOCAL_MODEL_NAME` at a larger Ollama model - there's no way around that trade-off, and I'd rather say so here than pretend otherwise.
