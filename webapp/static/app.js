@@ -325,18 +325,66 @@ async function respondTo(session){
   stopped = false; setGenerating(true); showThinking();
   currentAbort = new AbortController();
   let reply = '';
+  let bubbleEl = null;
   try{
-    const data = await apiPost('/api/chat', { messages: session.messages.map(m=>({role:m.role, content:m.content})) }, currentAbort.signal);
-    reply = data.reply || data.error || 'Something went wrong.';
+    const res = await fetch('/api/chat/stream', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ messages: session.messages.map(m=>({role:m.role, content:m.content})) }),
+      signal: currentAbort.signal
+    });
+    if(!res.ok || !res.body){
+      let data = {}; try{ data = await res.json(); }catch(e){}
+      reply = data.error || 'Something went wrong.';
+    } else {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      while(true){
+        const {done, value} = await reader.read();
+        if(done) break;
+        buf += decoder.decode(value, {stream:true});
+        let idx;
+        while((idx = buf.indexOf('\n\n')) !== -1){
+          const chunk = buf.slice(0, idx); buf = buf.slice(idx+2);
+          const line = chunk.split('\n').find(l=>l.startsWith('data: '));
+          if(!line) continue;
+          let payload;
+          try{ payload = JSON.parse(line.slice(6)); }catch(e){ continue; }
+          if(payload.delta){
+            reply += payload.delta;
+            if(!bubbleEl){ removeThinking(); bubbleEl = appendStreamingBubble(); }
+            updateStreamingBubble(bubbleEl, reply);
+          }
+        }
+      }
+    }
   }catch(err){
     if(err.name==='AbortError'){ removeThinking(); setGenerating(false); return; }
     reply = 'Could not reach the server: ' + (err.message||'unknown error');
   }
   removeThinking(); setGenerating(false);
   if(stopped) return;
+  if(!reply) reply = 'Something went wrong.';
   session.messages.push({ role:'assistant', content:reply, ts:nowISO() });
   saveServerState(); renderChat();
   if(uiPrefs.ttsEnabled) speak(reply);
+}
+function appendStreamingBubble(){
+  const inner = document.getElementById('chat-inner');
+  const scroll = document.getElementById('chat-scroll');
+  scroll.classList.remove('empty-mode'); inner.classList.remove('empty-mode');
+  const row = document.createElement('div');
+  row.className = 'msg-row assistant';
+  row.innerHTML = '<img class="avatar-logo" src="/static/logo.png" alt=""><div class="bubble-col assistant-col"><div class="bubble assistant" id="streamingBubbleContent"></div></div>';
+  inner.appendChild(row);
+  scroll.scrollTop = 999999;
+  return row.querySelector('#streamingBubbleContent');
+}
+function updateStreamingBubble(el, text){
+  el.innerHTML = renderMarkdown(text);
+  el.classList.toggle('is-urdu', isUrdu(text));
+  document.getElementById('chat-scroll').scrollTop = 999999;
 }
 function stopGenerating(){ stopped = true; if(currentAbort) currentAbort.abort(); removeThinking(); setGenerating(false); }
 function regenerateLast(){
