@@ -11,7 +11,7 @@ exposes them over a small local HTTP API. This module just talks to that API.
 Setup, once, on the machine that runs this server:
 1. Install Ollama from https://ollama.com/download (a normal app installer).
 2. Make sure it's running (it starts automatically after install on most
-   platforms; otherwise run the `ollama` app / `ollama serve`).
+   platforms; otherwise run the ollama app / 'ollama serve').
 3. That's it. On first request, this module asks Ollama to pull a small
    default model automatically if it isn't already present -- no need to run
    any command yourself.
@@ -23,7 +23,9 @@ engine, so the app is never broken by this being absent.
 Override the model with LOCAL_MODEL_NAME in .env (any name from
 https://ollama.com/library). Override the Ollama address with OLLAMA_URL if
 it's running on a different host/port. Set DISABLE_LOCAL_MODEL=1 to skip
-trying to use a local model entirely.
+trying to use a local model entirely. The active model can also be switched
+at runtime from Settings, without touching .env or restarting -- see
+set_active_model() below.
 """
 import json
 import os
@@ -56,6 +58,12 @@ def load_progress() -> dict:
     return dict(_progress)
 
 
+def current_model() -> str:
+    """The Ollama model name currently in use (or being downloaded, if a
+    switch to a new model is in progress)."""
+    return DEFAULT_MODEL
+
+
 def retry_now() -> dict:
     """Wakes the background loop up immediately instead of waiting out the
     current backoff delay. Safe to call any time -- a no-op if a pull is
@@ -85,6 +93,22 @@ def _model_present(model: str) -> bool:
         return any(n == model or n.startswith(base + ":") for n in names)
     except Exception:
         return False
+
+
+def list_models() -> list[dict]:
+    """Every model Ollama already has pulled on this machine, so Settings can
+    offer a dropdown of models that are instantly usable, with no download
+    wait, alongside the option to pull a new one by name."""
+    try:
+        r = requests.get(f"{OLLAMA_URL}/api/tags", timeout=5)
+        r.raise_for_status()
+        return [
+            {"name": m.get("name", ""), "size": m.get("size", 0)}
+            for m in r.json().get("models", [])
+            if m.get("name")
+        ]
+    except Exception:
+        return []
 
 
 def _pull_model(model: str) -> bool:
@@ -176,17 +200,51 @@ def _init_in_background():
 threading.Thread(target=_init_in_background, daemon=True).start()
 
 
-def generate_reply(messages: list[dict], system_prompt: str) -> str | None:
+def _pull_and_activate(model: str):
+    """Background worker for set_active_model() when the requested model
+    isn't already pulled: downloads it, and only flips the active model over
+    once it's confirmed present, so a failed switch leaves the previous
+    (working) model in place instead of pointing the app at nothing."""
+    global DEFAULT_MODEL, _ready, _status
+    if _pull_model(model):
+        DEFAULT_MODEL = model
+        _status = "loaded"
+        _ready = True
+
+
+def set_active_model(name: str) -> dict:
+    """Switch which Ollama model Zariya talks to, at runtime, from Settings --
+    no .env edit or restart required. If the model is already pulled locally
+    this takes effect immediately; otherwise it kicks off a background
+    download and the frontend can poll /api/config in the meantime, exactly
+    like first-run setup does."""
+    global DEFAULT_MODEL, _ready, _status
+    name = (name or "").strip()
+    if not name:
+        return {"ok": False, "error": "No model name provided"}
+    if _pulling:
+        return {"ok": False, "error": "A model download is already in progress -- try again once it finishes"}
+    if not _ollama_running():
+        return {"ok": False, "error": "Ollama isn't running, so no model can be selected right now"}
+    if _model_present(name):
+        DEFAULT_MODEL = name
+        _status = "loaded"
+        _ready = True
+        return {"ok": True, "status": _status, "model": DEFAULT_MODEL, "pulling": False}
+    threading.Thread(target=_pull_and_activate, args=(name,), daemon=True).start()
+    return {"ok": True, "status": f"Downloading '{name}'...", "model": name, "pulling": True}
+
+
+def generate_reply(messages: list[dict], system_prompt: str, temperature: float | None = None) -> str | None:
     if not _ready:
         return None
     chat_messages = [{"role": "system", "content": system_prompt}]
     chat_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-12:]]
+    payload = {"model": DEFAULT_MODEL, "messages": chat_messages, "stream": False}
+    if temperature is not None:
+        payload["options"] = {"temperature": temperature}
     try:
-        res = requests.post(
-            f"{OLLAMA_URL}/api/chat",
-            json={"model": DEFAULT_MODEL, "messages": chat_messages, "stream": False},
-            timeout=60,
-        )
+        res = requests.post(f"{OLLAMA_URL}/api/chat", json=payload, timeout=60)
         res.raise_for_status()
         data = res.json()
         return data.get("message", {}).get("content")
@@ -194,7 +252,7 @@ def generate_reply(messages: list[dict], system_prompt: str) -> str | None:
         return None
 
 
-def stream_reply(messages: list[dict], system_prompt: str):
+def stream_reply(messages: list[dict], system_prompt: str, temperature: float | None = None):
     """Yields reply tokens as they arrive from Ollama's streaming chat API,
     for a real-time typing effect in the UI. Yields nothing (an empty
     generator) if the local model isn't ready or the request fails partway --
@@ -204,25 +262,23 @@ def stream_reply(messages: list[dict], system_prompt: str):
         return
     chat_messages = [{"role": "system", "content": system_prompt}]
     chat_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-12:]]
+    payload = {"model": DEFAULT_MODEL, "messages": chat_messages, "stream": True}
+    if temperature is not None:
+        payload["options"] = {"temperature": temperature}
     try:
-        with requests.post(
-            f"{OLLAMA_URL}/api/chat",
-            json={"model": DEFAULT_MODEL, "messages": chat_messages, "stream": True},
-            timeout=120,
-            stream=True,
-        ) as res:
+        with requests.post(f"{OLLAMA_URL}/api/chat", json=payload, timeout=120, stream=True) as res:
             res.raise_for_status()
             for line in res.iter_lines():
                 if not line:
                     continue
                 try:
-                    payload = json.loads(line)
+                    payload_line = json.loads(line)
                 except (ValueError, TypeError):
                     continue
-                token = payload.get("message", {}).get("content")
+                token = payload_line.get("message", {}).get("content")
                 if token:
                     yield token
-                if payload.get("done"):
+                if payload_line.get("done"):
                     return
     except Exception:
         return
