@@ -15,6 +15,8 @@ let decks = [];
 let currentSessionId = null;
 let currentNoteId = null;
 let currentDeckId = null;
+  let activeNoteTagFilter = null;
+  let activeDeckTagFilter = null;
 let studyQueue = []; let studyIndex = 0; let studyFlipped = false;
 let editingIndex = null;
 let isGenerating = false;
@@ -155,7 +157,18 @@ function renderAccountUI(){
 document.getElementById('localModelStatusText').textContent = serverConfig.localModelAvailable ? 'Loaded -- answering your chats' + (serverConfig.localModelName ? ' (' + serverConfig.localModelName + ')' : '') : (serverConfig.localModelStatus || 'Not configured');
   document.getElementById('searchStatusText').textContent = serverConfig.searchConfigured ? 'Connected' : 'Not configured (optional)';
   updateLocalModelRetryUI();
+  updateOnboardingBanner();
 }
+  const ONBOARDING_DISMISS_KEY = 'zariya_onboarding_dismissed';
+  function updateOnboardingBanner(){
+      const banner = document.getElementById('onboardingBanner');
+      if(!banner) return;
+      const dismissed = LS.get(ONBOARDING_DISMISS_KEY, false);
+      const needsHelp = !serverConfig.claudeConfigured && !serverConfig.localModelAvailable;
+      banner.style.display = (needsHelp && !dismissed) ? 'flex' : 'none';
+  }
+  const onboardingDismissBtn = document.getElementById('onboardingDismissBtn');
+  if(onboardingDismissBtn) onboardingDismissBtn.addEventListener('click', ()=>{ LS.set(ONBOARDING_DISMISS_KEY, true); updateOnboardingBanner(); });
 document.getElementById('sbProfileRow').addEventListener('click', ()=>switchView('settings'));
 document.getElementById('githubSignInBtn').addEventListener('click', ()=>{ window.location.href = '/auth/github/login'; });
 document.getElementById('githubSignOutBtn').addEventListener('click', async ()=>{
@@ -293,6 +306,7 @@ function sendFeedback(idx, rating, btn){
   btn.textContent = rating==='up' ? 'Thanks!' : 'Noted';
 }
 function saveEdit(idx){
+    if(isGenerating) return;
   const ta = document.getElementById('editTa');
   const newText = ta.value.trim(); if(!newText) return;
   const session = currentSession();
@@ -407,6 +421,7 @@ function updateStreamingBubble(el, text){
 }
 function stopGenerating(){ stopped = true; if(currentAbort) currentAbort.abort(); removeThinking(); setGenerating(false); }
 function regenerateLast(){
+    if(isGenerating) return;
   const session = currentSession(); if(!session) return;
   const lastAssistantIdx = [...session.messages].reverse().findIndex(m=>m.role==='assistant');
   if(lastAssistantIdx===-1) return;
@@ -417,6 +432,7 @@ function regenerateLast(){
 /* ============ QUICK TOOLS ============ */
 document.querySelectorAll('.qt-btn').forEach(btn=> btn.addEventListener('click', ()=>runQuickTool(btn.dataset.tool)));
 async function runQuickTool(tool){
+    if(isGenerating) return;
   const session = currentSession(); if(!session || !session.messages.length) return;
   const payload = { messages: session.messages.map(m=>({role:m.role, content:m.content})) };
   if(tool==='summarize'){
@@ -431,7 +447,7 @@ async function runQuickTool(tool){
   } else if(tool==='flashcards'){
     const {cards} = await apiPost('/api/tools/flashcards', payload);
     if(cards && cards.length){
-      const deck = {id:uid(), name:session.title+' - flashcards', cards: cards.map(c=>({id:uid(), front:c.front, back:c.back, known:false})), createdAt:Date.now()};
+      const deck = {id:uid(), name:session.title+' - flashcards', tags:[], cards: cards.map(c=>({id:uid(), front:c.front, back:c.back, known:false})), createdAt:Date.now()};
       decks.unshift(deck); saveServerState();
       switchView('flashcards'); renderDeckGrid(); openDeck(deck.id);
       return;
@@ -508,26 +524,45 @@ try{
 /* ============ NOTEPAD ============ */
 function renderNotesList(){
   const wrap = document.getElementById('notesList'); wrap.innerHTML='';
-  if(!notes.length) wrap.innerHTML = '<div class="empty-mini"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span>No notes yet</span></div>';
-  notes.forEach(n=>{
+    renderNoteTagFilterRow();
+    const visibleNotes = activeNoteTagFilter ? notes.filter(n=>(n.tags||[]).includes(activeNoteTagFilter)) : notes;
+  if(!visibleNotes.length) wrap.innerHTML = '<div class="empty-mini"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span>No notes yet</span></div>';
+  visibleNotes.forEach(n=>{
     const div = document.createElement('div');
     div.className = 'note-card'+(n.id===currentNoteId?' active':'');
-    div.innerHTML = '<div class="note-card-title">'+escapeHtml(n.title||'Untitled')+'</div><div class="note-card-preview">'+escapeHtml((n.body||'').slice(0,60))+'</div>';
+    div.innerHTML = '<div class="note-card-title">'+escapeHtml(n.title||'Untitled')+'</div><div class="note-card-preview">'+escapeHtml((n.body||'').slice(0,60))+'</div>'+((n.tags&&n.tags.length)?'<div class="note-card-tags">'+n.tags.map(t=>'<span>'+escapeHtml(t)+'</span>').join('')+'</div>':'');
     div.addEventListener('click', ()=>openNote(n.id));
     wrap.appendChild(div);
   });
   if(!currentNoteId && notes.length) openNote(notes[0].id);
   if(!notes.length){ document.getElementById('note-title-input').value=''; document.getElementById('note-body-input').value=''; }
-}
+}}
+  function renderNoteTagFilterRow(){
+      const row = document.getElementById('noteTagFilterRow');
+      if(!row) return;
+      const tagCounts = {};
+      notes.forEach(n=>(n.tags||[]).forEach(t=>{ tagCounts[t] = (tagCounts[t]||0)+1; }));
+      const tags = Object.keys(tagCounts).sort();
+      if(!tags.length){ row.innerHTML = ''; return; }
+      row.innerHTML = tags.map(t=>'<span class="tag-chip'+(activeNoteTagFilter===t?' active':'')+'" data-tag="'+escapeHtml(t)+'">'+escapeHtml(t)+' ('+tagCounts[t]+')</span>').join('');
+      row.querySelectorAll('.tag-chip').forEach(chip=>{
+            chip.addEventListener('click', ()=>{
+                    const t = chip.dataset.tag;
+                    activeNoteTagFilter = activeNoteTagFilter===t ? null : t;
+                    renderNotesList();
+            });
+      });
+  }
 function openNote(id){
   currentNoteId = id;
   const n = notes.find(n=>n.id===id);
   document.getElementById('note-title-input').value = n? n.title : '';
   document.getElementById('note-body-input').value = n? n.body : '';
+  document.getElementById('note-tags-input').value = n && n.tags ? n.tags.join(', ') : '';  
   renderNotesList();
 }
 document.getElementById('newNoteBtn').addEventListener('click', ()=>{
-  const n = {id:uid(), title:'Untitled note', body:'', updatedAt:Date.now()};
+  const n = {id:uid(), title:'Untitled note', body:'', tags:[], updatedAt:Date.now()};
   notes.unshift(n); currentNoteId=n.id; saveServerState(); renderNotesList();
   document.getElementById('note-title-input').focus();
 });
@@ -552,6 +587,17 @@ document.getElementById('exportNoteBtn').addEventListener('click', ()=>{
   const n = notes.find(n=>n.id===currentNoteId); if(!n) return;
   downloadFile((n.title||'note')+'.md', '# '+n.title+'\n\n'+n.body);
 });
+  let noteTagsSaveTimer;
+  document.getElementById('note-tags-input').addEventListener('input', ()=>{
+      clearTimeout(noteTagsSaveTimer);
+      noteTagsSaveTimer = setTimeout(()=>{
+            const n = notes.find(n=>n.id===currentNoteId);
+            if(n){
+                    n.tags = document.getElementById('note-tags-input').value.split(',').map(t=>t.trim().toLowerCase()).filter(Boolean);
+                    saveServerState(); renderNotesList();
+            }
+      }, 400);
+  });
 function buildCardsFromNoteText(text){
   const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
 
@@ -593,7 +639,7 @@ document.getElementById('noteToFlashBtn').addEventListener('click', ()=>{
   if(!n || !n.body.trim()) return;
   const cards = buildCardsFromNoteText(n.body).map(c=>migrateCardForSpacedRepetition({id:uid(), front:c.front, back:c.back, known:false}));
   if(cards.length){
-    const deck = {id:uid(), name:n.title+' - flashcards', cards, createdAt:Date.now()};
+    const deck = {id:uid(), name:n.title+' - flashcards', tags:(n.tags||[]).slice(), cards, createdAt:Date.now()};
     decks.unshift(deck); saveServerState();
     switchView('flashcards'); renderDeckGrid(); openDeck(deck.id);
   } else {
@@ -640,14 +686,18 @@ function renderDeckGrid(){
   document.getElementById('studyArea').style.display='none';
   document.getElementById('quizArea').style.display='none';
   const grid = document.getElementById('deckGrid'); grid.style.display='grid'; grid.innerHTML='';
-  if(!decks.length){ grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M6 2h16v12"/></svg><span>No decks yet -- chat, then use "Make flashcards" above the message box</span></div>'; return; }
-  decks.forEach(d=>{
+    decks.forEach(d=>{ if(!d.tags) d.tags = []; });
+    renderDeckTagFilterRow();
+    const visibleDecks = activeDeckTagFilter ? decks.filter(d=>(d.tags||[]).includes(activeDeckTagFilter)) : decks;
+  if(!visibleDecks.length){ grid.innerHTML='<div class="empty-mini" style="grid-column:1/-1;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="12" rx="2"/><path d="M6 2h16v12"/></svg><span>No decks yet -- chat, then use "Make flashcards" above the message box</span></div>'; return; }
+  visibleDecks.forEach(d=>{
     d.cards.forEach(migrateCardForSpacedRepetition);
     const known = d.cards.filter(c=>c.known).length;
     const pct = d.cards.length? Math.round(known/d.cards.length*100):0;
     const due = cardsDue(d.cards).length;
     const card = document.createElement('div'); card.className='deck-card';
     card.innerHTML = '<h3>'+escapeHtml(d.name)+'</h3><p>'+d.cards.length+' card'+(d.cards.length!==1?'s':'')+' · '+pct+'% known'+(due? ' · <strong style="color:var(--accent-strong);">'+due+' due</strong>':' · none due')+'</p><div class="deck-progress"><div class="deck-progress-fill" style="width:'+pct+'%"></div></div>'+
+        '<div class="deck-card-tags">'+((d.tags&&d.tags.length)?d.tags.map(t=>'<span>'+escapeHtml(t)+'</span>').join(''):'')+'</div>'+
       '<div class="deck-card-actions"><button class="deck-action-btn" data-action="study">Study</button><button class="deck-action-btn" data-action="quiz"'+(d.cards.length<2?' disabled title="Needs at least 2 cards"':'')+'>Quiz</button><button class="deck-action-btn" data-action="rename" title="Rename deck" aria-label="Rename deck">Rename</button><button class="deck-action-btn" data-action="export" title="Download as JSON">Export</button><button class="deck-action-btn danger" data-action="delete" title="Delete deck" aria-label="Delete deck">Delete</button></div>';
     card.querySelector('[data-action="study"]').addEventListener('click', (e)=>{ e.stopPropagation(); openDeck(d.id); });
     const quizBtn = card.querySelector('[data-action="quiz"]');
@@ -676,7 +726,7 @@ function deleteDeck(id){
   saveServerState(); renderDeckGrid();
 }
 function exportDeck(deck){
-  const payload = { zariyaDeckExport: 1, name: deck.name, cards: deck.cards.map(c=>({
+  const payload = { zariyaDeckExport: 1, name: deck.name, tags: deck.tags||[], cards: deck.cards.map(c=>({
     front: c.front, back: c.back, known: !!c.known, ease: c.ease, interval: c.interval, reps: c.reps, due: c.due
   })) };
   downloadFile(deck.name.replace(/[^\w\- ]/g, '').trim().replace(/\s+/g, '_') + '.json', JSON.stringify(payload, null, 2));
@@ -699,7 +749,8 @@ function importDeckFromJson(text){
     }));
   }
   if(!cards.length){ alert('No valid cards (each needs a front and back) found in that file.'); return; }
-  decks.unshift({ id: uid(), name, cards, createdAt: Date.now() });
+  const tags = Array.isArray(parsed) ? [] : (Array.isArray(parsed.tags) ? parsed.tags : []);
+  decks.unshift({ id: uid(), name, tags, cards, createdAt: Date.now() });
   saveServerState(); renderDeckGrid();
 }
 document.getElementById('importDeckBtn').addEventListener('click', ()=>document.getElementById('importDeckFile').click());
@@ -761,6 +812,8 @@ function renderStudy(){
 }
 document.getElementById('newDeckBtn').addEventListener('click', ()=>{
   const name = prompt('Deck name?'); if(!name) return;
+    const tagsRaw = prompt('Tags (comma separated, optional)') || '';
+    const tags = tagsRaw.split(',').map(t=>t.trim().toLowerCase()).filter(Boolean);
   const cards = []; let addMore=true;
   while(addMore && cards.length<20){
     const front = prompt('Front of card #'+(cards.length+1)+' (Cancel to stop)'); if(front===null) break;
@@ -768,8 +821,24 @@ document.getElementById('newDeckBtn').addEventListener('click', ()=>{
     cards.push(migrateCardForSpacedRepetition({id:uid(), front, back, known:false}));
     addMore = confirm('Add another card?');
   }
-  if(cards.length){ decks.unshift({id:uid(), name, cards, createdAt:Date.now()}); saveServerState(); renderDeckGrid(); }
+  if(cards.length){ decks.unshift({id:uid(), name, tags, cards, createdAt:Date.now()}); saveServerState(); renderDeckGrid(); }
 });
+function renderDeckTagFilterRow(){
+    const row = document.getElementById('deckTagFilterRow');
+    if(!row) return;
+    const tagCounts = {};
+    decks.forEach(d=>(d.tags||[]).forEach(t=>{ tagCounts[t] = (tagCounts[t]||0)+1; }));
+    const tags = Object.keys(tagCounts).sort();
+    if(!tags.length){ row.innerHTML = ''; return; }
+    row.innerHTML = tags.map(t=>'<span class="tag-chip'+(activeDeckTagFilter===t?' active':'')+'" data-tag="'+escapeHtml(t)+'">'+escapeHtml(t)+' ('+tagCounts[t]+')</span>').join('');
+    row.querySelectorAll('.tag-chip').forEach(chip=>{
+          chip.addEventListener('click', ()=>{
+                  const t = chip.dataset.tag;
+                  activeDeckTagFilter = activeDeckTagFilter===t ? null : t;
+                  renderDeckGrid();
+          });
+    });
+}
 
 
 /* ============ QUIZ MODE ============ */
