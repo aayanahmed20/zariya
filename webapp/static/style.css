@@ -266,23 +266,23 @@ flex-shrink:0; transition:.15s; background:transparent; color:var(--text-dim);
 .composer-hint{ text-align:center; font-size:11px; color:var(--text-muted); margin-top:9px; }
 .composer-hint.listening{ color:var(--danger); font-weight:600; }
 
-.attach-preview{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
-.attach-chip{
-display:flex; align-items:center; gap:7px; background:var(--bg-surface); border:1px solid var(--border);
-border-radius:10px; padding:5px 8px 5px 6px; font-size:12px; color:var(--text-dim); max-width:220px;
-}
-.attach-chip img{ width:26px; height:26px; object-fit:cover; border-radius:6px; }
-.attach-chip .attach-icon{ width:26px; height:26px; border-radius:6px; background:var(--code-bg); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--accent-strong); }
-.attach-chip .attach-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px; }
-.attach-chip .attach-remove{ background:none; border:none; color:var(--text-muted); cursor:pointer; padding:2px; flex-shrink:0; }
-.attach-chip .attach-remove:hover{ color:var(--danger); }
-
-.msg-attachments{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:7px; justify-content:flex-end; }
-.msg-attachments .attach-chip{ background:var(--bg-user-bubble); }
-
+.onboarding-banner{ display:flex; align-items:center; gap:14px; padding:10px 20px; background:var(--accent-wash); border-bottom:1px solid var(--border-soft); font-size:12.5px; color:var(--text-dim); }
+.onboarding-banner a{ color:var(--accent-strong); font-weight:600; }
+.ob-text{ flex:1; line-height:1.5; }
+.ob-dismiss{ background:none; border:none; font-size:20px; line-height:1; color:var(--text-muted); cursor:pointer; padding:2px 6px; border-radius:6px; flex-shrink:0; }
+.ob-dismiss:hover{ background:var(--bg-hover); color:var(--text); }
 /* ===== NOTEPAD ===== */
 #notepad-body{ flex:1; display:flex; min-height:0; }
-.notes-list{ width:250px; border-right:1px solid var(--border-soft); overflow-y:auto; padding:10px; }
+.notes-list-wrap{ width:250px; border-right:1px solid var(--border-soft); display:flex; flex-direction:column; min-height:0; }
+.notes-list{ flex:1; overflow-y:auto; padding:10px; }
+.tag-filter-row{ display:flex; flex-wrap:wrap; gap:6px; padding:8px 10px 0; }
+.tag-filter-row:empty{ padding:0; }
+.tag-chip{ padding:4px 10px; border-radius:14px; border:1px solid var(--border); background:var(--bg-surface); color:var(--text-dim); font-size:11px; cursor:pointer; font-weight:600; transition:.12s; }
+.tag-chip:hover{ border-color:var(--accent); color:var(--accent-strong); }
+.tag-chip.active{ background:var(--accent-wash); border-color:var(--accent); color:var(--accent-strong); }
+.tag-input{ width:100%; padding:8px 12px; border-radius:9px; border:1px solid var(--border); background:var(--bg-app); color:var(--text); font-size:12.5px; margin-bottom:10px; font-family:inherit; }
+.note-card-tags{ display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
+.note-card-tags span{ font-size:10px; padding:1px 7px; border-radius:8px; background:var(--bg-hover); color:var(--text-muted); }
 .note-card{ padding:10px 11px; border-radius:10px; cursor:pointer; margin-bottom:4px; transition:.15s; }
 .note-card:hover{ background:var(--bg-hover); transform:translateX(2px); }
 .note-card.active{ background:var(--bg-hover); }
@@ -328,6 +328,8 @@ background:var(--bg-surface); display:flex; align-items:center; justify-content:
 .sc-btn.known{ border-color:var(--success); color:var(--success); }
 .study-progress-text{ font-size:11.5px; color:var(--text-muted); margin-bottom:14px; }
 
+.deck-card-tags{ display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+.deck-card-tags span{ font-size:10px; padding:1px 7px; border-radius:8px; background:var(--bg-app); color:var(--text-muted); }
 .deck-card-actions{ display:flex; gap:7px; margin-top:12px; }
 .deck-action-btn{
 flex:1; padding:6px 0; border-radius:9px; border:1px solid var(--border); background:var(--bg-app);
@@ -392,6 +394,6 @@ color:var(--text); font-size:13px; font-family:var(--font-mono);
 #sidebar.open{ margin-left:0; }
 .sb-scrim{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:30; }
 .sb-scrim.show{ display:block; }
-.notes-list{ width:140px; }
+.notes-list-wrap{ width:140px; }
 .bubble-col.user-col{ max-width:88%; }
 }
