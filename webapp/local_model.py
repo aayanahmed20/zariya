@@ -239,7 +239,7 @@ def generate_reply(messages: list[dict], system_prompt: str, temperature: float 
     if not _ready:
         return None
     chat_messages = [{"role": "system", "content": system_prompt}]
-    chat_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-12:]]
+    chat_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-24:]]
     payload = {"model": DEFAULT_MODEL, "messages": chat_messages, "stream": False}
     if temperature is not None:
         payload["options"] = {"temperature": temperature}
@@ -261,7 +261,7 @@ def stream_reply(messages: list[dict], system_prompt: str, temperature: float | 
     if not _ready:
         return
     chat_messages = [{"role": "system", "content": system_prompt}]
-    chat_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-12:]]
+    chat_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-24:]]
     payload = {"model": DEFAULT_MODEL, "messages": chat_messages, "stream": True}
     if temperature is not None:
         payload["options"] = {"temperature": temperature}
