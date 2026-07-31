@@ -76,7 +76,8 @@ def build_prompts():
 
     # 6. Dictionary / translation lookups
     words = ["university", "semester", "library", "book", "water", "friend", "teacher",
-             "exam", "hostel", "student", "notes", "holiday"]
+             "exam", "hostel", "student", "notes", "holiday", "cnic", "nadra",
+             "easypaisa", "jazzcash", "fbr", "wapda", "iftar", "sehri"]
     prompts += words
     prompts += [f"what is {w} in urdu" for w in ["book", "water", "friend"]]
 
@@ -88,6 +89,12 @@ def build_prompts():
         "what is a scholarship", "what is hec", "what is a credit hour",
         "how to manage time better", "how to stop procrastinating", "what is a viva",
         "what is a literature review", "what is peer review", "tips for writing assignments",
+        "what is a cnic", "what is nadra", "difference between easypaisa and jazzcash",
+        "what is mobile load", "what is fbr", "what is ntn", "why is there load shedding",
+        "difference between wapda and k-electric", "what is bisp", "what is ehsaas program",
+        "what is a patwari", "what is stamp paper used for", "what is a vakil",
+        "difference between iftar and sehri", "what is qurbani", "difference between zakat and ushr",
+        "what is mehr", "what is dowry",
     ]
 
     # 8. Time / date
