@@ -60,6 +60,6 @@ python run.py
 - `run.py` - entry point for the Streamlit app
 - `requirements.txt` - dependencies for the Streamlit app
 
-## Status
+## Status & limitations
 
-Actively working on this. The offline knowledge engine is still fairly small, and the local model is only as good as whatever you point it at - a 1.5B model on a laptop CPU won't compete with a hosted large model, and I'd rather say that upfront than pretend otherwise.
+Actively working on this. The offline knowledge engine covers everyday conversation, a general vocabulary bank, and a growing set of Pakistan-specific civic, financial, and cultural terms (CNIC/NADRA, mobile wallets, utilities, Ramadan-related terms, and similar), but it's still a fixed lookup table, not a language model - ask it something outside that set and it says so rather than guessing. The local model path is only as good as whatever you point it at - a 1.5B model on a laptop CPU won't compete with a hosted large model, and I'd rather say that upfront than pretend otherwise.
