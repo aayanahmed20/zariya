@@ -31,28 +31,6 @@ If you're only going to run one, use the web app - see [`webapp/README.md`](weba
 - Ollama for local model inference (web app)
 - Vanilla JS/CSS front end
 
-## Getting started
-
-Web app:
-
-```bash
-cd webapp
-pip install -r requirements.txt
-cp .env.example .env
-python app.py
-```
-
-Then open `http://localhost:5000`.
-
-Streamlit app:
-
-```bash
-pip install -r requirements.txt
-python run.py
-```
-
-`run.py` sets up the `models/` and `data/` folders, checks whether a model is already downloaded, and launches the UI. If there's no model yet, you can download one from inside the app under Settings > Model (Phi-3 Mini, Mistral 7B Instruct, and Llama 3 8B Instruct are built in as presets), or place any GGUF file at `models/model.gguf` yourself.
-
 ## Project structure
 
 - `webapp/` - Flask app, local model + offline fallback, browser front end
