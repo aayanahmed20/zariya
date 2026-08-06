@@ -85,9 +85,9 @@ class TTSEngine:
         text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
         text = re.sub(r"\*(.+?)\*", r"\1", text)
         text = re.sub(r"#{1,6}\s+", "", text)
-        text = re.sub(r"\[(.+?)\]\(.+?\)", r"\1", text)
-        text = re.sub(r"!\[.*?\]\(.*?\)", "", text)
-        text = re.sub(r"[-*]\s+", "", text)
+        text = re.sub(r"!\[.*?\]\(.*?\)", "", text)          # images -- must run before the link regex below,
+        text = re.sub(r"\[(.+?)\]\(.+?\)", r"\1", text)      # otherwise ![alt](url) matches the link pattern first
+        text = re.sub(r"[-*]\s+", "", text)                  # and leaves a stray "!" in front of the alt text
         return text.strip()
 
 
