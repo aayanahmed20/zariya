@@ -89,8 +89,15 @@ def _model_present(model: str) -> bool:
         r = requests.get(f"{OLLAMA_URL}/api/tags", timeout=5)
         r.raise_for_status()
         names = [m.get("name", "") for m in r.json().get("models", [])]
-        base = model.split(":")[0]
-        return any(n == model or n.startswith(base + ":") for n in names)
+        if ":" in model:
+            # Caller asked for a specific tag (e.g. "qwen2.5:1.5b") -- only an
+            # exact match counts. A prefix match here would let a completely
+            # different-sized pulled model (e.g. "qwen2.5:7b") silently pass
+            # as if the requested one were present.
+            return model in names
+        # No tag specified -- accept any tag of this base model (e.g. this
+        # picks up an already-pulled "qwen2.5:latest" for a bare "qwen2.5").
+        return any(n == model or n.startswith(model + ":") for n in names)
     except Exception:
         return False
 
