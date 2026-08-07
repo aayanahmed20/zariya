@@ -61,7 +61,10 @@ def render_flashcards(engine):
             if st.button("Shuffle"):
                 import random
                 random.shuffle(st.session_state.fc_cards)
+                # fc_known/fc_flipped track cards by position, not identity -- a shuffle
+                # without clearing both would silently reattach "known" to the wrong card.
                 st.session_state.fc_flipped = set()
+                st.session_state.fc_known = set()
                 st.rerun()
         with b2:
             if st.button("Reset"):
