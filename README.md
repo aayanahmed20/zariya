@@ -35,9 +35,17 @@ If you're only going to run one, use the web app - see [`webapp/README.md`](weba
 
 - `webapp/` - Flask app, local model + offline fallback, browser front end
 - `app/`, `core/`, `models/` - original Streamlit app and inference engine
+- `tests/` - pytest suite for `core/`
 - `run.py` - entry point for the Streamlit app
 - `requirements.txt` - dependencies for the Streamlit app
+- `requirements-dev.txt` - adds pytest, for running `tests/`
 
 ## Status & limitations
 
 Actively working on this. The offline knowledge engine covers everyday conversation, a general vocabulary bank, and a growing set of Pakistan-specific civic, financial, and cultural terms (CNIC/NADRA, mobile wallets, utilities, Ramadan-related terms, and similar), but it's still a fixed lookup table, not a language model - ask it something outside that set and it says so rather than guessing. The local model path is only as good as whatever you point it at - a 1.5B model on a laptop CPU won't compete with a hosted large model, and I'd rather say that upfront than pretend otherwise.
+
+## Tests
+
+- `tests/` - covers the Streamlit app's core logic (`core/`): session memory, notes, flashcard generation/parsing, TTS markdown stripping, model downloads, and inference (chat + streaming, including the chat-template-unsupported fallback path). Run with `pip install -r requirements-dev.txt && pytest tests/`.
+- `webapp/test_kb_engine.py` - runs 570 varied prompts through the offline knowledge engine and checks for crashes or regressions. Run with `python webapp/test_kb_engine.py` (standard library only, no install needed).
+- `webapp/test_local_model.py` - covers the Ollama integration: model-tag matching, and reply generation/streaming. Run with `pytest webapp/test_local_model.py`.
