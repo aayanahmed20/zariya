@@ -82,10 +82,10 @@ def _load_store():
     return {"users": {}}
 
 def _save_store(store):
-        """Writes to a temp file in the same directory, then atomically renames it
+    """Writes to a temp file in the same directory, then atomically renames it
     over the real file, so a crash or kill mid-write can never leave
-        store.json truncated or corrupted (matches the pattern already used by
-        core/model_downloader.py for its downloaded model file)."""
+    store.json truncated or corrupted (matches the pattern already used by
+    core/model_downloader.py for its downloaded model file)."""
     import json
     tmp_path = STORE_PATH.with_suffix(".json.tmp")
     tmp_path.write_text(json.dumps(store, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -404,8 +404,8 @@ def web_search():
     query = body.get("query", "").strip()
     if not query:
         return jsonify({"error": "No query provided"}), 400
-        if len(query) > MAX_TOTAL_CONTENT_CHARS:
-            return jsonify({"error": f"Search query is too long (max {MAX_TOTAL_CONTENT_CHARS} characters)"}), 413
+    if len(query) > MAX_TOTAL_CONTENT_CHARS:
+        return jsonify({"error": f"Search query is too long (max {MAX_TOTAL_CONTENT_CHARS} characters)"}), 413
     if not (GOOGLE_API_KEY and GOOGLE_CX):
         return jsonify({"error": "Web search isn't configured on this server. "
                                   "Set GOOGLE_API_KEY and GOOGLE_CX in .env."}), 400
