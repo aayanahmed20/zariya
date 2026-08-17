@@ -22,8 +22,14 @@ def _load_all() -> list[dict]:
 
 
 def _save_all(notes: list[dict]) -> None:
-    with open(NOTES_FILE, "w", encoding="utf-8") as f:
+    """Writes to a temp file in the same directory, then atomically renames it
+    over the real file, so a crash or kill mid-write can never leave
+    notes.json truncated or corrupted (matches the pattern already used by
+    core/model_downloader.py for its downloaded model file)."""
+    tmp_path = NOTES_FILE.with_suffix(".json.tmp")
+    with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(notes, f, ensure_ascii=False, indent=2)
+    tmp_path.replace(NOTES_FILE)
 
 
 class NotesManager:
