@@ -48,7 +48,7 @@ DEBUG_MODE = os.environ.get("FLASK_DEBUG", "0") == "1"
 # sent on most cross-site requests (CSRF mitigation) without breaking normal
 # top-level navigation/links; Secure is only forced when not in local debug
 # mode so plain http://localhost dev still works; a bounded lifetime means a
-# stale session cookie does not stay valid forever.
+# stale session cookie doesn't stay valid forever.
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = not DEBUG_MODE
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 24 * 7  # 7 days
