@@ -39,6 +39,23 @@ function formatInline(s){
   s = s.replace(/\u0000LINK(\d+)\u0000/g, (m, idx)=>{ const l = links[parseInt(idx,10)]; return '<a href="'+escapeHtml(l.url)+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(l.text)+'</a>'; });
   return s;
 }
+function renderSearchResultsHtml(query, results){
+  // Builds real .search-result/.sr-title/.sr-url/.sr-snippet card markup
+  // (see style.css) instead of a markdown-formatted list, so web-search
+  // results actually get the card styling those classes were made for.
+  const heading = formatInline('**Web search results for "'+query+'"**');
+  const cards = results.map(r=>{
+    const title = escapeHtml(r.title || r.link || 'Untitled result');
+    const url = escapeHtml(r.link || '');
+    const snippet = escapeHtml(r.snippet || '');
+    return '<div class="search-result">'
+      + '<a class="sr-title" href="'+url+'" target="_blank" rel="noopener noreferrer">'+title+'</a>'
+      + '<div class="sr-url">'+url+'</div>'
+      + '<div class="sr-snippet">'+snippet+'</div>'
+      + '</div>';
+  }).join('');
+  return heading + cards;
+}
 function renderMarkdown(raw){
   const codeBlockRegex = /```(\w*)\n?([\s\S]*?)```/g;
   let html=''; let lastIndex=0; let m;
@@ -274,7 +291,7 @@ function renderBubble(m, idx, isLast){
       '<div class="msg-actions"><button class="ghost-btn" data-act="edit">Edit</button></div></div>';
     row.querySelector('[data-act="edit"]').addEventListener('click', ()=>{ editingIndex=idx; renderChat(); });
   } else {
-    row.innerHTML = '<img class="avatar-logo" src="/static/logo.png" alt=""><div class="bubble-col assistant-col"><div class="bubble assistant '+urduClass+'">'+renderMarkdown(m.content)+'</div>'+
+    row.innerHTML = '<img class="avatar-logo" src="/static/logo.png" alt=""><div class="bubble-col assistant-col"><div class="bubble assistant '+urduClass+'">'+(m.html || renderMarkdown(m.content))+'</div>'+
       (uiPrefs.showTimestamps ? '<div class="msg-meta">'+(m.ts||'')+'</div>' : '')+
       '<div class="msg-actions"><button class="ghost-btn" data-act="copy">Copy</button><button class="ghost-btn" data-act="speak">Read aloud</button><button class="ghost-btn" data-act="up" title="Good answer">Helpful</button><button class="ghost-btn" data-act="down" title="Not helpful">Not helpful</button>'+
       (isLast?'<button class="ghost-btn" data-act="regen">Regenerate</button>':'')+'</div></div>';
@@ -464,8 +481,16 @@ async function runQuickTool(tool){
     } else if(!res.results || !res.results.length){
       session.messages.push({role:'assistant', content:'No web results came back for that search.', ts:nowISO()});
     } else {
-      const body = res.results.map((r,i)=> (i+1)+'. **['+r.title+']('+r.link+')**\n'+r.link+'\n'+r.snippet).join('\n\n');
-      session.messages.push({role:'assistant', content:'**Web search results for \u201c'+lastUser.content+'\u201d**\n\n'+body, ts:nowISO()});
+            // content stays plain markdown/text (used by Copy/Read-aloud and export);
+      // html holds the rendered .search-result card markup renderBubble()
+      // displays instead, once it's available in a persisted session.
+      const body = res.results.map((r,i)=> (i+1)+'. '+r.title+'\n'+r.link+'\n'+r.snippet).join('\n\n');
+            session.messages.push({
+        role:'assistant',
+        content:'Web search results for "'+lastUser.content+'":\n\n'+body,
+        html: renderSearchResultsHtml(lastUser.content, res.results),
+        ts:nowISO(),
+      });
     }
   } else if(tool==='title'){
     session.title = session.messages[0].content.slice(0,42);
@@ -536,7 +561,7 @@ function renderNotesList(){
   });
   if(!currentNoteId && notes.length) openNote(notes[0].id);
   if(!notes.length){ document.getElementById('note-title-input').value=''; document.getElementById('note-body-input').value=''; }
-}}
+}
   function renderNoteTagFilterRow(){
       const row = document.getElementById('noteTagFilterRow');
       if(!row) return;
