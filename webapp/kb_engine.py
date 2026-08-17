@@ -1,14 +1,22 @@
 """
 Zariya offline knowledge engine.
 
-This is the guaranteed-to-work core: pure Python, no network calls, no API keys.
-It handles arithmetic, unit conversions, a bilingual Urdu/English dictionary, and
-a curated general-knowledge base matched with a lightweight fuzzy scorer.
+This is the guaranteed-to-work core: pure Python, no network calls required,
+no API keys. It handles arithmetic, unit conversions, a bilingual Urdu/English
+dictionary, and a curated general-knowledge base matched with a lightweight
+fuzzy scorer -- all of that stays fully offline and dependency-free.
 
 It is intentionally honest about what it is: a rule-based lookup system, not a
 language model. The Claude API / local model integrations in app.py sit in front
 of this and are tried first when configured; this is the fallback that never
 needs a key, a server, or an internet connection.
+
+Optional semantic layer: if the fast keyword/edit-distance match below draws a
+blank, offline_reply() also tries embeddings.py's cosine-similarity search over
+the same knowledge base (via a local Ollama embedding model). That layer is
+purely additive and never a hard dependency -- see semantic_kb_lookup() below
+for the exact fallback chain and how it degrades to keyword-only behavior when
+Ollama/embeddings aren't available.
 """
 import json
 import math
@@ -16,6 +24,11 @@ import os
 import re
 import time
 from pathlib import Path
+
+try:
+    import embeddings as _kb_embeddings
+except Exception:  # pragma: no cover - embeddings.py only needs stdlib + requests
+    _kb_embeddings = None
 
 DATA_PATH = Path(__file__).parent / "server" / "kb_data.json"
 LEARNED_PATH = Path(__file__).parent / "server" / "learned.json"
@@ -74,7 +87,13 @@ def _load_learned():
     return []
 
 def _save_learned(entries):
-    LEARNED_PATH.write_text(json.dumps(entries, ensure_ascii=False, indent=2), encoding="utf-8")
+    """Writes to a temp file in the same directory, then atomically renames it
+    over the real file, so a crash or kill mid-write can never leave
+    learned.json truncated or corrupted (matches the pattern already used by
+    core/model_downloader.py for its downloaded model file)."""
+    tmp_path = LEARNED_PATH.with_suffix(".json.tmp")
+    tmp_path.write_text(json.dumps(entries, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_path.replace(LEARNED_PATH)
 
 def remember_answer(question: str, answer: str, max_entries: int = 500):
     """Cache a real model answer locally so offline mode can reuse it later.
@@ -229,6 +248,192 @@ def knowledge_base_lookup(text: str):
     return best["a"] if best_score > 0 else None
 
 
+# Lazy singleton: kb-entry-index -> embedding vector, built at most once per
+# process (and cached to disk across processes/restarts by embeddings.py).
+# Left as None until semantic_kb_lookup() is first called, and left as an
+# empty dict (rather than retried every call) if that first attempt found
+# Ollama/embeddings unavailable, so a chat session with no local embedding
+# model pulled doesn't retry a failing network call on every single message.
+_SEMANTIC_KB_VECTORS: "dict[int, list[float]] | None" = None
+SEMANTIC_SIMILARITY_THRESHOLD = 0.6
+
+
+def semantic_kb_lookup(text: str):
+    """Second-pass, embedding-based fallback for knowledge_base_lookup().
+
+    Fallback chain (see offline_reply() below): the fast keyword/edit-distance
+    match in knowledge_base_lookup() is always tried first -- it's free and
+    already good for exact-ish matches -- and this is only reached when that
+    comes back empty. It embeds `text` and every KB entry with a small local
+    embedding model served by Ollama (see embeddings.py), then returns the
+    answer of the closest KB entry by cosine similarity if it clears
+    SEMANTIC_SIMILARITY_THRESHOLD.
+
+    Degrades completely silently to "no match" (returns None) if Ollama isn't
+    running, the embedding model hasn't been pulled, or embeddings.py isn't
+    importable for any reason -- this must never be the thing that makes a
+    chat request fail, since keyword matching (or the local/Claude model, or
+    the final generic reply) already has this message covered either way.
+    """
+    global _SEMANTIC_KB_VECTORS
+    if _kb_embeddings is None:
+        return None
+    try:
+        if _SEMANTIC_KB_VECTORS is None:
+            _SEMANTIC_KB_VECTORS = _kb_embeddings.ensure_kb_embeddings(KB)
+        if not _SEMANTIC_KB_VECTORS:
+            return None
+        query_vec = _kb_embeddings.get_embedding(text)
+        if query_vec is None:
+            return None
+        idx, score = _kb_embeddings.best_match(query_vec, _SEMANTIC_KB_VECTORS)
+        if idx is not None and score >= SEMANTIC_SIMILARITY_THRESHOLD:
+            return KB[idx]["a"]
+    except Exception:
+        pass
+    return None
+
+
+class _ArithmeticError(ValueError):
+    """Raised for any malformed or unsupported arithmetic expression -- caught
+    by try_math() and treated exactly like a failed match, never surfaced."""
+
+
+def _tokenize_arithmetic(expr: str):
+    """Splits a pre-sanitized arithmetic string (digits, '.', '+', '-', '*',
+    '/', '(', ')', whitespace only -- already enforced by try_math's regex
+    filter before this is ever called) into a flat token list."""
+    tokens = []
+    i, n = 0, len(expr)
+    while i < n:
+        c = expr[i]
+        if c.isspace():
+            i += 1
+            continue
+        if c.isdigit() or c == ".":
+            j = i
+            saw_dot = False
+            while j < n and (expr[j].isdigit() or (expr[j] == "." and not saw_dot)):
+                if expr[j] == ".":
+                    saw_dot = True
+                j += 1
+            num_text = expr[i:j]
+            if num_text == "." or not any(ch.isdigit() for ch in num_text):
+                raise _ArithmeticError(f"Invalid number '{num_text}'")
+            tokens.append(("NUM", float(num_text) if saw_dot else int(num_text)))
+            i = j
+        elif c == "*" and i + 1 < n and expr[i + 1] == "*":
+            tokens.append(("POW", "**"))
+            i += 2
+        elif c in "+-*/()":
+            tokens.append((c, c))
+            i += 1
+        else:
+            raise _ArithmeticError(f"Unexpected character '{c}'")
+    return tokens
+
+
+class _ArithmeticParser:
+    """Small hand-rolled recursive-descent parser/evaluator for basic
+    arithmetic (+ - * / ( ) ** and decimals), used in place of eval() so
+    try_math() never runs arbitrary Python on user input. Precedence and
+    associativity match normal arithmetic/Python conventions: unary minus
+    binds looser than '**' on its left (`-2**2 == -4`) but a '**' exponent
+    may itself start with a unary sign (`2**-2 == 0.25`).
+
+        expr   := term (('+' | '-') term)*
+        term   := unary (('*' | '/') unary)*
+        unary  := ('+' | '-')? power
+        power  := primary ('**' unary)?
+        primary:= NUMBER | '(' expr ')'
+    """
+
+    _MAX_EXPONENT = 1000  # guards against a pathological/huge computation, e.g. 9**9**9
+
+    def __init__(self, tokens):
+        self._tokens = tokens
+        self._pos = 0
+
+    def _peek(self):
+        return self._tokens[self._pos] if self._pos < len(self._tokens) else None
+
+    def _advance(self):
+        tok = self._peek()
+        self._pos += 1
+        return tok
+
+    def parse(self):
+        if not self._tokens:
+            raise _ArithmeticError("Empty expression")
+        value = self._expr()
+        if self._pos != len(self._tokens):
+            raise _ArithmeticError("Unexpected trailing tokens")
+        return value
+
+    def _expr(self):
+        value = self._term()
+        while self._peek() and self._peek()[0] in ("+", "-"):
+            op = self._advance()[0]
+            rhs = self._term()
+            value = value + rhs if op == "+" else value - rhs
+        return value
+
+    def _term(self):
+        value = self._unary()
+        while self._peek() and self._peek()[0] in ("*", "/"):
+            op = self._advance()[0]
+            rhs = self._unary()
+            if op == "*":
+                value = value * rhs
+            else:
+                if rhs == 0:
+                    raise _ArithmeticError("Division by zero")
+                value = value / rhs
+        return value
+
+    def _unary(self):
+        if self._peek() and self._peek()[0] in ("+", "-"):
+            op = self._advance()[0]
+            value = self._power()
+            return -value if op == "-" else value
+        return self._power()
+
+    def _power(self):
+        base = self._primary()
+        if self._peek() and self._peek()[0] == "POW":
+            self._advance()
+            exponent = self._unary()
+            if abs(exponent) > self._MAX_EXPONENT:
+                raise _ArithmeticError("Exponent too large")
+            return base ** exponent
+        return base
+
+    def _primary(self):
+        tok = self._peek()
+        if tok is None:
+            raise _ArithmeticError("Unexpected end of expression")
+        if tok[0] == "NUM":
+            self._advance()
+            return tok[1]
+        if tok[0] == "(":
+            self._advance()
+            value = self._expr()
+            closing = self._advance()
+            if not closing or closing[0] != ")":
+                raise _ArithmeticError("Missing closing parenthesis")
+            return value
+        raise _ArithmeticError(f"Unexpected token '{tok[1]}'")
+
+
+def _safe_eval_arithmetic(expr: str):
+    """Evaluates a sanitized arithmetic expression string without eval()/exec()
+    anywhere, using a small recursive-descent parser (+ - * / ( ) ** and
+    decimals). Raises _ArithmeticError (a ValueError subclass) on anything
+    malformed, mirroring the exceptions a bad eval() call used to raise, so
+    callers can keep catching `Exception` the same way as before."""
+    return _ArithmeticParser(_tokenize_arithmetic(expr)).parse()
+
+
 def try_math(text: str):
     m = re.search(r"sqrt\(?\s*(-?\d+(\.\d+)?)\s*\)?", text, re.I)
     if m:
@@ -268,7 +473,7 @@ def try_math(text: str):
         and re.search(r"[+\-*/]", cleaned)
     ):
         try:
-            val = eval(cleaned, {"__builtins__": {}}, {})  # noqa: S307 (sanitized input, digits/operators only)
+                        val = _safe_eval_arithmetic(cleaned)
             if isinstance(val, (int, float)):
                 return f"That comes to **{val}**."
         except Exception:
@@ -553,6 +758,9 @@ def offline_reply(messages: list[dict]) -> str:
     kb_hit = knowledge_base_lookup(last)
     if kb_hit:
         return kb_hit
+    semantic_hit = semantic_kb_lookup(last)
+    if semantic_hit:
+        return semantic_hit
 
     # Time/date intent is checked last, after the knowledge base has had a
     # chance to answer, so a curated fact always takes priority over a guess.
