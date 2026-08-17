@@ -473,7 +473,7 @@ def try_math(text: str):
         and re.search(r"[+\-*/]", cleaned)
     ):
         try:
-                        val = _safe_eval_arithmetic(cleaned)
+            val = _safe_eval_arithmetic(cleaned)
             if isinstance(val, (int, float)):
                 return f"That comes to **{val}**."
         except Exception:
