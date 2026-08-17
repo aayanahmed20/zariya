@@ -481,11 +481,11 @@ async function runQuickTool(tool){
     } else if(!res.results || !res.results.length){
       session.messages.push({role:'assistant', content:'No web results came back for that search.', ts:nowISO()});
     } else {
-            // content stays plain markdown/text (used by Copy/Read-aloud and export);
+      // content stays plain markdown/text (used by Copy/Read-aloud and export);
       // html holds the rendered .search-result card markup renderBubble()
       // displays instead, once it's available in a persisted session.
       const body = res.results.map((r,i)=> (i+1)+'. '+r.title+'\n'+r.link+'\n'+r.snippet).join('\n\n');
-            session.messages.push({
+      session.messages.push({
         role:'assistant',
         content:'Web search results for "'+lastUser.content+'":\n\n'+body,
         html: renderSearchResultsHtml(lastUser.content, res.results),
