@@ -105,15 +105,32 @@ class InferenceEngine:
         prompt += "Zariya:"
         return prompt
 
-    def chat(self, messages: list[dict]) -> str:
+    def chat(
+        self,
+        messages: list[dict],
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+    ) -> str:
+        """Runs a single non-streaming completion. `max_tokens`/`temperature`
+        default to the engine's current settings (`self._max_tokens` /
+        `self._temperature`, kept in sync with the Settings sliders by
+        app/ui.py) so every caller -- Summarize, Key Points, Auto-Title,
+        Flashcard generation, and Notepad's "Improve with AI", not just the
+        streaming chat path -- respects the user's chosen values unless it
+        explicitly asks for something else."""
         if not self._try_load():
             return f"Error: {self._error}"
+
+        if max_tokens is None:
+            max_tokens = self._max_tokens
+        if temperature is None:
+            temperature = self._temperature
 
         try:
             output = self._llm.create_chat_completion(
                 messages=self._build_chat_messages(messages),
-                max_tokens=512,
-                temperature=0.7,
+                max_tokens=max_tokens,
+                temperature=temperature,
                 top_p=0.9,
                 repeat_penalty=1.1,
             )
@@ -125,9 +142,9 @@ class InferenceEngine:
         try:
             output = self._llm(
                 prompt,
-                max_tokens=512,
+                max_tokens=max_tokens,
                 stop=["User:", "\nUser", "Human:"],
-                temperature=0.7,
+                temperature=temperature,
                 top_p=0.9,
                 repeat_penalty=1.1,
                 echo=False,
