@@ -22,6 +22,7 @@ If you're only going to run one, use the web app - see [`webapp/README.md`](weba
 - Local inference - no data leaves your machine unless you turn on an optional cloud feature yourself
 - Streaming, token-by-token responses in the web app
 - A small offline knowledge engine as a safety net when no model is loaded yet
+- Semantic fallback search over the knowledge base: when the fast keyword matcher comes up empty, the web app can optionally use a local Ollama embedding model to find the closest entry by meaning, not just shared words - and degrades silently back to keyword-only if Ollama or the embedding model isn't available
 
 ## Tech stack
 
@@ -40,12 +41,23 @@ If you're only going to run one, use the web app - see [`webapp/README.md`](weba
 - `requirements.txt` - dependencies for the Streamlit app
 - `requirements-dev.txt` - adds pytest, for running `tests/`
 
-## Status & limitations
+## Setup
 
-Actively working on this. The offline knowledge engine covers everyday conversation, a general vocabulary bank, and a growing set of Pakistan-specific civic, financial, and cultural terms (CNIC/NADRA, mobile wallets, utilities, Ramadan-related terms, and similar), but it's still a fixed lookup table, not a language model - ask it something outside that set and it says so rather than guessing. The local model path is only as good as whatever you point it at - a 1.5B model on a laptop CPU won't compete with a hosted large model, and I'd rather say that upfront than pretend otherwise.
+Run the web app - see [`webapp/README.md`](webapp/README.md) for full setup (Ollama install, `.env` config, optional Claude/search/GitHub sign-in).
+
+To run the original Streamlit app instead: `pip install -r requirements.txt && streamlit run run.py`, then place a GGUF model in `models/` per `models/PLACE_MODEL_HERE.txt`.
+
+## Status
+
+Actively working on this. The offline knowledge engine covers everyday conversation, a general vocabulary bank, and a growing set of Pakistan-specific civic, financial, and cultural terms (CNIC/NADRA, mobile wallets, utilities, Ramadan-related terms, and similar), but it's still primarily a fixed lookup table, not a language model - ask it something outside that set (and outside what semantic search can match) and it says so rather than guessing. The local model path is only as good as whatever you point it at - a 1.5B model on a laptop CPU won't compete with a hosted large model, and I'd rather say that upfront than pretend otherwise.
 
 ## Tests
 
 - `tests/` - covers the Streamlit app's core logic (`core/`): session memory, notes, flashcard generation/parsing, TTS markdown stripping, model downloads, and inference (chat + streaming, including the chat-template-unsupported fallback path). Run with `pip install -r requirements-dev.txt && pytest tests/`.
 - `webapp/test_kb_engine.py` - runs 570 varied prompts through the offline knowledge engine and checks for crashes or regressions. Run with `python webapp/test_kb_engine.py` (standard library only, no install needed).
 - `webapp/test_local_model.py` - covers the Ollama integration: model-tag matching, and reply generation/streaming. Run with `pytest webapp/test_local_model.py`.
+- `webapp/test_embeddings.py` - covers the semantic KB search fallback: embedding parsing, cosine similarity, caching, and the two required fallback behaviors (keyword-empty triggers semantic search; embeddings unavailable falls back silently to keyword-only). Run with `pytest webapp/test_embeddings.py`.
+
+## License
+
+MIT - see [LICENSE](LICENSE).
