@@ -24,6 +24,7 @@ import secrets
 import time
 import json
 from pathlib import Path
+from urllib.parse import urlencode
 
 import requests
 from dotenv import load_dotenv
@@ -36,6 +37,21 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
+
+# Debug mode is opt-in only (never on by default) since Flask's debugger
+# exposes an interactive Python console / arbitrary code execution to anyone
+# who can trigger an unhandled exception -- fine for local development,
+# dangerous left on for anything reachable over a network.
+DEBUG_MODE = os.environ.get("FLASK_DEBUG", "0") == "1"
+
+# Basic session-cookie hardening: SameSite=Lax blocks the cookie from being
+# sent on most cross-site requests (CSRF mitigation) without breaking normal
+# top-level navigation/links; Secure is only forced when not in local debug
+# mode so plain http://localhost dev still works; a bounded lifetime means a
+# stale session cookie does not stay valid forever.
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = not DEBUG_MODE
+app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 24 * 7  # 7 days
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
@@ -66,8 +82,14 @@ def _load_store():
     return {"users": {}}
 
 def _save_store(store):
+        """Writes to a temp file in the same directory, then atomically renames it
+    over the real file, so a crash or kill mid-write can never leave
+        store.json truncated or corrupted (matches the pattern already used by
+        core/model_downloader.py for its downloaded model file)."""
     import json
-    STORE_PATH.write_text(json.dumps(store, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_path = STORE_PATH.with_suffix(".json.tmp")
+    tmp_path.write_text(json.dumps(store, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_path.replace(STORE_PATH)
 
 def _current_user_key():
     return session.get("github_login", "anonymous")
@@ -82,22 +104,37 @@ def _user_bucket(store):
 # route with an unhandled 500. A misbehaving or future frontend change should
 # get a clear 400 error back, not a blank server error page.
 # ---------------------------------------------------------------------------
+# Basic request-size guards, consistent with the systemPrompt cap below: an
+# unbounded messages array or unbounded combined content length is an easy way
+# for a misbehaving client (or a deliberately abusive one) to force huge
+# memory/CPU use or huge outbound payloads to Claude/Ollama on every request.
+MAX_MESSAGES = 200
+MAX_TOTAL_CONTENT_CHARS = 200_000
+
 def _normalize_messages(raw):
     """Validates the 'messages' list coming from the client.
-    Returns (messages, error) where error is None on success, or a short
-    user-facing string describing what's wrong."""
+    Returns (messages, error, status) where error is None on success, or a
+    short user-facing string describing what's wrong, paired with the HTTP
+    status code that best fits it (400 for malformed input, 413 for a
+    payload that's simply too large)."""
     if not isinstance(raw, list) or not raw:
-        return None, "No messages provided"
+        return None, "No messages provided", 400
+    if len(raw) > MAX_MESSAGES:
+        return None, f"Too many messages (max {MAX_MESSAGES})", 413
     cleaned = []
+    total_chars = 0
     for m in raw:
         if not isinstance(m, dict):
-            return None, "Each message must be an object with 'role' and 'content'"
+            return None, "Each message must be an object with 'role' and 'content'", 400
         role = m.get("role")
         content = m.get("content")
         if role not in ("user", "assistant", "system") or not isinstance(content, str):
-            return None, "Each message needs a valid 'role' (user/assistant/system) and a string 'content'"
+            return None, "Each message needs a valid 'role' (user/assistant/system) and a string 'content'", 400
+        total_chars += len(content)
+        if total_chars > MAX_TOTAL_CONTENT_CHARS:
+            return None, f"Combined message content is too long (max {MAX_TOTAL_CONTENT_CHARS} characters)", 413
         cleaned.append({"role": role, "content": content})
-    return cleaned, None
+    return cleaned, None, None
 
 def _generation_params(body):
     """Optional per-request generation overrides from the client: a custom
@@ -143,28 +180,39 @@ def github_callback():
     if not code:
         return jsonify({"error": "GitHub didn't return an authorization code."}), 400
 
-    token_res = requests.post(
-        "https://github.com/login/oauth/access_token",
-        headers={"Accept": "application/json"},
-        data={
-            "client_id": GITHUB_CLIENT_ID,
-            "client_secret": GITHUB_CLIENT_SECRET,  # server-side only, never sent to the browser
-            "code": code,
-            "redirect_uri": f"{APP_BASE_URL}/auth/github/callback",
-        },
-        timeout=10,
-    )
-    token_data = token_res.json()
+    try:
+        token_res = requests.post(
+            "https://github.com/login/oauth/access_token",
+            headers={"Accept": "application/json"},
+            data={
+                "client_id": GITHUB_CLIENT_ID,
+                "client_secret": GITHUB_CLIENT_SECRET,  # server-side only, never sent to the browser
+                "code": code,
+                "redirect_uri": f"{APP_BASE_URL}/auth/github/callback",
+            },
+            timeout=10,
+        )
+        token_res.raise_for_status()
+        token_data = token_res.json()
+    except Exception as e:
+        app.logger.warning("GitHub token exchange failed: %s", e)
+        return redirect("/?" + urlencode({"authError": "GitHub sign-in failed while exchanging the authorization code. Please try again."}))
+
     access_token = token_data.get("access_token")
     if not access_token:
-        return jsonify({"error": "GitHub token exchange failed", "details": token_data}), 400
+        return redirect("/?" + urlencode({"authError": "GitHub sign-in failed -- no access token was returned."}))
 
-    user_res = requests.get(
-        "https://api.github.com/user",
-        headers={"Authorization": f"Bearer {access_token}", "Accept": "application/vnd.github+json"},
-        timeout=10,
-    )
-    profile = user_res.json()
+    try:
+        user_res = requests.get(
+            "https://api.github.com/user",
+            headers={"Authorization": f"Bearer {access_token}", "Accept": "application/vnd.github+json"},
+            timeout=10,
+        )
+        user_res.raise_for_status()
+        profile = user_res.json()
+    except Exception as e:
+        app.logger.warning("GitHub profile fetch failed: %s", e)
+        return redirect("/?" + urlencode({"authError": "GitHub sign-in failed while fetching your profile. Please try again."}))
 
     session["github_login"] = profile.get("login")
     session["github_name"] = profile.get("name") or profile.get("login")
@@ -198,9 +246,9 @@ def me():
 @app.route("/api/chat", methods=["POST"])
 def chat():
     body = request.get_json(silent=True) or {}
-    messages, err = _normalize_messages(body.get("messages"))
+    messages, err, err_status = _normalize_messages(body.get("messages"))
     if err:
-        return jsonify({"error": err}), 400
+        return jsonify({"error": err}), err_status
     system_prompt, temperature = _generation_params(body)
 
     used_real_model = False
@@ -268,9 +316,9 @@ def chat_stream():
     replies are sent as a single event -- only the local model path streams
     incrementally."""
     body = request.get_json(silent=True) or {}
-    messages, err = _normalize_messages(body.get("messages"))
+    messages, err, err_status = _normalize_messages(body.get("messages"))
     if err:
-        return jsonify({"error": err}), 400
+        return jsonify({"error": err}), err_status
     system_prompt, temperature = _generation_params(body)
 
     def generate():
@@ -356,6 +404,8 @@ def web_search():
     query = body.get("query", "").strip()
     if not query:
         return jsonify({"error": "No query provided"}), 400
+        if len(query) > MAX_TOTAL_CONTENT_CHARS:
+            return jsonify({"error": f"Search query is too long (max {MAX_TOTAL_CONTENT_CHARS} characters)"}), 413
     if not (GOOGLE_API_KEY and GOOGLE_CX):
         return jsonify({"error": "Web search isn't configured on this server. "
                                   "Set GOOGLE_API_KEY and GOOGLE_CX in .env."}), 400
@@ -383,8 +433,14 @@ def web_search():
 @app.route("/api/state", methods=["GET"])
 def get_state():
     store = _load_store()
+    key = _current_user_key()
+    is_new_user = key not in store["users"]
     bucket = _user_bucket(store)
-    _save_store(store)
+    # Only persist when a brand-new user bucket was actually just created --
+    # this route runs on every page load/poll, so writing the file on every
+    # GET (even when nothing changed) would mean constant, pointless disk I/O.
+    if is_new_user:
+        _save_store(store)
     return jsonify(bucket)
 
 @app.route("/api/state", methods=["POST"])
@@ -404,9 +460,9 @@ def save_state():
 def run_tool(name):
     body = request.get_json(silent=True) or {}
     raw_messages = body.get("messages", [])
-    messages, err = _normalize_messages(raw_messages) if raw_messages else ([], None)
+    messages, err, err_status = _normalize_messages(raw_messages) if raw_messages else ([], None, None)
     if err:
-        return jsonify({"error": err}), 400
+        return jsonify({"error": err}), err_status
     if name == "summarize":
         return jsonify({"result": kb_engine.summarize_messages(messages)})
     if name == "keypoints":
@@ -470,4 +526,4 @@ def index():
 
 if __name__ == "__main__":
     DATA_DIR.mkdir(exist_ok=True)
-    app.run(debug=True, port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=DEBUG_MODE, port=int(os.environ.get("PORT", 5000)))
