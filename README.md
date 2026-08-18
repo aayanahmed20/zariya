@@ -1,6 +1,8 @@
 # Zariya
 
-**Python** · **Flask + Streamlit** · **MIT License**
+![Python](https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![Streamlit](https://img.shields.io/badge/streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
 
 Zariya is an offline-first AI assistant for Urdu and other low-resource languages. Once a model is downloaded, it runs entirely on your own device, so it works without an internet connection and doesn't depend on any cloud API to hold a conversation.
 
