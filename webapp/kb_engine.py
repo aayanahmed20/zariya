@@ -435,7 +435,7 @@ def _safe_eval_arithmetic(expr: str):
 
 
 def try_math(text: str):
-    m = re.search(r"sqrt\(?\s*(-?\d+(\.\d+)?)\s*\)?", text, re.I)
+    m = re.search(r"(?:sqrt|square\s+root)\s*(?:of\s*)?\(?\s*(-?\d+(\.\d+)?)\s*\)?", text, re.I)
     if m:
         n = float(m.group(1))
         if n >= 0:
